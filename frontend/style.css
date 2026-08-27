@@ -1,0 +1,765 @@
+/* Accessibility Assistant — frontend stylesheet
+ * Visual design: gentle gradients, soft shadows, rounded geometry.
+ * Inspired by Linear / Notion / Vercel design language. */
+:root {
+  --navy: #1F3864;
+  --navy-deep: #152A4D;
+  --blue: #2E75B6;
+  --blue-light: #E8F0F9;
+  --orange: #ED7D31;
+  --red: #D32F2F;
+  --yellow: #F9A825;
+  --green: #43A047;
+  --light: #F2F2F2;
+  --grey: #595959;
+  --grey-soft: #8B96A8;
+  --border: #E5E9F2;
+  --bg: #f4f6fb;
+  --bg-card: #FFFFFF;
+  --shadow-sm: 0 1px 3px rgba(31,56,100,0.06), 0 1px 2px rgba(31,56,100,0.04);
+  --shadow-md: 0 4px 12px rgba(31,56,100,0.08), 0 2px 4px rgba(31,56,100,0.04);
+  --shadow-lg: 0 12px 32px rgba(31,56,100,0.12), 0 4px 8px rgba(31,56,100,0.06);
+  --r-sm: 8px;
+  --r-md: 12px;
+  --r-lg: 16px;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, "Inter", "Segoe UI", system-ui, sans-serif;
+  background: var(--bg);
+  background-image:
+    radial-gradient(circle at 0% 0%, rgba(46, 117, 182, 0.06) 0px, transparent 50%),
+    radial-gradient(circle at 100% 0%, rgba(237, 125, 49, 0.04) 0px, transparent 50%);
+  background-attachment: fixed;
+  color: #1a1a1a;
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+header {
+  background: linear-gradient(135deg, var(--navy-deep) 0%, var(--navy) 60%, #2c4a7a 100%);
+  color: white;
+  padding: 20px 32px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 16px;
+  box-shadow: var(--shadow-md);
+}
+
+header h1 {
+  margin: 0;
+  font-size: 24px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+header .tagline { margin: 3px 0 0 0; color: #c5d2e8; font-size: 13px; font-weight: 400; }
+
+nav { display: flex; gap: 6px; }
+.tab {
+  background: rgba(255,255,255,0.08);
+  color: rgba(255,255,255,0.85);
+  border: 1px solid rgba(255,255,255,0.12);
+  padding: 9px 18px;
+  border-radius: var(--r-sm);
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 600;
+  transition: all 0.18s ease;
+  font-family: inherit;
+}
+.tab:hover {
+  background: rgba(255,255,255,0.16);
+  color: white;
+  transform: translateY(-1px);
+}
+.tab.active {
+  background: var(--blue);
+  border-color: var(--blue);
+  color: white;
+  box-shadow: 0 2px 8px rgba(46,117,182,0.4);
+}
+
+main {
+  max-width: 1180px;
+  margin: 28px auto;
+  padding: 0 20px;
+}
+
+.page { display: none; }
+.page.active { display: block; animation: fadeIn 0.3s ease; }
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.card {
+  background: var(--bg-card);
+  border-radius: var(--r-md);
+  padding: 22px 24px;
+  margin-bottom: 16px;
+  box-shadow: var(--shadow-sm);
+  border: 1px solid var(--border);
+  transition: box-shadow 0.18s ease;
+}
+.card:hover { box-shadow: var(--shadow-md); }
+.card.hero {
+  background: linear-gradient(135deg, #fff 0%, #fff8f1 100%);
+  border-left: 4px solid var(--orange);
+  border-top: 1px solid var(--border);
+  border-right: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+}
+
+h2 {
+  margin: 0 0 6px 0;
+  color: var(--navy);
+  font-weight: 700;
+  font-size: 20px;
+  letter-spacing: -0.01em;
+}
+h3 {
+  margin: 0 0 14px 0;
+  color: var(--navy);
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.controls {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 16px 0 8px 0;
+  flex-wrap: wrap;
+}
+
+button {
+  font-size: 14px;
+  padding: 10px 18px;
+  border-radius: var(--r-sm);
+  border: none;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.15s ease;
+  font-family: inherit;
+  letter-spacing: 0.01em;
+}
+button:disabled { opacity: 0.4; cursor: not-allowed; }
+button:not(:disabled):hover { transform: translateY(-1px); }
+button:not(:disabled):active { transform: translateY(0); }
+
+.primary {
+  background: var(--blue);
+  color: white;
+  box-shadow: 0 2px 6px rgba(46,117,182,0.25);
+}
+.primary:not(:disabled):hover {
+  background: var(--navy);
+  box-shadow: 0 4px 12px rgba(31,56,100,0.3);
+}
+.danger {
+  background: var(--red);
+  color: white;
+  box-shadow: 0 2px 6px rgba(211,47,47,0.25);
+}
+.danger:not(:disabled):hover { background: #b71c1c; }
+.secondary {
+  background: var(--light);
+  color: var(--navy);
+  border: 1px solid var(--border);
+}
+.secondary:not(:disabled):hover { background: #e6eaf2; }
+.ghost {
+  background: transparent;
+  color: var(--grey);
+  padding: 8px 12px;
+}
+.ghost:not(:disabled):hover { background: var(--light); color: var(--navy); }
+
+.hidden { display: none !important; }
+
+.status {
+  font-family: ui-monospace, "SF Mono", Monaco, monospace;
+  color: var(--grey);
+  font-size: 13px;
+  padding: 6px 12px;
+  background: var(--light);
+  border-radius: var(--r-sm);
+  border: 1px solid var(--border);
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+@media (max-width: 720px) {
+  .grid { grid-template-columns: 1fr; }
+  header { padding: 14px 18px; }
+  main { padding: 0 12px; }
+  .card { padding: 16px; }
+}
+
+.event-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  max-height: 320px;
+  overflow-y: auto;
+}
+.event-list:empty::before {
+  content: "Nothing yet — waiting for events…";
+  display: block;
+  color: var(--grey-soft);
+  font-style: italic;
+  padding: 16px 0;
+  font-size: 13px;
+}
+.event-list li {
+  padding: 11px 14px;
+  border-radius: var(--r-sm);
+  margin-bottom: 6px;
+  background: var(--light);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  font-size: 14px;
+  transition: transform 0.15s ease;
+  animation: slideIn 0.25s ease;
+}
+.event-list li:hover { transform: translateX(2px); }
+@keyframes slideIn {
+  from { opacity: 0; transform: translateX(-8px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+.event-list li.critical {
+  background: linear-gradient(90deg, #ffebee 0%, #fff5f6 100%);
+  border-left: 4px solid var(--red);
+  font-weight: 600;
+}
+.event-list li.important {
+  background: linear-gradient(90deg, #fff3e0 0%, #fffaf5 100%);
+  border-left: 4px solid var(--orange);
+}
+.event-list li.inform {
+  background: linear-gradient(90deg, #fffde7 0%, #fffef5 100%);
+  border-left: 4px solid var(--yellow);
+}
+.event-list li.ambient {
+  background: linear-gradient(90deg, #e8f5e9 0%, #f5fbf6 100%);
+  border-left: 4px solid var(--green);
+}
+.event-list li small {
+  color: var(--grey-soft);
+  font-size: 11px;
+  font-family: ui-monospace, "SF Mono", Monaco, monospace;
+  font-weight: 500;
+}
+
+/* Custom scrollbar for event lists + captions */
+.event-list::-webkit-scrollbar,
+#captions::-webkit-scrollbar,
+.transcript::-webkit-scrollbar {
+  width: 8px;
+}
+.event-list::-webkit-scrollbar-track,
+#captions::-webkit-scrollbar-track,
+.transcript::-webkit-scrollbar-track {
+  background: transparent;
+}
+.event-list::-webkit-scrollbar-thumb,
+#captions::-webkit-scrollbar-thumb,
+.transcript::-webkit-scrollbar-thumb {
+  background: #ccd6e8;
+  border-radius: 4px;
+}
+.event-list::-webkit-scrollbar-thumb:hover,
+#captions::-webkit-scrollbar-thumb:hover,
+.transcript::-webkit-scrollbar-thumb:hover {
+  background: var(--grey-soft);
+}
+
+#captions {
+  background: linear-gradient(180deg, #fafbfd 0%, #f4f7fb 100%);
+  border: 1px solid var(--border);
+  border-radius: var(--r-sm);
+  padding: 16px;
+  font-size: 15px;
+  line-height: 1.55;
+  min-height: 80px;
+  max-height: 320px;
+  overflow-y: auto;
+}
+#captions:empty::before {
+  content: "Speech captions will appear here when someone speaks…";
+  color: var(--grey-soft);
+  font-style: italic;
+  font-size: 13px;
+}
+#captions p {
+  margin: 0 0 12px 0;
+  padding: 8px 10px;
+  background: white;
+  border-radius: 6px;
+  border-left: 3px solid var(--blue);
+  box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+}
+#captions p:last-child { margin-bottom: 0; }
+#captions .speaker { color: var(--blue); font-weight: 600; }
+
+.scene {
+  background: linear-gradient(135deg, #f5f8ff 0%, #eaf1fb 100%);
+  padding: 14px 16px;
+  border-radius: var(--r-sm);
+  font-style: italic;
+  color: #2c3e5b;
+  min-height: 50px;
+  font-size: 14px;
+  line-height: 1.55;
+  border: 1px solid #e0e7f3;
+}
+.scene:empty::before {
+  content: "Scene description will appear here…";
+  color: var(--grey-soft);
+  font-style: italic;
+  font-size: 13px;
+}
+
+.stats {
+  display: flex;
+  gap: 28px;
+  font-size: 13px;
+  color: var(--grey);
+  flex-wrap: wrap;
+  padding: 14px 22px;
+}
+.stats span {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.stats strong {
+  color: var(--navy);
+  font-size: 22px;
+  font-weight: 700;
+  font-family: ui-monospace, "SF Mono", Monaco, monospace;
+}
+
+.muted { color: var(--grey); }
+.small { font-size: 13px; }
+
+label {
+  display: block;
+  margin: 14px 0 6px 0;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--navy);
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+input[type="text"], select {
+  padding: 11px 14px;
+  border-radius: var(--r-sm);
+  border: 1.5px solid var(--border);
+  font-size: 14px;
+  font-family: inherit;
+  width: 100%;
+  max-width: 360px;
+  transition: border-color 0.15s, box-shadow 0.15s;
+  background: white;
+}
+input[type="text"]:focus, select:focus {
+  outline: none;
+  border-color: var(--blue);
+  box-shadow: 0 0 0 3px rgba(46,117,182,0.15);
+}
+
+.summary {
+  background: linear-gradient(135deg, #f5f8ff 0%, #e8eef7 100%);
+  padding: 20px 22px;
+  border-radius: var(--r-md);
+  margin-top: 12px;
+  font-size: 17px;
+  line-height: 1.6;
+  border-left: 4px solid var(--blue);
+  white-space: pre-wrap;
+  min-height: 50px;
+  font-weight: 500;
+  color: #1c2e4a;
+  box-shadow: 0 1px 4px rgba(31,56,100,0.04);
+}
+.summary:empty::before {
+  content: "—";
+  color: var(--grey-soft);
+}
+
+#webcam-preview {
+  width: 240px;
+  border-radius: var(--r-md);
+  position: fixed;
+  bottom: 20px;
+  left: 20px;
+  border: 3px solid white;
+  background: black;
+  z-index: 10;
+  box-shadow: var(--shadow-lg);
+  transition: transform 0.2s ease;
+}
+#webcam-preview:hover { transform: scale(1.05); }
+
+/* ─── Hazard radar / compass / emotion / sign panels ─── */
+
+.radar {
+  display: block;
+  margin: 10px auto;
+  background: radial-gradient(circle at center, #fff 0%, #f0f4fa 60%, #dde6f3 100%);
+  border-radius: 50%;
+  border: 2px solid var(--border);
+  box-shadow: inset 0 2px 8px rgba(31,56,100,0.05);
+  max-width: 100%;
+}
+
+.compass-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 18px 0;
+}
+.compass-pointer {
+  font-size: 72px;
+  transition: transform 0.4s ease;
+  user-select: none;
+  margin-bottom: 12px;
+  filter: drop-shadow(0 4px 12px rgba(31,56,100,0.15));
+}
+
+.emotion-display {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  padding: 12px 0;
+}
+.emo-emoji {
+  font-size: 72px;
+  line-height: 1;
+  filter: drop-shadow(0 4px 12px rgba(31,56,100,0.15));
+}
+.emo-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.emo-meta strong {
+  font-size: 20px;
+  color: var(--navy);
+  text-transform: capitalize;
+}
+.emo-meta small { font-size: 12px; }
+
+/* ─── SIGN LANGUAGE PANEL — special treatment ─── */
+
+#sign-gloss {
+  font-family: ui-monospace, "SF Mono", Monaco, monospace;
+  background: linear-gradient(90deg, #faf3e6 0%, #fef9ed 100%);
+  border-left: 3px solid var(--orange);
+  margin-top: 12px;
+  padding: 12px 16px;
+  border-radius: var(--r-sm);
+  font-size: 13px;
+  color: #5a4a2a;
+}
+#sign-gloss:empty { display: none; }
+
+#sign-spoken {
+  margin-top: 10px;
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--navy);
+  background: linear-gradient(135deg, #e3f2fd 0%, #f0f8ff 100%);
+  padding: 18px 20px;
+  border-radius: var(--r-md);
+  border-left: 5px solid var(--blue);
+  line-height: 1.4;
+  min-height: 30px;
+  letter-spacing: -0.01em;
+  box-shadow: 0 2px 8px rgba(46,117,182,0.08);
+  animation: signGlow 0.4s ease;
+}
+#sign-spoken:empty::before {
+  content: "Your translated message will appear here…";
+  color: var(--grey-soft);
+  font-style: italic;
+  font-size: 14px;
+  font-weight: 400;
+}
+@keyframes signGlow {
+  from {
+    background: linear-gradient(135deg, #fff3d6 0%, #fff8e1 100%);
+    transform: scale(1.01);
+  }
+  to {
+    background: linear-gradient(135deg, #e3f2fd 0%, #f0f8ff 100%);
+    transform: scale(1);
+  }
+}
+
+/* Sign vocabulary details */
+details summary {
+  cursor: pointer;
+  padding: 6px 0;
+  font-weight: 600;
+  color: var(--navy);
+  user-select: none;
+  transition: color 0.15s;
+}
+details summary:hover { color: var(--blue); }
+details[open] summary { margin-bottom: 8px; }
+
+/* ─── Session report (shown after Stop) ─── */
+
+.session-report {
+  border-left: 5px solid var(--green);
+  margin-top: 24px;
+}
+.session-report h3 {
+  margin-top: 20px;
+  color: var(--navy);
+}
+.session-report .transcript {
+  background: #fbfbfd;
+  padding: 16px;
+  border-radius: 6px;
+  font-family: ui-monospace, "SF Mono", monospace;
+  font-size: 13px;
+  line-height: 1.6;
+  white-space: pre-wrap;
+  max-height: 320px;
+  overflow-y: auto;
+  border-left: 3px solid var(--blue);
+  color: #1a1a1a;
+}
+.caption-time {
+  color: var(--grey);
+  font-family: ui-monospace, monospace;
+  font-size: 11px;
+  margin-right: 4px;
+}
+
+footer {
+  text-align: center;
+  color: var(--grey);
+  padding: 24px;
+  font-size: 13px;
+}
+
+/* TTS health warning — shows when ElevenLabs isn't configured */
+.tts-warning {
+  background: linear-gradient(90deg, #fff8e1 0%, #fff3d6 100%);
+  color: #5d4a1a;
+  padding: 12px 24px;
+  font-size: 13px;
+  border-bottom: 1px solid #f0d97a;
+  border-top: 1px solid #f5e2a0;
+}
+.tts-warning code {
+  background: rgba(0,0,0,0.06);
+  padding: 1px 6px;
+  border-radius: 3px;
+  font-family: ui-monospace, "SF Mono", Monaco, monospace;
+  font-size: 12px;
+}
+
+/* Real-time sign-language badge — overlays the webcam preview */
+.sign-live-badge {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  background: rgba(31, 56, 100, 0.92);
+  color: #fff;
+  padding: 14px 20px;
+  border-radius: 999px;
+  font-size: 16px;
+  font-weight: 600;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
+  z-index: 1000;
+  animation: signPulse 0.3s ease-out;
+  max-width: 60%;
+  pointer-events: none;
+}
+.sign-live-badge.hidden { display: none; }
+.sign-live-badge .sign-conf {
+  font-size: 12px;
+  opacity: 0.85;
+  margin-left: 8px;
+}
+@keyframes signPulse {
+  0%   { transform: scale(0.7); opacity: 0; }
+  50%  { transform: scale(1.05); }
+  100% { transform: scale(1.00); opacity: 1; }
+}
+
+/* ─── Critical-event haptic flash overlay ────────────────────────────
+   Triggered by app.js triggerCriticalAlert() — adds .critical-flash to
+   <body> for ~250ms. The ::before paints a translucent red over the
+   whole viewport so the UI stays visible underneath. */
+body.critical-flash::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background: rgba(220, 38, 38, 0.34);
+  pointer-events: none;
+  z-index: 9999;
+  /* Pulse ~8 times over ~4s so an emergency is sustained and unmissable. */
+  animation: criticalFlashPulse 0.5s ease-in-out 8;
+}
+@keyframes criticalFlashPulse {
+  0%, 100% { opacity: 0; }
+  50%      { opacity: 1; }
+}
+/* Also pulse a thick red border for extra peripheral salience. */
+body.critical-flash::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  border: 12px solid rgba(220, 38, 38, 0.9);
+  pointer-events: none;
+  z-index: 10000;
+  animation: criticalFlashPulse 0.5s ease-in-out 8;
+}
+
+/* Header toggle — sits alongside <nav> */
+.header-settings {
+  display: flex;
+  align-items: center;
+  margin-left: auto;
+  padding-left: 1rem;
+}
+.alerts-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.85rem;
+  padding: 0.35rem 0.7rem;
+  border: 1px solid var(--border, #d0d6e0);
+  border-radius: 999px;
+  background: var(--grey-soft, #f4f6fa);
+  cursor: pointer;
+  user-select: none;
+  white-space: nowrap;
+  transition: background 0.15s ease, border-color 0.15s ease;
+}
+.alerts-toggle:hover {
+  background: #e9edf4;
+  border-color: #b4bdcc;
+}
+.alerts-toggle input[type="checkbox"] {
+  accent-color: #dc2626;
+  margin: 0;
+}
+
+/* ─── Speaker-name prompt — inline banner above Captions ─────────────
+   Shown when the diarizer surfaces a new SPEAKER_XX id. Once the user
+   types a friendly name and saves, the prompt disappears and every
+   subsequent caption uses that name. */
+.speaker-prompt {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.55rem 0.75rem;
+  margin: 0.5rem 0;
+  background: #fff7ed;
+  border: 1px solid #fdba74;
+  border-radius: 6px;
+  font-size: 0.85rem;
+}
+.speaker-prompt span { flex: 0 0 auto; color: #7c2d12; }
+.speaker-prompt input {
+  flex: 1 1 auto;
+  padding: 0.3rem 0.5rem;
+  border: 1px solid #fdba74;
+  border-radius: 4px;
+  font-size: 0.9rem;
+  min-width: 100px;
+}
+.speaker-prompt button.primary {
+  padding: 0.3rem 0.7rem;
+  font-size: 0.85rem;
+}
+.speaker-prompt button.ghost.dismiss {
+  background: none;
+  border: none;
+  font-size: 1.1rem;
+  color: #7c2d12;
+  cursor: pointer;
+  padding: 0 0.3rem;
+}
+
+/* ─── Feedback ✓/✗ buttons on personal-sound matches ─────────────────
+   Each personal-sound row carries a match_id; clicking ✓/✗ tells the
+   backend to fold the audio sample into the running embedding mean
+   (positive) or bump the per-sound threshold (negative). */
+.feedback-buttons {
+  display: inline-flex;
+  gap: 0.2rem;
+  margin: 0 0.4rem 0 0.2rem;
+}
+.feedback-buttons button {
+  border: 1px solid var(--border, #d0d6e0);
+  background: white;
+  border-radius: 4px;
+  width: 22px; height: 22px;
+  font-size: 0.8rem;
+  cursor: pointer;
+  padding: 0;
+  line-height: 1;
+}
+.feedback-buttons .feedback-yes:hover { background: #d1fae5; border-color: #34d399; }
+.feedback-buttons .feedback-no:hover  { background: #fee2e2; border-color: #f87171; }
+.feedback-buttons button:disabled { opacity: 0.5; cursor: not-allowed; }
+
+/* ─── Name & Keyword Alerts panel (replaced 3D Sound Direction) ─────── */
+.name-alert-config {
+  margin: 0.4rem 0 0.6rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid var(--border, #e5e7eb);
+}
+.name-alert-config label.small {
+  display: block;
+  margin: 0.35rem 0 0.15rem;
+  font-size: 0.78rem;
+  color: var(--grey, #64748b);
+}
+.name-alert-config .controls {
+  display: flex;
+  gap: 0.4rem;
+  margin: 0;
+}
+.name-alert-config input {
+  flex: 1 1 auto;
+  padding: 0.3rem 0.5rem;
+  border: 1px solid var(--border, #cbd5e1);
+  border-radius: 4px;
+  font-size: 0.85rem;
+  min-width: 0;
+}
+#name-alerts li.critical span { color: #b91c1c; font-weight: 700; }
+
+/* ─── Streaming / partial captions ──────────────────────────────────
+   The interim caption is the live, not-yet-final transcription; it shows
+   greyed and italic, then is replaced by the solid final caption. */
+.caption-interim {
+  color: var(--grey, #64748b);
+  opacity: 0.9;
+  margin: 0 0 0.35rem 0;
+}
+.caption-interim em { font-style: italic; }

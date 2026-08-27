@@ -1,0 +1,508 @@
+{
+  "n_glosses": 100,
+  "min_instances": 5,
+  "vocab": [
+    "book",
+    "drink",
+    "computer",
+    "before",
+    "chair",
+    "go",
+    "clothes",
+    "who",
+    "candy",
+    "cousin",
+    "deaf",
+    "fine",
+    "help",
+    "no",
+    "thin",
+    "walk",
+    "year",
+    "yes",
+    "all",
+    "black",
+    "cool",
+    "finish",
+    "hot",
+    "like",
+    "many",
+    "mother",
+    "now",
+    "orange",
+    "table",
+    "thanksgiving",
+    "what",
+    "woman",
+    "bed",
+    "blue",
+    "bowling",
+    "can",
+    "dog",
+    "family",
+    "fish",
+    "graduate",
+    "hat",
+    "hearing",
+    "kiss",
+    "language",
+    "later",
+    "man",
+    "shirt",
+    "study",
+    "tall",
+    "white",
+    "wrong",
+    "accident",
+    "apple",
+    "bird",
+    "change",
+    "color",
+    "corn",
+    "cow",
+    "dance",
+    "dark",
+    "doctor",
+    "eat",
+    "enjoy",
+    "forget",
+    "give",
+    "last",
+    "meet",
+    "pink",
+    "pizza",
+    "play",
+    "school",
+    "secretary",
+    "short",
+    "time",
+    "want",
+    "work",
+    "africa",
+    "basketball",
+    "birthday",
+    "brown",
+    "but",
+    "cheat",
+    "city",
+    "cook",
+    "decide",
+    "full",
+    "how",
+    "jacket",
+    "letter",
+    "medicine",
+    "need",
+    "paint",
+    "paper",
+    "pull",
+    "purple",
+    "right",
+    "same",
+    "son",
+    "tell",
+    "thursday"
+  ],
+  "vocab_with_counts": [
+    {
+      "gloss": "book",
+      "instances": 40
+    },
+    {
+      "gloss": "drink",
+      "instances": 35
+    },
+    {
+      "gloss": "computer",
+      "instances": 30
+    },
+    {
+      "gloss": "before",
+      "instances": 26
+    },
+    {
+      "gloss": "chair",
+      "instances": 26
+    },
+    {
+      "gloss": "go",
+      "instances": 26
+    },
+    {
+      "gloss": "clothes",
+      "instances": 25
+    },
+    {
+      "gloss": "who",
+      "instances": 25
+    },
+    {
+      "gloss": "candy",
+      "instances": 24
+    },
+    {
+      "gloss": "cousin",
+      "instances": 23
+    },
+    {
+      "gloss": "deaf",
+      "instances": 23
+    },
+    {
+      "gloss": "fine",
+      "instances": 22
+    },
+    {
+      "gloss": "help",
+      "instances": 22
+    },
+    {
+      "gloss": "no",
+      "instances": 22
+    },
+    {
+      "gloss": "thin",
+      "instances": 22
+    },
+    {
+      "gloss": "walk",
+      "instances": 22
+    },
+    {
+      "gloss": "year",
+      "instances": 22
+    },
+    {
+      "gloss": "yes",
+      "instances": 22
+    },
+    {
+      "gloss": "all",
+      "instances": 21
+    },
+    {
+      "gloss": "black",
+      "instances": 21
+    },
+    {
+      "gloss": "cool",
+      "instances": 21
+    },
+    {
+      "gloss": "finish",
+      "instances": 21
+    },
+    {
+      "gloss": "hot",
+      "instances": 21
+    },
+    {
+      "gloss": "like",
+      "instances": 21
+    },
+    {
+      "gloss": "many",
+      "instances": 21
+    },
+    {
+      "gloss": "mother",
+      "instances": 21
+    },
+    {
+      "gloss": "now",
+      "instances": 21
+    },
+    {
+      "gloss": "orange",
+      "instances": 21
+    },
+    {
+      "gloss": "table",
+      "instances": 21
+    },
+    {
+      "gloss": "thanksgiving",
+      "instances": 21
+    },
+    {
+      "gloss": "what",
+      "instances": 21
+    },
+    {
+      "gloss": "woman",
+      "instances": 21
+    },
+    {
+      "gloss": "bed",
+      "instances": 20
+    },
+    {
+      "gloss": "blue",
+      "instances": 20
+    },
+    {
+      "gloss": "bowling",
+      "instances": 20
+    },
+    {
+      "gloss": "can",
+      "instances": 20
+    },
+    {
+      "gloss": "dog",
+      "instances": 20
+    },
+    {
+      "gloss": "family",
+      "instances": 20
+    },
+    {
+      "gloss": "fish",
+      "instances": 20
+    },
+    {
+      "gloss": "graduate",
+      "instances": 20
+    },
+    {
+      "gloss": "hat",
+      "instances": 20
+    },
+    {
+      "gloss": "hearing",
+      "instances": 20
+    },
+    {
+      "gloss": "kiss",
+      "instances": 20
+    },
+    {
+      "gloss": "language",
+      "instances": 20
+    },
+    {
+      "gloss": "later",
+      "instances": 20
+    },
+    {
+      "gloss": "man",
+      "instances": 20
+    },
+    {
+      "gloss": "shirt",
+      "instances": 20
+    },
+    {
+      "gloss": "study",
+      "instances": 20
+    },
+    {
+      "gloss": "tall",
+      "instances": 20
+    },
+    {
+      "gloss": "white",
+      "instances": 20
+    },
+    {
+      "gloss": "wrong",
+      "instances": 20
+    },
+    {
+      "gloss": "accident",
+      "instances": 19
+    },
+    {
+      "gloss": "apple",
+      "instances": 19
+    },
+    {
+      "gloss": "bird",
+      "instances": 19
+    },
+    {
+      "gloss": "change",
+      "instances": 19
+    },
+    {
+      "gloss": "color",
+      "instances": 19
+    },
+    {
+      "gloss": "corn",
+      "instances": 19
+    },
+    {
+      "gloss": "cow",
+      "instances": 19
+    },
+    {
+      "gloss": "dance",
+      "instances": 19
+    },
+    {
+      "gloss": "dark",
+      "instances": 19
+    },
+    {
+      "gloss": "doctor",
+      "instances": 19
+    },
+    {
+      "gloss": "eat",
+      "instances": 19
+    },
+    {
+      "gloss": "enjoy",
+      "instances": 19
+    },
+    {
+      "gloss": "forget",
+      "instances": 19
+    },
+    {
+      "gloss": "give",
+      "instances": 19
+    },
+    {
+      "gloss": "last",
+      "instances": 19
+    },
+    {
+      "gloss": "meet",
+      "instances": 19
+    },
+    {
+      "gloss": "pink",
+      "instances": 19
+    },
+    {
+      "gloss": "pizza",
+      "instances": 19
+    },
+    {
+      "gloss": "play",
+      "instances": 19
+    },
+    {
+      "gloss": "school",
+      "instances": 19
+    },
+    {
+      "gloss": "secretary",
+      "instances": 19
+    },
+    {
+      "gloss": "short",
+      "instances": 19
+    },
+    {
+      "gloss": "time",
+      "instances": 19
+    },
+    {
+      "gloss": "want",
+      "instances": 19
+    },
+    {
+      "gloss": "work",
+      "instances": 19
+    },
+    {
+      "gloss": "africa",
+      "instances": 18
+    },
+    {
+      "gloss": "basketball",
+      "instances": 18
+    },
+    {
+      "gloss": "birthday",
+      "instances": 18
+    },
+    {
+      "gloss": "brown",
+      "instances": 18
+    },
+    {
+      "gloss": "but",
+      "instances": 18
+    },
+    {
+      "gloss": "cheat",
+      "instances": 18
+    },
+    {
+      "gloss": "city",
+      "instances": 18
+    },
+    {
+      "gloss": "cook",
+      "instances": 18
+    },
+    {
+      "gloss": "decide",
+      "instances": 18
+    },
+    {
+      "gloss": "full",
+      "instances": 18
+    },
+    {
+      "gloss": "how",
+      "instances": 18
+    },
+    {
+      "gloss": "jacket",
+      "instances": 18
+    },
+    {
+      "gloss": "letter",
+      "instances": 18
+    },
+    {
+      "gloss": "medicine",
+      "instances": 18
+    },
+    {
+      "gloss": "need",
+      "instances": 18
+    },
+    {
+      "gloss": "paint",
+      "instances": 18
+    },
+    {
+      "gloss": "paper",
+      "instances": 18
+    },
+    {
+      "gloss": "pull",
+      "instances": 18
+    },
+    {
+      "gloss": "purple",
+      "instances": 18
+    },
+    {
+      "gloss": "right",
+      "instances": 18
+    },
+    {
+      "gloss": "same",
+      "instances": 18
+    },
+    {
+      "gloss": "son",
+      "instances": 18
+    },
+    {
+      "gloss": "tell",
+      "instances": 18
+    },
+    {
+      "gloss": "thursday",
+      "instances": 18
+    }
+  ]
+}

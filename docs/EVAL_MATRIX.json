@@ -1,0 +1,539 @@
+{
+  "runs": {
+    "eval_audio_scene.py": {
+      "ok": true,
+      "elapsed_s": 0,
+      "stdout_tail": "(cached)",
+      "stderr_tail": ""
+    },
+    "eval_wlasl.py": {
+      "ok": true,
+      "elapsed_s": 0,
+      "stdout_tail": "(cached)",
+      "stderr_tail": ""
+    },
+    "eval_sign_recognizer.py": {
+      "ok": true,
+      "elapsed_s": 0,
+      "stdout_tail": "(cached)",
+      "stderr_tail": ""
+    },
+    "eval_whisper.py": {
+      "ok": true,
+      "elapsed_s": 0,
+      "stdout_tail": "(cached)",
+      "stderr_tail": ""
+    },
+    "eval_blip_scene.py": {
+      "ok": true,
+      "elapsed_s": 0,
+      "stdout_tail": "(cached)",
+      "stderr_tail": ""
+    },
+    "eval_emotion.py": {
+      "ok": true,
+      "elapsed_s": 0,
+      "stdout_tail": "(cached)",
+      "stderr_tail": ""
+    },
+    "eval_yolo_latency.py": {
+      "ok": true,
+      "elapsed_s": 0,
+      "stdout_tail": "(cached)",
+      "stderr_tail": ""
+    },
+    "eval_personalizer.py": {
+      "ok": true,
+      "elapsed_s": 0,
+      "stdout_tail": "(cached)",
+      "stderr_tail": ""
+    }
+  },
+  "results": {
+    "ESC-50 (AST)": {
+      "top_k": 3,
+      "n_clips": 2000,
+      "n_correct": 1556,
+      "overall_accuracy": 0.778,
+      "per_class": {
+        "dog": {
+          "hits": 39,
+          "total": 40,
+          "acc": 0.975
+        },
+        "chirping_birds": {
+          "hits": 37,
+          "total": 40,
+          "acc": 0.925
+        },
+        "vacuum_cleaner": {
+          "hits": 28,
+          "total": 40,
+          "acc": 0.7
+        },
+        "thunderstorm": {
+          "hits": 36,
+          "total": 40,
+          "acc": 0.9
+        },
+        "door_wood_knock": {
+          "hits": 40,
+          "total": 40,
+          "acc": 1.0
+        },
+        "can_opening": {
+          "hits": 0,
+          "total": 40,
+          "acc": 0.0
+        },
+        "crow": {
+          "hits": 40,
+          "total": 40,
+          "acc": 1.0
+        },
+        "clapping": {
+          "hits": 39,
+          "total": 40,
+          "acc": 0.975
+        },
+        "fireworks": {
+          "hits": 37,
+          "total": 40,
+          "acc": 0.925
+        },
+        "chainsaw": {
+          "hits": 32,
+          "total": 40,
+          "acc": 0.8
+        },
+        "airplane": {
+          "hits": 28,
+          "total": 40,
+          "acc": 0.7
+        },
+        "mouse_click": {
+          "hits": 1,
+          "total": 40,
+          "acc": 0.025
+        },
+        "pouring_water": {
+          "hits": 33,
+          "total": 40,
+          "acc": 0.825
+        },
+        "train": {
+          "hits": 39,
+          "total": 40,
+          "acc": 0.975
+        },
+        "sheep": {
+          "hits": 39,
+          "total": 40,
+          "acc": 0.975
+        },
+        "water_drops": {
+          "hits": 26,
+          "total": 40,
+          "acc": 0.65
+        },
+        "church_bells": {
+          "hits": 37,
+          "total": 40,
+          "acc": 0.925
+        },
+        "clock_alarm": {
+          "hits": 36,
+          "total": 40,
+          "acc": 0.9
+        },
+        "keyboard_typing": {
+          "hits": 40,
+          "total": 40,
+          "acc": 1.0
+        },
+        "wind": {
+          "hits": 6,
+          "total": 40,
+          "acc": 0.15
+        },
+        "footsteps": {
+          "hits": 21,
+          "total": 40,
+          "acc": 0.525
+        },
+        "frog": {
+          "hits": 39,
+          "total": 40,
+          "acc": 0.975
+        },
+        "cow": {
+          "hits": 40,
+          "total": 40,
+          "acc": 1.0
+        },
+        "brushing_teeth": {
+          "hits": 34,
+          "total": 40,
+          "acc": 0.85
+        },
+        "car_horn": {
+          "hits": 40,
+          "total": 40,
+          "acc": 1.0
+        },
+        "crackling_fire": {
+          "hits": 21,
+          "total": 40,
+          "acc": 0.525
+        },
+        "helicopter": {
+          "hits": 26,
+          "total": 40,
+          "acc": 0.65
+        },
+        "drinking_sipping": {
+          "hits": 0,
+          "total": 40,
+          "acc": 0.0
+        },
+        "rain": {
+          "hits": 39,
+          "total": 40,
+          "acc": 0.975
+        },
+        "insects": {
+          "hits": 38,
+          "total": 40,
+          "acc": 0.95
+        },
+        "laughing": {
+          "hits": 23,
+          "total": 40,
+          "acc": 0.575
+        },
+        "hen": {
+          "hits": 37,
+          "total": 40,
+          "acc": 0.925
+        },
+        "engine": {
+          "hits": 37,
+          "total": 40,
+          "acc": 0.925
+        },
+        "breathing": {
+          "hits": 21,
+          "total": 40,
+          "acc": 0.525
+        },
+        "crying_baby": {
+          "hits": 40,
+          "total": 40,
+          "acc": 1.0
+        },
+        "hand_saw": {
+          "hits": 38,
+          "total": 40,
+          "acc": 0.95
+        },
+        "coughing": {
+          "hits": 35,
+          "total": 40,
+          "acc": 0.875
+        },
+        "glass_breaking": {
+          "hits": 28,
+          "total": 40,
+          "acc": 0.7
+        },
+        "snoring": {
+          "hits": 34,
+          "total": 40,
+          "acc": 0.85
+        },
+        "toilet_flush": {
+          "hits": 40,
+          "total": 40,
+          "acc": 1.0
+        },
+        "pig": {
+          "hits": 34,
+          "total": 40,
+          "acc": 0.85
+        },
+        "washing_machine": {
+          "hits": 0,
+          "total": 40,
+          "acc": 0.0
+        },
+        "clock_tick": {
+          "hits": 38,
+          "total": 40,
+          "acc": 0.95
+        },
+        "sneezing": {
+          "hits": 35,
+          "total": 40,
+          "acc": 0.875
+        },
+        "rooster": {
+          "hits": 40,
+          "total": 40,
+          "acc": 1.0
+        },
+        "sea_waves": {
+          "hits": 34,
+          "total": 40,
+          "acc": 0.85
+        },
+        "siren": {
+          "hits": 40,
+          "total": 40,
+          "acc": 1.0
+        },
+        "cat": {
+          "hits": 40,
+          "total": 40,
+          "acc": 1.0
+        },
+        "door_wood_creaks": {
+          "hits": 22,
+          "total": 40,
+          "acc": 0.55
+        },
+        "crickets": {
+          "hits": 29,
+          "total": 40,
+          "acc": 0.725
+        }
+      },
+      "elapsed_s": 526.9572186470032
+    },
+    "WLASL-100 (TGCN+geom)": {
+      "n_glosses": 15,
+      "n_clips": 17,
+      "top1_correct": 1,
+      "top3_correct": 1,
+      "top5_correct": 1,
+      "top1_accuracy": 0.058823529411764705,
+      "top3_accuracy": 0.058823529411764705,
+      "top5_accuracy": 0.058823529411764705,
+      "mean_latency_ms": 1955.7307302157449,
+      "p95_latency_ms": 4444.581999909133,
+      "per_class": {
+        "book": {
+          "n": 2,
+          "top1": 0,
+          "top3": 0,
+          "top5": 0
+        },
+        "drink": {
+          "n": 2,
+          "top1": 0,
+          "top3": 0,
+          "top5": 0
+        },
+        "go": {
+          "n": 1,
+          "top1": 0,
+          "top3": 0,
+          "top5": 0
+        },
+        "who": {
+          "n": 1,
+          "top1": 0,
+          "top3": 0,
+          "top5": 0
+        },
+        "cousin": {
+          "n": 1,
+          "top1": 0,
+          "top3": 0,
+          "top5": 0
+        },
+        "fine": {
+          "n": 1,
+          "top1": 0,
+          "top3": 0,
+          "top5": 0
+        },
+        "help": {
+          "n": 1,
+          "top1": 0,
+          "top3": 0,
+          "top5": 0
+        },
+        "no": {
+          "n": 1,
+          "top1": 0,
+          "top3": 0,
+          "top5": 0
+        },
+        "yes": {
+          "n": 1,
+          "top1": 1,
+          "top3": 1,
+          "top5": 1
+        },
+        "all": {
+          "n": 1,
+          "top1": 0,
+          "top3": 0,
+          "top5": 0
+        },
+        "black": {
+          "n": 1,
+          "top1": 0,
+          "top3": 0,
+          "top5": 0
+        },
+        "cool": {
+          "n": 1,
+          "top1": 0,
+          "top3": 0,
+          "top5": 0
+        },
+        "hot": {
+          "n": 1,
+          "top1": 0,
+          "top3": 0,
+          "top5": 0
+        },
+        "like": {
+          "n": 1,
+          "top1": 0,
+          "top3": 0,
+          "top5": 0
+        },
+        "many": {
+          "n": 1,
+          "top1": 0,
+          "top3": 0,
+          "top5": 0
+        }
+      },
+      "misclassifications": [
+        {
+          "gloss": "book",
+          "video": "69241.mp4",
+          "predicted_top5": [
+            "ok"
+          ]
+        },
+        {
+          "gloss": "book",
+          "video": "65225.mp4",
+          "predicted_top5": [
+            "ok"
+          ]
+        },
+        {
+          "gloss": "drink",
+          "video": "69302.mp4",
+          "predicted_top5": []
+        },
+        {
+          "gloss": "drink",
+          "video": "65539.mp4",
+          "predicted_top5": [
+            "no"
+          ]
+        },
+        {
+          "gloss": "go",
+          "video": "69345.mp4",
+          "predicted_top5": [
+            "you",
+            "no"
+          ]
+        },
+        {
+          "gloss": "who",
+          "video": "69534.mp4",
+          "predicted_top5": []
+        },
+        {
+          "gloss": "cousin",
+          "video": "65415.mp4",
+          "predicted_top5": []
+        },
+        {
+          "gloss": "fine",
+          "video": "65717.mp4",
+          "predicted_top5": [
+            "hello"
+          ]
+        },
+        {
+          "gloss": "help",
+          "video": "69364.mp4",
+          "predicted_top5": [
+            "ok"
+          ]
+        },
+        {
+          "gloss": "no",
+          "video": "69411.mp4",
+          "predicted_top5": []
+        },
+        {
+          "gloss": "all",
+          "video": "69206.mp4",
+          "predicted_top5": [
+            "hello"
+          ]
+        },
+        {
+          "gloss": "black",
+          "video": "69236.mp4",
+          "predicted_top5": []
+        },
+        {
+          "gloss": "cool",
+          "video": "69281.mp4",
+          "predicted_top5": []
+        },
+        {
+          "gloss": "hot",
+          "video": "69368.mp4",
+          "predicted_top5": [
+            "ok"
+          ]
+        },
+        {
+          "gloss": "like",
+          "video": "69389.mp4",
+          "predicted_top5": []
+        },
+        {
+          "gloss": "many",
+          "video": "69396.mp4",
+          "predicted_top5": []
+        }
+      ]
+    },
+    "Custom sign set": {
+      "status": "SKIPPED \u2014 no data / no output"
+    },
+    "LibriSpeech WER (Whisper)": {
+      "n_clips": 0,
+      "wer_mean": null,
+      "samples": []
+    },
+    "BLIP scene captions": {
+      "n_images": 0,
+      "captions": []
+    },
+    "DeepFace 7-class": {
+      "n_images": 0
+    },
+    "YOLO hazard latency": {
+      "n_frames": 0,
+      "latencies_ms": []
+    },
+    "Personalizer P/R/F1": {
+      "n_labels": 0,
+      "samples": []
+    }
+  }
+}

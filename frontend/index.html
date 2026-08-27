@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Accessibility Assistant — Live</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header>
+    <div>
+      <h1>👂 Accessibility Assistant</h1>
+      <p class="tagline">For Deaf and hard-of-hearing users</p>
+    </div>
+    <nav>
+      <button id="tab-live" class="tab active">🔴 Live</button>
+      <button id="tab-personal" class="tab">⭐ Personal Sounds</button>
+      <button id="tab-people" class="tab">👤 People</button>
+      <button id="tab-summary" class="tab">📜 Summary</button>
+      <button id="tab-diary" class="tab">📒 Diary</button>
+    </nav>
+    <div class="header-settings">
+      <label class="alerts-toggle" title="Vibrate + flash the screen when a CRITICAL event is detected">
+        <input type="checkbox" id="alerts-enabled" checked>
+        <span>🚨 Vibrate + flash on critical</span>
+      </label>
+    </div>
+  </header>
+
+  <main>
+
+    <!-- LIVE MODE ----------------------------------------------------- -->
+    <section id="page-live" class="page active">
+      <div class="card hero">
+        <h2>Live Situational Awareness</h2>
+        <p class="muted">
+          Captions, sounds, scene, and safety-critical events — fused.
+        </p>
+        <div class="controls">
+          <button id="start-btn" class="primary">Start Listening</button>
+          <button id="stop-btn" class="secondary hidden">Stop</button>
+          <span id="status" class="status">idle</span>
+        </div>
+      </div>
+
+      <div class="grid">
+        <div class="card">
+          <h3>🚨 Headlines</h3>
+          <ul id="headlines" class="event-list"></ul>
+        </div>
+        <div class="card">
+          <h3>🗣️ Captions</h3>
+          <div id="captions"></div>
+        </div>
+      </div>
+
+      <div class="grid">
+        <div class="card">
+          <h3>🔊 Sounds</h3>
+          <ul id="sounds" class="event-list"></ul>
+        </div>
+        <div class="card">
+          <h3>👀 Scene</h3>
+          <p id="scene" class="scene"></p>
+          <small class="muted">
+            Lip-reading reliability: <span id="lip-rel">—</span><br>
+            Recognised person: <span id="known-person">— nobody enrolled recognised —</span><br>
+            Speaker attribution: <span id="speaker">—</span><br>
+            Detected emotion: <span id="emotion-tag">—</span>
+          </small>
+        </div>
+      </div>
+
+      <div class="grid">
+        <div class="card">
+          <h3>🛰️ Hazard Radar</h3>
+          <canvas id="radar-canvas" width="320" height="320" class="radar"></canvas>
+          <small class="muted">YOLOv11 — 25 fps real-time hazard detection.</small>
+        </div>
+        <div class="card">
+          <h3>🔔 Name &amp; Keyword Alerts</h3>
+          <p class="muted small">
+            Flashes when your name or a safety keyword is spoken aloud.
+          </p>
+          <div class="name-alert-config">
+            <label class="small">Your name</label>
+            <div class="controls">
+              <input id="alert-self-name" type="text" placeholder="e.g. Laura" maxlength="40" />
+              <button id="alert-self-save" class="secondary">Save</button>
+            </div>
+            <label class="small">Keywords to watch (comma-separated)</label>
+            <div class="controls">
+              <input id="alert-keywords" type="text" placeholder="fire, help, ambulance" />
+              <button id="alert-keywords-save" class="secondary">Save</button>
+            </div>
+          </div>
+          <ul id="name-alerts" class="event-list"></ul>
+          <p id="name-alerts-empty" class="muted small">No alerts yet — listening for your name and keywords.</p>
+        </div>
+      </div>
+
+      <div class="grid">
+        <div class="card">
+          <h3>🤲 Sign Language Channel (you → speech)</h3>
+          <p class="muted">Sign your message, click Stop — all signs are analysed together and spoken as one sentence.</p>
+          <details class="muted" style="font-size:0.8em;margin-bottom:0.5rem">
+            <summary>Supported signs — 3 recognition tiers (hold each ~1 s)</summary>
+            <p style="margin:0.3rem 0"><strong>Tier 1 · MediaPipe pre-trained CNN (7 words)</strong></p>
+            <ul style="margin:0 0 0 1rem;line-height:1.7">
+              <li>🖐 Open palm → <strong>hello</strong></li>
+              <li>✊ Closed fist → <strong>yes</strong></li>
+              <li>👍 Thumb up → <strong>ok</strong></li>
+              <li>👇 Thumb down → <strong>no</strong></li>
+              <li>☝️ Point up → <strong>you</strong></li>
+              <li>✌️ Peace / V → <strong>peace</strong></li>
+              <li>🤟 ILY → <strong>love</strong></li>
+            </ul>
+            <p style="margin:0.4rem 0"><strong>Tier 2 · ASL letter model (A–Z when loaded)</strong></p>
+            <ul style="margin:0 0 0 1rem;line-height:1.7">
+              <li>Sign each letter of any word to <strong>fingerspell</strong> it</li>
+              <li>e.g. spell Y-O-U O-K → LLM → "Are you okay?"</li>
+            </ul>
+            <p style="margin:0.4rem 0"><strong>Tier 3 · Geometric rules (25 extra handshapes)</strong></p>
+            <ul style="margin:0 0 0 1rem;line-height:1.7;column-count:2">
+              <li>🤘 Rock-on → <strong>more</strong></li>
+              <li>👋 L-shape → <strong>help</strong></li>
+              <li>🤙 Thumb+pinky → <strong>phone</strong></li>
+              <li>☝️ Middle only → <strong>who</strong></li>
+              <li>🤙 Pinky only → <strong>me</strong></li>
+              <li>3 fingers → <strong>three</strong></li>
+              <li>4 fingers → <strong>four</strong></li>
+              <li>Thumb+middle → <strong>six</strong></li>
+              <li>Thumb+ring → <strong>seven</strong></li>
+              <li>3+index+pinky → <strong>nine</strong></li>
+              <li>index+ring → <strong>letter R</strong></li>
+              <li>middle+pinky → <strong>letter U</strong></li>
+              <li>ring+pinky → <strong>letter H</strong></li>
+            </ul>
+            <p style="margin:0.4rem 0 0">The LLM converts the gloss into a natural English sentence, so
+            sign <em>you ok</em> and get <em>"Are you okay?"</em>.</p>
+          </details>
+          <ul id="sign-events" class="event-list"></ul>
+          <div class="controls">
+            <button id="sign-speak-btn" class="primary">▶ Start signing</button>
+            <button id="sign-stop-btn" class="danger hidden">🛑 Stop signing</button>
+            <button id="sign-clear-btn" class="ghost">Clear</button>
+          </div>
+          <p id="sign-gloss" class="scene"></p>
+          <p id="sign-spoken" class="summary"></p>
+        </div>
+        <div class="card">
+          <h3>😶 Emotion / Tone</h3>
+          <div id="emotion-display" class="emotion-display">
+            <div class="emo-emoji" id="emo-emoji">😐</div>
+            <div class="emo-meta">
+              <strong id="emo-label">neutral</strong>
+              <small class="muted">audio: <span id="emo-audio">—</span></small>
+              <small class="muted">visual: <span id="emo-visual">—</span></small>
+              <small class="muted" id="emo-mixed"></small>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card stats">
+        <span>Latency: <strong id="latency">—</strong></span>
+        <span>Events processed: <strong id="event-count">0</strong></span>
+        <span>Critical: <strong id="critical-count">0</strong></span>
+      </div>
+
+      <video id="webcam-preview" muted autoplay playsinline class="hidden"></video>
+      <div id="sign-live-badge" class="sign-live-badge hidden"></div>
+    </section>
+
+    <!-- PERSONAL SOUNDS ----------------------------------------------- -->
+    <section id="page-personal" class="page">
+      <div class="card">
+        <h2>Train your own sounds</h2>
+        <p class="muted">
+          Record 3–5 examples of a specific sound (your doorbell, your
+          dog, your baby's cry) and the system will recognise it.
+        </p>
+
+        <label>Sound name</label>
+        <input id="enrol-label" type="text" placeholder="e.g. my front door bell" />
+
+        <label>Priority</label>
+        <select id="enrol-priority">
+          <option value="3">🔴 Critical</option>
+          <option value="2" selected>🟠 Important</option>
+          <option value="1">🟡 Inform</option>
+        </select>
+
+        <div class="controls">
+          <button id="enrol-record" class="primary">● Record example (3s)</button>
+          <span id="enrol-count" class="muted">0 examples recorded</span>
+        </div>
+
+        <div class="controls">
+          <button id="enrol-submit" class="secondary" disabled>Enrol Sound</button>
+          <button id="enrol-clear" class="ghost">Clear</button>
+        </div>
+
+        <h3>Currently enrolled</h3>
+        <ul id="enrolled-list" class="event-list"></ul>
+      </div>
+    </section>
+
+    <!-- PEOPLE -------------------------------------------------------- -->
+    <section id="page-people" class="page">
+      <div class="card">
+        <h2>People — face + voice + name</h2>
+        <p class="muted">
+          Enrol the people who matter to you. The app will:
+          (1) attribute captions to them when their face is on camera,
+          (2) flash + vibrate when <em>your own name</em> is spoken aloud,
+          (3) tell you when a known person is mentioned in conversation.
+        </p>
+
+        <h3>Your name</h3>
+        <p class="muted small">
+          Used for the name-call alert — when this name appears in any
+          spoken transcript, the screen flashes and your phone vibrates.
+        </p>
+        <div class="controls">
+          <input id="self-name-input" type="text" placeholder="e.g. Laura" maxlength="40" />
+          <button id="self-name-save" class="primary">Save my name</button>
+          <span id="self-name-current" class="muted small"></span>
+        </div>
+
+        <hr style="border:none;border-top:1px solid var(--border, #e5e7eb);margin:1.2rem 0">
+
+        <h3>Add a person</h3>
+        <label>Their name</label>
+        <input id="people-enrol-name" type="text" placeholder="e.g. Sarah" maxlength="40" />
+
+        <div class="controls">
+          <button id="people-enrol-face" class="secondary">📷 Record face (3 s)</button>
+          <span id="people-face-count" class="muted">0 face frames</span>
+        </div>
+
+        <div class="controls">
+          <button id="people-enrol-voice" class="secondary">🎙 Record voice (3 s)</button>
+          <span id="people-voice-count" class="muted">0 voice clips</span>
+        </div>
+
+        <div class="controls">
+          <button id="people-enrol-submit" class="primary" disabled>Save person</button>
+          <button id="people-enrol-clear" class="ghost">Clear</button>
+        </div>
+
+        <h3>Enrolled people</h3>
+        <ul id="people-list" class="event-list"></ul>
+      </div>
+    </section>
+
+    <!-- SUMMARY MODE -------------------------------------------------- -->
+    <section id="page-summary" class="page">
+      <div class="card">
+        <h2>Summary of recent activity</h2>
+        <p class="muted">
+          Generate a one-paragraph recap of what's happened recently
+          (LLM-composed; safety-critical events are always called out).
+        </p>
+        <button id="generate-summary" class="primary">Generate Summary</button>
+        <div id="summary-text" class="summary"></div>
+        <div id="summary-stats" class="muted small"></div>
+      </div>
+    </section>
+
+    <!-- DIARY --------------------------------------------------------- -->
+    <section id="page-diary" class="page">
+      <div class="card">
+        <h2>Soundscape Diary</h2>
+        <p class="muted">
+          Longitudinal log of detected events. No audio is stored — only
+          labels, priorities, and timestamps.
+        </p>
+        <div class="controls">
+          <label>Time window:
+            <select id="diary-window">
+              <option value="3600">last hour</option>
+              <option value="86400" selected>last 24h</option>
+              <option value="604800">last 7 days</option>
+            </select>
+          </label>
+          <label>Min priority:
+            <select id="diary-min-priority">
+              <option value="0" selected>all</option>
+              <option value="1">inform+</option>
+              <option value="2">important+</option>
+              <option value="3">critical only</option>
+            </select>
+          </label>
+          <button id="diary-refresh" class="secondary">Refresh</button>
+        </div>
+        <h3>Most frequent labels</h3>
+        <ul id="diary-histogram" class="event-list"></ul>
+        <h3>Recent events</h3>
+        <ul id="diary-events" class="event-list small"></ul>
+      </div>
+    </section>
+
+  </main>
+
+  <footer>
+    Research prototype — University of London FYP — Laura Barsoum
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>

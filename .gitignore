@@ -1,0 +1,45 @@
+# ─── Python ───────────────────────────────────────────────────────
+__pycache__/
+*.pyc
+*.pyo
+venv/
+.venv/
+.pytest_cache/
+
+# ─── Secrets ──────────────────────────────────────────────────────
+# NEVER commit .env: it holds Groq, ElevenLabs, HuggingFace and pyannote
+# keys. Use .env.example as the committed template.
+.env
+*.key
+
+# ─── OS ───────────────────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+
+# ─── Large data, datasets and model weights (do not version) ──────
+backend/data/ESC-50/
+backend/data/WLASL-master/videos/
+backend/data/*.task
+backend/data/*.pt
+# YOLO weights, downloaded automatically on first run
+backend/*.pt
+backend/data/tts_cache/
+backend/data/diary.db
+backend/data/personal_sounds/
+backend/data/people/
+backend/data/speakers.json
+backend/data/sign_profile/
+
+# Keep the eval folder structure and its protocols, ignore recorded media
+backend/data/personalizer_eval/**/*.wav
+backend/data/scene_eval/*.jpg
+backend/data/emotion_eval/**/*.jpg
+backend/data/libri_eval/*
+
+# ─── Generated evaluation output ──────────────────────────────────
+backend/*_eval_results.json
+backend/data/*.log
+*.log
+
+# ─── Node (unused, kept for safety) ───────────────────────────────
+node_modules/
