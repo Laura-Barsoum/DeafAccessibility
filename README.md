@@ -37,6 +37,21 @@ personalisation with open-set rejection, and graceful degradation.
 | Name and keyword alerts | Transcript matching, word-boundary safe | Working |
 | Caption reliability | Heuristic scorer from lip motion | Working (**not** lip reading) |
 
+### Feedback from target users
+
+The prototype has been demonstrated informally to Deaf and hard-of-hearing
+users. This was unstructured formative feedback, with no measures collected
+and nothing recorded, so it is design input rather than research data. The
+reception was positive, and the response that best captures the intent was
+that this is *"finally an app that lets us hear the world, not the other way
+around"*.
+
+Participants independently suggested the ability to enrol specific people so
+the system recognises who is present and alerts on your own name, which
+converges with the People feature and the name-alert channel already in the
+build. A formal within-subjects study with measured outcomes is still to be
+conducted; no claim of measured benefit is made on the basis of this feedback.
+
 ### Honest limitations
 
 - **Sign recognition is constrained.** The TGCN tier trained on WLASL is
@@ -49,8 +64,9 @@ personalisation with open-set rejection, and graceful degradation.
 - **Sound localisation was withdrawn.** GCC-PHAT direction-of-arrival is not
   feasible on laptop microphones (mono, closely spaced, browser audio
   processing removes the cues). It was replaced by name and keyword alerts.
-- **No user study yet.** All current results are technical. No Deaf or
-  hard-of-hearing person has evaluated the system.
+- **No formal user study yet.** All current *quantitative* results are
+  technical. Deaf and hard-of-hearing users have tried the prototype and
+  responded positively, but that feedback was informal and unmeasured.
 
 ---
 
