@@ -1,0 +1,14 @@
+{
+ "held_out_clip": "1-13613-A-37.wav",
+ "enrolled_clips": [
+  "1-14262-A-37.wav",
+  "1-34853-A-37.wav",
+  "1-67033-A-37.wav"
+ ],
+ "radius": 0.23822667201360068,
+ "gate_calibrated": 0.357340008020401,
+ "gate_original": 0.714680016040802,
+ "held_out_uncompressed": 0.4254835009054647,
+ "held_out_opus": 0.3115443813333444,
+ "speech": 1.369579982140754
+}

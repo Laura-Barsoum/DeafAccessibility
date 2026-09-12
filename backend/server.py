@@ -312,10 +312,13 @@ def _ffmpeg_convert(raw_bytes: bytes) -> bytes:
 def process():
     """The main per-tick multimodal endpoint.
 
-    Takes one audio chunk plus a few webcam frames, runs all six pre-trained
-    models in parallel (each with its own timeout so a slow model cannot stall
-    the tick), fuses their outputs into priority-ranked headlines, and returns
-    one JSON document the frontend renders across its live panels. This is the
+    Takes one audio chunk plus a few webcam frames. Six inference tasks
+    (Whisper, AST, the personaliser, BLIP, the face tracker and YOLO) are
+    dispatched concurrently to the thread pool, each collected under its own
+    timeout so a slow model cannot stall the tick. Sign landmarks, voice and
+    facial emotion, and face identification then run on the request thread.
+    Outputs are fused into priority-ranked headlines and returned as one JSON
+    document the frontend renders across its live panels. This is the
     orchestration hot path; heavier or optional work (BLIP scene captioning,
     the LLM notification) is throttled or gated to stay within the latency
     budget.
@@ -437,8 +440,11 @@ def process():
         visual_emo = get_emo_visual().analyse_frames(sample)
     fused_emotion = emotion_mod.fuse_emotions(audio_emo, visual_emo)
 
-    # 4d) Sound localization
-    localization_result = get_localizer().localize(audio_bytes) if audio_bytes else {"compass": "unknown"}
+    # 4d) Sound localisation (GCC-PHAT) was withdrawn after prototyping: laptop
+    #     microphones are closely spaced, often exposed as mono, and browser
+    #     audio processing removes the inter-channel timing cues it relies on.
+    #     The field is kept so the response shape is unchanged.
+    localization_result = {"compass": "unknown", "withdrawn": True}
 
     # 5) Lip reliability
     mar_series = [face_attribution["speaker_attribution"].get("mar", 0)] if face_attribution.get("speaker_attribution") else []

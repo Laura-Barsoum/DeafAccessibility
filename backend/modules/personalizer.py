@@ -43,6 +43,12 @@ PROFILE_DIR = os.path.join(
 )
 PROFILE_PATH = os.path.join(PROFILE_DIR, "profile.json")
 
+# Prototypical matcher settings, calibrated on a development split of ESC-50
+# and checked on a held-out test split (see match_prototypical).
+PROTO_TEMPERATURE = 0.5
+PROTO_RADIUS_K = 1.5
+PROTO_GATE_FLOOR = 0.10
+
 
 def _cosine(a: np.ndarray, b: np.ndarray) -> float:
     na = np.linalg.norm(a) + 1e-9
@@ -113,6 +119,11 @@ class Personalizer:
                 ssl._create_default_https_context = ssl._create_unverified_context
             except Exception:
                 pass
+            # Persistent, self-healing cache. An empty entry left in the system
+            # temp directory otherwise fails to load and silently forces the
+            # fallback embedding (see model_cache.py).
+            from .model_cache import prepare_tfhub_cache
+            prepare_tfhub_cache()
             import tensorflow_hub as hub
             self._yamnet = hub.load("https://tfhub.dev/google/yamnet/1")
             log.info("YamNet loaded for embeddings")
@@ -292,7 +303,8 @@ class Personalizer:
     # ── Prototypical-network matching (Snell et al., 2017) ──────────
     def match_prototypical(
         self, audio_bytes: bytes,
-        prob_threshold: float = 0.55, radius_k: float = 3.0,
+        prob_threshold: float = 0.55, radius_k: float = PROTO_RADIUS_K,
+        temperature: float = PROTO_TEMPERATURE, gate_floor: float = PROTO_GATE_FLOOR,
     ) -> List[Event]:
         """Classify incoming audio against enrolled prototypes.
 
@@ -301,6 +313,16 @@ class Personalizer:
         rule), and an open-set reject: the nearest prototype must fall within
         its own enrolment radius, so ambient audio that resembles nothing in
         particular is rejected rather than snapped to the closest sound.
+
+        Defaults were calibrated on a development split of ESC-50 (the 40
+        non-domestic classes) under a 5% false-acceptance constraint, then
+        checked on a held-out test split (the 10 domestic classes). The
+        temperature matters because squared distances between unit vectors lie
+        in [0, 4], which makes an untempered softmax nearly flat: on the test
+        split the original rule (temperature 1, radius_k 3, floor 0.20)
+        rejected 59% of correct nearest-prototype decisions on probability
+        alone. Calibrated, test F1 rose from 0.327 to 0.344 at an unchanged
+        false-acceptance rate.
         """
         sounds = self.profile.get("sounds", {})
         if not sounds:
@@ -323,7 +345,7 @@ class Personalizer:
             return []
 
         dists = np.array([_sqeuclidean(e, p) for p in protos])
-        logits = -dists
+        logits = -dists / temperature
         logits = logits - logits.max()
         probs = np.exp(logits); probs = probs / probs.sum()
         j = int(np.argmax(probs))
@@ -331,7 +353,7 @@ class Personalizer:
         # Open-set reject: nearest prototype must be within its radius band.
         # Floor at 0.20 (≈ cosine 0.90) so a tight enrolment still admits a
         # genuine play; s['threshold'] (raised by thumbs-down) tightens it.
-        gate = max(radii[j] * radius_k, 0.20)
+        gate = max(radii[j] * radius_k, gate_floor)
         gate = min(gate, sounds[labels[j]].get("proto_gate", gate))
         if probs[j] < prob_threshold or dists[j] > gate:
             return []
@@ -416,20 +438,26 @@ class Personalizer:
                 "similarity": match["similarity"],
             }
         else:
-            # Bump the per-sound threshold a tiny amount (capped at 0.95)
-            # so this false-positive is less likely next time.
+            # Tighten BOTH matchers. The cosine rule reads `threshold`; the
+            # default prototypical rule reads `proto_gate`. Originally only the
+            # threshold was bumped, so under the prototypical matcher a rejected
+            # alert changed nothing. The gate shrinks by 15% per rejection but
+            # never below a small floor, so a sound cannot become unmatchable.
             current = float(s.get("threshold", 0.90))
             bumped = min(0.95, current + 0.02)
             s["threshold"] = bumped
+            default_gate = max(float(s.get("radius", 0.0)) * PROTO_RADIUS_K, PROTO_GATE_FLOOR)
+            gate_before = float(s.get("proto_gate", default_gate))
+            s["proto_gate"] = max(0.02, gate_before * 0.85)
             s["last_negative_ts"] = match["similarity"]
             self._save()
             log.info(
-                "personalizer: - feedback on '%s' (threshold %.2f → %.2f)",
-                label, current, bumped,
+                "personalizer: - feedback on '%s' (threshold %.2f → %.2f, gate %.3f → %.3f)",
+                label, current, bumped, gate_before, s["proto_gate"],
             )
             return {
                 "ok": True, "label": label, "is_positive": False,
-                "threshold": bumped,
+                "threshold": bumped, "proto_gate": s["proto_gate"],
             }
 
     def remove(self, label: str) -> bool:

@@ -1,0 +1,115 @@
+{
+ "dataset": "hf-internal-testing/librispeech_asr_dummy (LibriSpeech validation-clean sample)",
+ "n_utterances": 73,
+ "audio_minutes": 8.017247916666667,
+ "results": {
+  "tiny": {
+   "wer": 0.14,
+   "errors": 161,
+   "ref_words": 1150,
+   "empty_outputs": 0,
+   "median_utt_wer": 0.1111111111111111,
+   "worst": [
+    {
+     "id": "1272-135031-0019",
+     "wer": 1.8,
+     "ref": "THAT'S FUNNY REMARKED BETSY THOUGHTFULLY",
+     "hyp": "That's funny. Remark to bed, see you thought for a week!"
+    },
+    {
+     "id": "1272-135031-0011",
+     "wer": 0.75,
+     "ref": "NOT EXACTLY RETURNED KALIKO",
+     "hyp": "Not exactly. We've turned Calico"
+    },
+    {
+     "id": "1272-141231-0028",
+     "wer": 0.6666666666666666,
+     "ref": "IROLG LOOKED AMAZED AT THE SUDDEN FURY OF THE ATTACK THEN SMILED",
+     "hyp": "I rolled up the maze at a sudden fear of attack, then smiled."
+    }
+   ]
+  },
+  "base": {
+   "wer": 0.13391304347826086,
+   "errors": 154,
+   "ref_words": 1150,
+   "empty_outputs": 0,
+   "median_utt_wer": 0.1,
+   "worst": [
+    {
+     "id": "1272-135031-0011",
+     "wer": 0.75,
+     "ref": "NOT EXACTLY RETURNED KALIKO",
+     "hyp": "Not exactly, we've turned Calico."
+    },
+    {
+     "id": "1272-141231-0028",
+     "wer": 0.6666666666666666,
+     "ref": "IROLG LOOKED AMAZED AT THE SUDDEN FURY OF THE ATTACK THEN SMILED",
+     "hyp": "I roll and collect the maize at a sudden fury of attack, then smiled."
+    },
+    {
+     "id": "1272-135031-0016",
+     "wer": 0.5,
+     "ref": "KALIKO HESITATED",
+     "hyp": "Calago hesitated."
+    }
+   ]
+  },
+  "small": {
+   "wer": 0.1591304347826087,
+   "errors": 183,
+   "ref_words": 1150,
+   "empty_outputs": 0,
+   "median_utt_wer": 0.06666666666666667,
+   "worst": [
+    {
+     "id": "1272-135031-0011",
+     "wer": 0.75,
+     "ref": "NOT EXACTLY RETURNED KALIKO",
+     "hyp": "Not exactly, we've turned calico."
+    },
+    {
+     "id": "1272-135031-0002",
+     "wer": 0.6129032258064516,
+     "ref": "I HAVE REMAINED A PRISONER ONLY BECAUSE I WISHED TO BE ONE AND WITH THIS HE STEPPED FORWARD AND BURST THE STOUT CHAINS AS EASILY AS IF THEY HAD BEEN THREADS",
+     "hyp": "I have remained a prisoner only because I wished to be one."
+    },
+    {
+     "id": "1272-128104-0011",
+     "wer": 0.5588235294117647,
+     "ref": "IN FACT HE IS QUITE SEVERE ON MISTER RUSKIN FOR NOT RECOGNISING THAT A PICTURE SHOULD DENOTE THE FRAILTY OF MAN AND REMARKS WITH PLEASING COURTESY AND FELICITOUS GRACE THAT MANY PHASES OF FEELING",
+     "hyp": "In fact, he is quite severe on Mr. Ruskin for not recognizing that a picture should denote"
+    }
+   ]
+  },
+  "distil-small.en": {
+   "wer": 0.23391304347826086,
+   "errors": 269,
+   "ref_words": 1150,
+   "empty_outputs": 0,
+   "median_utt_wer": 0.125,
+   "worst": [
+    {
+     "id": "1272-135031-0011",
+     "wer": 0.75,
+     "ref": "NOT EXACTLY RETURNED KALIKO",
+     "hyp": "Not exactly, we've turned calico."
+    },
+    {
+     "id": "1272-128104-0009",
+     "wer": 0.6744186046511628,
+     "ref": "HE LAMENTS MOST BITTERLY THE DIVORCE THAT HAS BEEN MADE BETWEEN DECORATIVE ART AND WHAT WE USUALLY CALL PICTURES MAKES THE CUSTOMARY APPEAL TO THE LAST JUDGMENT AND REMINDS US THAT IN THE GREAT DAYS OF ART MICHAEL ANGELO WAS THE FURNISHING UPHOLSTERER",
+     "hyp": "He laments most bitterly the divorce that has been made between decorative art and"
+    },
+    {
+     "id": "1272-135031-0002",
+     "wer": 0.6451612903225806,
+     "ref": "I HAVE REMAINED A PRISONER ONLY BECAUSE I WISHED TO BE ONE AND WITH THIS HE STEPPED FORWARD AND BURST THE STOUT CHAINS AS EASILY AS IF THEY HAD BEEN THREADS",
+     "hyp": "I have remained a prisoner only because i wish to be one.\""
+    }
+   ]
+  }
+ }
+}

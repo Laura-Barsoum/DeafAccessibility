@@ -1,0 +1,60 @@
+{
+ "n_utterances": 73,
+ "audio_minutes": 8.017247916666667,
+ "results": {
+  "tiny/shipped": {
+   "wer": 0.13304347826086957,
+   "median_utt_wer": 0.1,
+   "truncated": 1,
+   "seconds": 20.037569999694824
+  },
+  "tiny/no_repetition_guards": {
+   "wer": 0.10869565217391304,
+   "median_utt_wer": 0.08333333333333333,
+   "truncated": 1,
+   "seconds": 19.90750789642334
+  },
+  "tiny/library_defaults": {
+   "wer": 0.10608695652173913,
+   "median_utt_wer": 0.08333333333333333,
+   "truncated": 1,
+   "seconds": 23.413315057754517
+  },
+  "base/shipped": {
+   "wer": 0.12695652173913044,
+   "median_utt_wer": 0.09302325581395349,
+   "truncated": 1,
+   "seconds": 37.51179766654968
+  },
+  "base/no_repetition_guards": {
+   "wer": 0.08956521739130435,
+   "median_utt_wer": 0.058823529411764705,
+   "truncated": 1,
+   "seconds": 40.972607135772705
+  },
+  "base/library_defaults": {
+   "wer": 0.08695652173913043,
+   "median_utt_wer": 0.06451612903225806,
+   "truncated": 1,
+   "seconds": 39.60617804527283
+  },
+  "small/shipped": {
+   "wer": 0.15217391304347827,
+   "median_utt_wer": 0.0625,
+   "truncated": 5,
+   "seconds": 83.88570404052734
+  },
+  "small/no_repetition_guards": {
+   "wer": 0.07130434782608695,
+   "median_utt_wer": 0.05,
+   "truncated": 1,
+   "seconds": 95.70686888694763
+  },
+  "small/library_defaults": {
+   "wer": 0.06434782608695652,
+   "median_utt_wer": 0.03571428571428571,
+   "truncated": 1,
+   "seconds": 129.98205184936523
+  }
+ }
+}

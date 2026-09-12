@@ -12,13 +12,63 @@ without crashing.
 from __future__ import annotations
 
 import json
+import os
+import shutil
 import sys
+import tempfile
 import unittest
 from base64 import b64encode
 from pathlib import Path
 from unittest.mock import patch
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent.parent))
+
+_TMP = None
+_SAVED = {}
+
+
+def setUpModule():
+    """Redirect every file these endpoints write into a temp directory.
+
+    Without this the suite wrote to the user's real data: the round-trip test
+    for /me/name overwrote the saved self-name (found as "TestLaura"), and the
+    speaker tests touched the real speakers.json.
+    """
+    global _TMP
+    _TMP = tempfile.mkdtemp(prefix="endpoint_tests_")
+    import server
+    from modules import diarized_stt as dz
+    from modules import people as people_mod
+    _SAVED.update(
+        people_dir=people_mod.PROFILE_DIR, people_path=people_mod.PROFILE_PATH,
+        people_singleton=people_mod._registry_singleton,
+        speakers_path=dz._SPEAKERS_PATH, diar_singleton=dz._diarized_stt_singleton,
+        db_env=os.environ.get("ACCESSIBILITY_DB_PATH"), diary=server._diary,
+    )
+    people_mod.PROFILE_DIR = os.path.join(_TMP, "people")
+    people_mod.PROFILE_PATH = os.path.join(_TMP, "people", "profile.json")
+    people_mod._registry_singleton = None
+    dz._SPEAKERS_PATH = Path(_TMP) / "speakers.json"
+    dz._diarized_stt_singleton = None
+    os.environ["ACCESSIBILITY_DB_PATH"] = os.path.join(_TMP, "diary.db")
+    server._diary = None
+
+
+def tearDownModule():
+    import server
+    from modules import diarized_stt as dz
+    from modules import people as people_mod
+    people_mod.PROFILE_DIR = _SAVED["people_dir"]
+    people_mod.PROFILE_PATH = _SAVED["people_path"]
+    people_mod._registry_singleton = _SAVED["people_singleton"]
+    dz._SPEAKERS_PATH = _SAVED["speakers_path"]
+    dz._diarized_stt_singleton = _SAVED["diar_singleton"]
+    if _SAVED["db_env"] is None:
+        os.environ.pop("ACCESSIBILITY_DB_PATH", None)
+    else:
+        os.environ["ACCESSIBILITY_DB_PATH"] = _SAVED["db_env"]
+    server._diary = _SAVED["diary"]
+    shutil.rmtree(_TMP, ignore_errors=True)
 
 
 class EndpointShapeTests(unittest.TestCase):

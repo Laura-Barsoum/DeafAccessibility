@@ -1,0 +1,203 @@
+{
+  "n_glosses": 15,
+  "n_clips": 17,
+  "top1_correct": 1,
+  "top3_correct": 1,
+  "top5_correct": 1,
+  "top1_accuracy": 0.058823529411764705,
+  "top3_accuracy": 0.058823529411764705,
+  "top5_accuracy": 0.058823529411764705,
+  "mean_latency_ms": 1955.7307302157449,
+  "p95_latency_ms": 4444.581999909133,
+  "per_class": {
+    "book": {
+      "n": 2,
+      "top1": 0,
+      "top3": 0,
+      "top5": 0
+    },
+    "drink": {
+      "n": 2,
+      "top1": 0,
+      "top3": 0,
+      "top5": 0
+    },
+    "go": {
+      "n": 1,
+      "top1": 0,
+      "top3": 0,
+      "top5": 0
+    },
+    "who": {
+      "n": 1,
+      "top1": 0,
+      "top3": 0,
+      "top5": 0
+    },
+    "cousin": {
+      "n": 1,
+      "top1": 0,
+      "top3": 0,
+      "top5": 0
+    },
+    "fine": {
+      "n": 1,
+      "top1": 0,
+      "top3": 0,
+      "top5": 0
+    },
+    "help": {
+      "n": 1,
+      "top1": 0,
+      "top3": 0,
+      "top5": 0
+    },
+    "no": {
+      "n": 1,
+      "top1": 0,
+      "top3": 0,
+      "top5": 0
+    },
+    "yes": {
+      "n": 1,
+      "top1": 1,
+      "top3": 1,
+      "top5": 1
+    },
+    "all": {
+      "n": 1,
+      "top1": 0,
+      "top3": 0,
+      "top5": 0
+    },
+    "black": {
+      "n": 1,
+      "top1": 0,
+      "top3": 0,
+      "top5": 0
+    },
+    "cool": {
+      "n": 1,
+      "top1": 0,
+      "top3": 0,
+      "top5": 0
+    },
+    "hot": {
+      "n": 1,
+      "top1": 0,
+      "top3": 0,
+      "top5": 0
+    },
+    "like": {
+      "n": 1,
+      "top1": 0,
+      "top3": 0,
+      "top5": 0
+    },
+    "many": {
+      "n": 1,
+      "top1": 0,
+      "top3": 0,
+      "top5": 0
+    }
+  },
+  "misclassifications": [
+    {
+      "gloss": "book",
+      "video": "69241.mp4",
+      "predicted_top5": [
+        "ok"
+      ]
+    },
+    {
+      "gloss": "book",
+      "video": "65225.mp4",
+      "predicted_top5": [
+        "ok"
+      ]
+    },
+    {
+      "gloss": "drink",
+      "video": "69302.mp4",
+      "predicted_top5": []
+    },
+    {
+      "gloss": "drink",
+      "video": "65539.mp4",
+      "predicted_top5": [
+        "no"
+      ]
+    },
+    {
+      "gloss": "go",
+      "video": "69345.mp4",
+      "predicted_top5": [
+        "you",
+        "no"
+      ]
+    },
+    {
+      "gloss": "who",
+      "video": "69534.mp4",
+      "predicted_top5": []
+    },
+    {
+      "gloss": "cousin",
+      "video": "65415.mp4",
+      "predicted_top5": []
+    },
+    {
+      "gloss": "fine",
+      "video": "65717.mp4",
+      "predicted_top5": [
+        "hello"
+      ]
+    },
+    {
+      "gloss": "help",
+      "video": "69364.mp4",
+      "predicted_top5": [
+        "ok"
+      ]
+    },
+    {
+      "gloss": "no",
+      "video": "69411.mp4",
+      "predicted_top5": []
+    },
+    {
+      "gloss": "all",
+      "video": "69206.mp4",
+      "predicted_top5": [
+        "hello"
+      ]
+    },
+    {
+      "gloss": "black",
+      "video": "69236.mp4",
+      "predicted_top5": []
+    },
+    {
+      "gloss": "cool",
+      "video": "69281.mp4",
+      "predicted_top5": []
+    },
+    {
+      "gloss": "hot",
+      "video": "69368.mp4",
+      "predicted_top5": [
+        "ok"
+      ]
+    },
+    {
+      "gloss": "like",
+      "video": "69389.mp4",
+      "predicted_top5": []
+    },
+    {
+      "gloss": "many",
+      "video": "69396.mp4",
+      "predicted_top5": []
+    }
+  ]
+}

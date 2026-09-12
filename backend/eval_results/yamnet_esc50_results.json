@@ -1,0 +1,259 @@
+{
+  "top_k": 3,
+  "n_clips": 2000,
+  "n_correct": 1291,
+  "overall_accuracy": 0.6455,
+  "per_class": {
+    "dog": {
+      "hits": 33,
+      "total": 40,
+      "acc": 0.825
+    },
+    "chirping_birds": {
+      "hits": 39,
+      "total": 40,
+      "acc": 0.975
+    },
+    "vacuum_cleaner": {
+      "hits": 20,
+      "total": 40,
+      "acc": 0.5
+    },
+    "thunderstorm": {
+      "hits": 40,
+      "total": 40,
+      "acc": 1.0
+    },
+    "door_wood_knock": {
+      "hits": 29,
+      "total": 40,
+      "acc": 0.725
+    },
+    "can_opening": {
+      "hits": 0,
+      "total": 40,
+      "acc": 0.0
+    },
+    "crow": {
+      "hits": 34,
+      "total": 40,
+      "acc": 0.85
+    },
+    "clapping": {
+      "hits": 35,
+      "total": 40,
+      "acc": 0.875
+    },
+    "fireworks": {
+      "hits": 39,
+      "total": 40,
+      "acc": 0.975
+    },
+    "chainsaw": {
+      "hits": 28,
+      "total": 40,
+      "acc": 0.7
+    },
+    "airplane": {
+      "hits": 17,
+      "total": 40,
+      "acc": 0.425
+    },
+    "mouse_click": {
+      "hits": 0,
+      "total": 40,
+      "acc": 0.0
+    },
+    "pouring_water": {
+      "hits": 38,
+      "total": 40,
+      "acc": 0.95
+    },
+    "train": {
+      "hits": 40,
+      "total": 40,
+      "acc": 1.0
+    },
+    "sheep": {
+      "hits": 37,
+      "total": 40,
+      "acc": 0.925
+    },
+    "water_drops": {
+      "hits": 12,
+      "total": 40,
+      "acc": 0.3
+    },
+    "church_bells": {
+      "hits": 40,
+      "total": 40,
+      "acc": 1.0
+    },
+    "clock_alarm": {
+      "hits": 35,
+      "total": 40,
+      "acc": 0.875
+    },
+    "keyboard_typing": {
+      "hits": 40,
+      "total": 40,
+      "acc": 1.0
+    },
+    "wind": {
+      "hits": 8,
+      "total": 40,
+      "acc": 0.2
+    },
+    "footsteps": {
+      "hits": 20,
+      "total": 40,
+      "acc": 0.5
+    },
+    "frog": {
+      "hits": 33,
+      "total": 40,
+      "acc": 0.825
+    },
+    "cow": {
+      "hits": 30,
+      "total": 40,
+      "acc": 0.75
+    },
+    "brushing_teeth": {
+      "hits": 21,
+      "total": 40,
+      "acc": 0.525
+    },
+    "car_horn": {
+      "hits": 37,
+      "total": 40,
+      "acc": 0.925
+    },
+    "crackling_fire": {
+      "hits": 14,
+      "total": 40,
+      "acc": 0.35
+    },
+    "helicopter": {
+      "hits": 19,
+      "total": 40,
+      "acc": 0.475
+    },
+    "drinking_sipping": {
+      "hits": 0,
+      "total": 40,
+      "acc": 0.0
+    },
+    "rain": {
+      "hits": 26,
+      "total": 40,
+      "acc": 0.65
+    },
+    "insects": {
+      "hits": 29,
+      "total": 40,
+      "acc": 0.725
+    },
+    "laughing": {
+      "hits": 29,
+      "total": 40,
+      "acc": 0.725
+    },
+    "hen": {
+      "hits": 5,
+      "total": 40,
+      "acc": 0.125
+    },
+    "engine": {
+      "hits": 30,
+      "total": 40,
+      "acc": 0.75
+    },
+    "breathing": {
+      "hits": 27,
+      "total": 40,
+      "acc": 0.675
+    },
+    "crying_baby": {
+      "hits": 35,
+      "total": 40,
+      "acc": 0.875
+    },
+    "hand_saw": {
+      "hits": 24,
+      "total": 40,
+      "acc": 0.6
+    },
+    "coughing": {
+      "hits": 34,
+      "total": 40,
+      "acc": 0.85
+    },
+    "glass_breaking": {
+      "hits": 36,
+      "total": 40,
+      "acc": 0.9
+    },
+    "snoring": {
+      "hits": 39,
+      "total": 40,
+      "acc": 0.975
+    },
+    "toilet_flush": {
+      "hits": 39,
+      "total": 40,
+      "acc": 0.975
+    },
+    "pig": {
+      "hits": 29,
+      "total": 40,
+      "acc": 0.725
+    },
+    "washing_machine": {
+      "hits": 0,
+      "total": 40,
+      "acc": 0.0
+    },
+    "clock_tick": {
+      "hits": 27,
+      "total": 40,
+      "acc": 0.675
+    },
+    "sneezing": {
+      "hits": 28,
+      "total": 40,
+      "acc": 0.7
+    },
+    "rooster": {
+      "hits": 2,
+      "total": 40,
+      "acc": 0.05
+    },
+    "sea_waves": {
+      "hits": 31,
+      "total": 40,
+      "acc": 0.775
+    },
+    "siren": {
+      "hits": 38,
+      "total": 40,
+      "acc": 0.95
+    },
+    "cat": {
+      "hits": 30,
+      "total": 40,
+      "acc": 0.75
+    },
+    "door_wood_creaks": {
+      "hits": 1,
+      "total": 40,
+      "acc": 0.025
+    },
+    "crickets": {
+      "hits": 14,
+      "total": 40,
+      "acc": 0.35
+    }
+  },
+  "elapsed_s": 26.986740350723267
+}

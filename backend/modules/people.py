@@ -344,9 +344,13 @@ class PeopleRegistry:
                     extra={"trigger": "keyword", "keyword": kw},
                 ))
 
+        self_first = self_name.split()[0] if self_name else ""
         for n in self.profile.get("people", {}):
             ln = n.lower().strip()
-            if ln == self_name:
+            # Skip the user themself. Matching is on first names, so comparing
+            # full names let an enrolled "Laura Barsoum" raise a duplicate
+            # "was mentioned" alert every time the user's own name was called.
+            if ln == self_name or (self_first and ln.split() and ln.split()[0] == self_first):
                 continue
             if self._name_in_text(ln, text):
                 mentioned.append(n)

@@ -2,7 +2,8 @@
 face_tracker.py — MediaPipe-based face tracking + speaker attribution.
 
 For each video frame:
-    - Detects faces via MediaPipe FaceMesh
+    - Detects faces via MediaPipe (Tasks-API FaceLandmarker; the legacy
+      FaceMesh solution is used only if an older MediaPipe still ships it)
     - Estimates whether each face is "actively speaking" via mouth-aspect-ratio
       variation (a classic but reliable visual VAD signal)
     - Outputs: list of {face_id, position_horizontal (left/centre/right),
@@ -15,7 +16,10 @@ from __future__ import annotations
 
 import base64
 import logging
+import os
+import threading
 from collections import deque
+from types import SimpleNamespace
 from typing import Any, Dict, List, Optional
 
 import numpy as np
@@ -28,6 +32,51 @@ UPPER_LIP_TOP = 13
 LOWER_LIP_BOT = 14
 LIP_LEFT = 78
 LIP_RIGHT = 308
+
+
+_FACE_MODEL = os.path.join(
+    os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
+    "data", "face_landmarker.task",
+)
+
+
+class _TasksFaceMesh:
+    """Gives the Tasks-API FaceLandmarker the legacy FaceMesh interface.
+
+    MediaPipe removed `mediapipe.solutions`, so the original FaceMesh import
+    failed and this tracker silently fell back to a placeholder that did no
+    work: speaker attribution never ran, and profiling showed the stage taking
+    0 ms. The Tasks face model returns the same landmark topology, so the lip
+    indices above are unchanged. A lock guards the detector, which is not
+    safe for concurrent calls from the thread pool.
+    """
+
+    def __init__(self, model_path: str, max_faces: int = 4) -> None:
+        import mediapipe as mp
+        from mediapipe.tasks import python as mp_tasks
+        from mediapipe.tasks.python import vision as mp_vision
+        self._mp = mp
+        self._lock = threading.Lock()
+        opts = mp_vision.FaceLandmarkerOptions(
+            base_options=mp_tasks.BaseOptions(model_asset_path=model_path),
+            running_mode=mp_vision.RunningMode.IMAGE,
+            num_faces=max_faces,
+            min_face_detection_confidence=0.5,
+            min_tracking_confidence=0.5,
+        )
+        self._det = mp_vision.FaceLandmarker.create_from_options(opts)
+
+    def process(self, rgb: np.ndarray) -> SimpleNamespace:
+        """Detect faces; return an object shaped like FaceMesh's result."""
+        image = self._mp.Image(image_format=self._mp.ImageFormat.SRGB,
+                               data=np.ascontiguousarray(rgb))
+        with self._lock:
+            res = self._det.detect(image)
+        faces = [
+            SimpleNamespace(landmark=[SimpleNamespace(x=p.x, y=p.y, z=p.z) for p in pts])
+            for pts in (getattr(res, "face_landmarks", None) or [])
+        ]
+        return SimpleNamespace(multi_face_landmarks=faces)
 
 
 class FaceTracker:
@@ -56,8 +105,13 @@ class FaceTracker:
             )
             log.info("MediaPipe FaceMesh LOADED SUCCESSFULLY")
         except Exception as e:
-            log.warning("MediaPipe FaceMesh load failed (%s)", e)
-            self._mesh = "placeholder"
+            log.info("legacy FaceMesh unavailable (%s); trying Tasks FaceLandmarker", e)
+            try:
+                self._mesh = _TasksFaceMesh(_FACE_MODEL)
+                log.info("MediaPipe FaceLandmarker (Tasks API) loaded for face tracking")
+            except Exception as e2:
+                log.warning("face tracking unavailable, speaker attribution disabled (%s)", e2)
+                self._mesh = "placeholder"
 
     def analyse_frame(self, jpeg_b64: str) -> List[Dict[str, Any]]:
         """Return list of detected faces with speaking scores."""

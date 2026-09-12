@@ -1,0 +1,19 @@
+{
+ "results": {
+  "distil-small.en/shipped": {
+   "wer": 0.22956521739130434,
+   "median_utt_wer": 0.125,
+   "truncated": 9
+  },
+  "distil-small.en/no_repetition_guards": {
+   "wer": 0.06869565217391305,
+   "median_utt_wer": 0.038461538461538464,
+   "truncated": 1
+  },
+  "distil-small.en/library_defaults": {
+   "wer": 0.06695652173913043,
+   "median_utt_wer": 0.029411764705882353,
+   "truncated": 1
+  }
+ }
+}

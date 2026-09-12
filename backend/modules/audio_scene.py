@@ -105,7 +105,7 @@ class AudioSceneClassifier:
         - Preferred: AST (Audio Spectrogram Transformer) via HuggingFace
           `MIT/ast-finetuned-audioset-10-10-0.4593` — works on Python 3.13.
           Trained on AudioSet (Gemmeke et al. 2017) with 527 classes.
-        - Secondary (Python ≤3.11 only): TF-Hub YamNet.
+        - Secondary: TF-Hub YamNet (AST was preferred after both were evaluated on ESC-50).
         - Tertiary: heuristic energy/centroid fallback.
 
         AST is a real pre-trained audio CNN/Transformer — it satisfies the
@@ -134,15 +134,20 @@ class AudioSceneClassifier:
         except Exception as e:
             log.warning("AST audio-scene unavailable (%s) — trying YamNet", e)
 
-        # ── Attempt 2: TF-Hub YamNet (Python ≤3.11 only)
+        # ── Attempt 2: TF-Hub YamNet
         try:
+            import csv
             import tensorflow as tf
             import tensorflow_hub as hub
+            from .model_cache import prepare_tfhub_cache
+            prepare_tfhub_cache()
             self._model = hub.load("https://tfhub.dev/google/yamnet/1")
             class_map_path = self._model.class_map_path().numpy()
             with tf.io.gfile.GFile(class_map_path) as f:
-                lines = f.read().splitlines()
-            self._labels = [line.split(",")[2] for line in lines[1:]]
+                # csv-aware: many AudioSet display names contain commas
+                # ("Baby cry, infant cry"), which a plain split truncates.
+                rows = list(csv.reader(f))
+            self._labels = [row[2] for row in rows[1:]]
             self._backend = "yamnet"
             log.info("YamNet loaded with %d labels", len(self._labels))
             return
@@ -193,7 +198,7 @@ class AudioSceneClassifier:
             return []
 
     def _classify_yamnet(self, audio_bytes: bytes, top_k: int) -> List[Tuple[str, float]]:
-        """YamNet inference path (only used if TF loads — Python ≤3.11)."""
+        """YamNet inference path (used only if AST cannot be loaded)."""
         try:
             import tensorflow as tf
             import librosa

@@ -1,0 +1,462 @@
+{
+ "inputs": {
+  "sentence": "The meeting has moved to three o'clock this afternoon, so please bring the report.",
+  "alarm_clip": "1-13613-A-37.wav",
+  "frames": "WLASL 69241.mp4 @0.6/1.2/1.8s, 320x240"
+ },
+ "whisper_sweep": {
+  "tiny": {
+   "load_s": 0.6176611669361591,
+   "median": 0.2725917501375079,
+   "p90": 0.2962270830757916,
+   "min": 0.2137970421463251,
+   "max": 0.33812237484380603,
+   "n": 10,
+   "text": "The meeting has moved to 3 o'clock this afternoon."
+  },
+  "base": {
+   "load_s": 0.2803842918947339,
+   "median": 0.45084195863455534,
+   "p90": 0.6312580411322415,
+   "min": 0.3610870409756899,
+   "max": 0.858731500338763,
+   "n": 10,
+   "text": "The meeting has moved to three o'clock this afternoon."
+  },
+  "small": {
+   "load_s": 0.5094113331288099,
+   "median": 1.232771979412064,
+   "p90": 1.2755295000970364,
+   "min": 0.9980162498541176,
+   "max": 1.4688827497884631,
+   "n": 10,
+   "text": "The meeting has moved to three o'clock this afternoon."
+  },
+  "distil-small.en": {
+   "load_s": 0.4486384582705796,
+   "median": 0.8218515203334391,
+   "p90": 0.8786750826984644,
+   "min": 0.7582113337703049,
+   "max": 0.8842949592508376,
+   "n": 10,
+   "text": "The meeting has moved to 3 o'clock this afternoon."
+  }
+ },
+ "blip_caption": "a woman in a blue shirt",
+ "face_tracker_backend": "_TasksFaceMesh",
+ "face_tracker_faces": [
+  {
+   "face_id": 0,
+   "position": "centre",
+   "mar": 0.0225,
+   "speaking_score": 0.0084,
+   "speaking": false,
+   "mean_speaking_score": 0.0084
+  }
+ ],
+ "components": {
+  "ffmpeg_webm_to_wav": {
+   "median": 0.028051812667399645,
+   "p90": 0.02861212519928813,
+   "min": 0.02697737468406558,
+   "max": 0.028612707741558552,
+   "n": 10
+  },
+  "whisper_small_transcribe": {
+   "median": 0.8092528539709747,
+   "p90": 0.8566146669909358,
+   "min": 0.7657375829294324,
+   "max": 0.9277764996513724,
+   "n": 10
+  },
+  "ast_classify_to_events": {
+   "median": 0.25470606284216046,
+   "p90": 0.2588557922281325,
+   "min": 0.24971312517300248,
+   "max": 0.263954708352685,
+   "n": 10
+  },
+  "yamnet_personal_embed": {
+   "median": 0.00650004087947309,
+   "p90": 0.006811833009123802,
+   "min": 0.0061918338760733604,
+   "max": 0.006952708121389151,
+   "n": 10
+  },
+  "yolo_detect_3frames": {
+   "median": 0.022129853256046772,
+   "p90": 0.022948625031858683,
+   "min": 0.02044470841065049,
+   "max": 0.02301450027152896,
+   "n": 10
+  },
+  "blip_describe_1frame": {
+   "median": 0.22456379188224673,
+   "p90": 0.2287569590844214,
+   "min": 0.21706912480294704,
+   "max": 0.22898533334955573,
+   "n": 5
+  },
+  "mediapipe_face_tracker_3frames": {
+   "median": 0.018451104639098048,
+   "p90": 0.018669582903385162,
+   "min": 0.017941792029887438,
+   "max": 0.01871087495237589,
+   "n": 10
+  },
+  "deepface_emotion_3frames": {
+   "median": 0.06046306202188134,
+   "p90": 0.060987167060375214,
+   "min": 0.059271040838211775,
+   "max": 0.0611672499217093,
+   "n": 10
+  },
+  "wav2vec2_voice_emotion": {
+   "median": 0.052916645305231214,
+   "p90": 0.05596904130652547,
+   "min": 0.04966570809483528,
+   "max": 0.057377833873033524,
+   "n": 10
+  },
+  "mediapipe_tasks_sign_3frames": {
+   "median": 0.12766087520867586,
+   "p90": 0.1294005000963807,
+   "min": 0.12554570892825723,
+   "max": 0.12950087524950504,
+   "n": 10
+  },
+  "deepface_face_identify_1frame": {
+   "median": 0.09500918770208955,
+   "p90": 0.0963492919690907,
+   "min": 0.09298487473279238,
+   "max": 0.10243437485769391,
+   "n": 10
+  },
+  "llm_compose_notification": {
+   "median": 0.3536675409413874,
+   "p90": 0.3674315419048071,
+   "min": 0.34635683335363865,
+   "max": 0.5574067910201848,
+   "n": 5
+  }
+ },
+ "stt_stream": {
+  "interim_tiny_1s": {
+   "median": 0.31783681246452034,
+   "p90": 0.4001317089423537,
+   "min": 0.30856833374127746,
+   "max": 0.450231125112623,
+   "n": 10
+  },
+  "final_small_2p8s": {
+   "median": 0.889061291469261,
+   "p90": 0.9664607499726117,
+   "min": 0.8706378326751292,
+   "max": 1.2104132920503616,
+   "n": 10
+  }
+ },
+ "enrolment": {
+  "ok": true,
+  "label": "Kitchen alarm",
+  "n_examples": 3
+ },
+ "personal_match_prototypical": {
+  "median": 0.006310041761025786,
+  "p90": 0.006920916959643364,
+  "min": 0.005940000060945749,
+  "max": 0.0069282082840800285,
+  "n": 10
+ },
+ "personal_match_example": [],
+ "personal_match_on_speech": [],
+ "ticks": {
+  "streaming_captions_on": {
+   "n": 20,
+   "wall_median": 0.6445379168726504,
+   "wall_p95": 0.7836037501692772,
+   "wall_max": 2.9703005831688643,
+   "wall_min": 0.6026157918386161,
+   "per_tick_wall": [
+    2.9703005831688643,
+    0.6378680416382849,
+    0.6101297498680651,
+    0.7527467086911201,
+    0.6392367500811815,
+    0.6026157918386161,
+    0.635962083004415,
+    0.7801704998128116,
+    0.7377605000510812,
+    0.7542493748478591,
+    0.6211543339304626,
+    0.7504181666299701,
+    0.6766899581998587,
+    0.6413807077333331,
+    0.6427899589762092,
+    0.7453111656941473,
+    0.6264926251024008,
+    0.6263610003516078,
+    0.6462858747690916,
+    0.7836037501692772
+   ],
+   "per_tick_server": [
+    2.969,
+    0.637,
+    0.609,
+    0.752,
+    0.638,
+    0.602,
+    0.635,
+    0.779,
+    0.736,
+    0.753,
+    0.62,
+    0.749,
+    0.676,
+    0.64,
+    0.642,
+    0.744,
+    0.625,
+    0.625,
+    0.645,
+    0.783
+   ],
+   "samples": [
+    {
+     "tick": 0,
+     "stt": "",
+     "sounds": [
+      [
+       "Speech",
+       0.8,
+       "IMPORTANT"
+      ]
+     ],
+     "headlines": [
+      [
+       "Speech",
+       "IMPORTANT"
+      ]
+     ],
+     "scene": "a woman in a blue shirt",
+     "emotion": "neutral",
+     "hazards": 1,
+     "notification": ""
+    },
+    {
+     "tick": 19,
+     "stt": "",
+     "sounds": [
+      [
+       "Speech",
+       0.8,
+       "IMPORTANT"
+      ]
+     ],
+     "headlines": [
+      [
+       "Speech",
+       "IMPORTANT"
+      ]
+     ],
+     "scene": "a woman in a blue shirt",
+     "emotion": "neutral",
+     "hazards": 1,
+     "notification": ""
+    }
+   ]
+  },
+  "streaming_captions_off": {
+   "n": 20,
+   "wall_median": 1.6015625204890966,
+   "wall_p95": 1.8123728749342263,
+   "wall_max": 1.8766445419751108,
+   "wall_min": 1.3851022077724338,
+   "per_tick_wall": [
+    1.5249691670760512,
+    1.3851022077724338,
+    1.6120786252431571,
+    1.6339547079987824,
+    1.4232417922466993,
+    1.507560750003904,
+    1.4798918343149126,
+    1.6702179997228086,
+    1.7316860421560705,
+    1.8766445419751108,
+    1.6249159998260438,
+    1.708272541873157,
+    1.5312942499294877,
+    1.5951959579251707,
+    1.5842659575864673,
+    1.8123728749342263,
+    1.6079290830530226,
+    1.4672144590876997,
+    1.526537457946688,
+    1.6176271247677505
+   ],
+   "per_tick_server": [
+    1.524,
+    1.384,
+    1.611,
+    1.633,
+    1.422,
+    1.507,
+    1.479,
+    1.669,
+    1.73,
+    1.875,
+    1.624,
+    1.707,
+    1.53,
+    1.594,
+    1.583,
+    1.811,
+    1.607,
+    1.466,
+    1.526,
+    1.617
+   ],
+   "samples": [
+    {
+     "tick": 0,
+     "stt": "The meeting has moved to 3 o'clock this afternoon.",
+     "sounds": [
+      [
+       "Speech",
+       0.8,
+       "IMPORTANT"
+      ]
+     ],
+     "headlines": [
+      [
+       "Speech",
+       "IMPORTANT"
+      ],
+      [
+       "The meeting has moved to 3 o'clock this afternoon.",
+       "IMPORTANT"
+      ]
+     ],
+     "scene": "a woman in a blue shirt",
+     "emotion": "neutral",
+     "hazards": 1,
+     "notification": ""
+    },
+    {
+     "tick": 19,
+     "stt": "The meeting has moved to 3 o'clock this afternoon.",
+     "sounds": [
+      [
+       "Speech",
+       0.8,
+       "IMPORTANT"
+      ]
+     ],
+     "headlines": [
+      [
+       "Speech",
+       "IMPORTANT"
+      ],
+      [
+       "The meeting has moved to 3 o'clock this afternoon.",
+       "IMPORTANT"
+      ]
+     ],
+     "scene": "a woman in a blue shirt",
+     "emotion": "neutral",
+     "hazards": 1,
+     "notification": ""
+    }
+   ]
+  },
+  "critical_alarm": {
+   "n": 12,
+   "wall_median": 0.6973034378606826,
+   "wall_p95": 0.8495261250063777,
+   "wall_max": 0.8564790827222168,
+   "wall_min": 0.6678085001185536,
+   "per_tick_wall": [
+    0.6972819590009749,
+    0.6973249167203903,
+    0.6820585411041975,
+    0.8495261250063777,
+    0.7244756249710917,
+    0.833130625076592,
+    0.6838008342310786,
+    0.8564790827222168,
+    0.6895779590122402,
+    0.6678085001185536,
+    0.6885067080147564,
+    0.8204930420033634
+   ],
+   "per_tick_server": [
+    0.696,
+    0.696,
+    0.681,
+    0.848,
+    0.723,
+    0.832,
+    0.683,
+    0.855,
+    0.688,
+    0.667,
+    0.687,
+    0.819
+   ],
+   "samples": [
+    {
+     "tick": 0,
+     "stt": "",
+     "sounds": [
+      [
+       "Kitchen alarm (personal)",
+       1.0,
+       "IMPORTANT"
+      ],
+      [
+       "Squeal",
+       0.22,
+       "AMBIENT"
+      ]
+     ],
+     "headlines": [
+      [
+       "Kitchen alarm (personal)",
+       "IMPORTANT"
+      ]
+     ],
+     "scene": "a woman in a blue shirt",
+     "emotion": "happy",
+     "hazards": 1,
+     "notification": ""
+    },
+    {
+     "tick": 11,
+     "stt": "",
+     "sounds": [
+      [
+       "Kitchen alarm (personal)",
+       1.0,
+       "IMPORTANT"
+      ],
+      [
+       "Squeal",
+       0.22,
+       "AMBIENT"
+      ]
+     ],
+     "headlines": [
+      [
+       "Kitchen alarm (personal)",
+       "IMPORTANT"
+      ]
+     ],
+     "scene": "a woman in a blue shirt",
+     "emotion": "happy",
+     "hazards": 1,
+     "notification": ""
+    }
+   ]
+  }
+ }
+}

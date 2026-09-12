@@ -29,6 +29,7 @@ backend/data/personal_sounds/
 backend/data/people/
 backend/data/speakers.json
 backend/data/sign_profile/
+backend/data/model_cache/
 
 # Keep the eval folder structure and its protocols, ignore recorded media
 backend/data/personalizer_eval/**/*.wav
@@ -43,3 +44,12 @@ backend/data/*.log
 
 # ─── Node (unused, kept for safety) ───────────────────────────────
 node_modules/
+
+# ─── Report experiment scratch data (results JSON is committed) ───
+backend/eval_results/librispeech/
+backend/eval_results/librispeech_wav/
+backend/eval_results/media/
+backend/eval_results/shots_media/
+backend/eval_results/shots/
+backend/eval_results/*.npz
+backend/eval_results/*.log

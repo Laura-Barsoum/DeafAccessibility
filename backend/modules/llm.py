@@ -1,5 +1,5 @@
 """
-llm.py — LLaMA 3 wrapper (via Groq) for situational reasoning.
+llm.py — LLM wrapper (open-weight models hosted on Groq) for situational reasoning.
 
 Three roles:
     1. Compose user-facing notifications from a set of multimodal events
@@ -19,15 +19,18 @@ log = logging.getLogger("accessibility.llm")
 
 
 # Models to try in order. Hosted model catalogues change without notice: the
-# LLaMA 3 models this project originally used were withdrawn by the provider
-# and began returning "model_not_found", which surfaced as an error string in
-# the user interface. The chain below is tried in order so a single withdrawn
-# model degrades to the next rather than breaking the feature.
+# LLaMA 3 models this project originally used were decommissioned by the
+# provider on 16 August 2026 and began returning "model_not_found", which
+# surfaced as an error string in the user interface. The chain below is tried
+# in order so a single withdrawn model degrades to the next.
+#
+# Order is set by a 144-call benchmark on the shipped gloss-to-English prompt
+# (12 glosses x 3 repeats per model, content-preservation rubric):
 _MODEL_FALLBACKS = [
-    "openai/gpt-oss-120b",    # measured fastest and most consistent on this task
-    "openai/gpt-oss-20b",     # smaller, more variable latency
-    "groq/compound-mini",
-    "qwen/qwen3.8-27b",       # last: occasionally returns empty content
+    "openai/gpt-oss-20b",     # 36/36 correct, median 0.32 s, max 0.67 s
+    "openai/gpt-oss-120b",    # 36/36 correct, median 0.42 s, max 1.22 s
+    "qwen/qwen3.8-27b",       # 36/36 correct, ~3x the reasoning tokens, 2.6 s tail
+    "groq/compound-mini",     # rejects reasoning_effort (HTTP 400); works on retry
 ]
 
 
@@ -70,44 +73,36 @@ class LLM:
         for model in self._models:
             if model in self._dead:
                 continue
-            try:
-                resp = self._client.chat.completions.create(
-                    model=model,
-                    messages=messages,
-                    # gpt-oss models emit reasoning tokens that consume the
-                    # completion budget, so allow headroom and ask for the
-                    # shortest reasoning pass. Unsupported keys are ignored
-                    # by providers that do not implement them.
-                    max_tokens=max(max_tokens, 150),
-                    temperature=temperature,
-                    reasoning_effort="low",
-                )
-                text = (resp.choices[0].message.content or "").strip()
-                if text:
-                    if model != self._model:
-                        log.info("LLM: fell back to %s", model)
-                        self._model = model
-                    return text
-            except TypeError:
-                # Client rejected reasoning_effort; retry without it.
+            # First attempt asks for the shortest reasoning pass: gpt-oss
+            # models emit reasoning tokens that consume the completion budget.
+            # Some hosted models reject the parameter outright with HTTP 400
+            # (measured: groq/compound-mini), so the second attempt omits it.
+            for with_reasoning in (True, False):
+                kwargs = dict(model=model, messages=messages,
+                              max_tokens=max(max_tokens, 150), temperature=temperature)
+                if with_reasoning:
+                    kwargs["reasoning_effort"] = "low"
                 try:
-                    resp = self._client.chat.completions.create(
-                        model=model, messages=messages,
-                        max_tokens=max(max_tokens, 150), temperature=temperature,
-                    )
+                    resp = self._client.chat.completions.create(**kwargs)
                     text = (resp.choices[0].message.content or "").strip()
                     if text:
-                        self._model = model
+                        if model != self._model:
+                            log.info("LLM: fell back to %s", model)
+                            self._model = model
                         return text
+                    break                      # answered but empty: next model
+                except TypeError:
+                    continue                   # old client lacks the parameter
                 except Exception as e:
-                    log.warning("LLM %s failed: %s", model, e)
-            except Exception as e:
-                msg = str(e)
-                if "model_not_found" in msg or "does not exist" in msg:
-                    log.warning("LLM model %s unavailable, trying next", model)
-                    self._dead.add(model)
-                    continue
-                log.warning("LLM %s failed: %s", model, msg[:160])
+                    msg = str(e)
+                    if with_reasoning and "reasoning_effort" in msg:
+                        continue               # model rejects the parameter
+                    if any(k in msg for k in ("model_not_found", "does not exist", "decommissioned")):
+                        log.warning("LLM model %s unavailable, trying next", model)
+                        self._dead.add(model)
+                    else:
+                        log.warning("LLM %s failed: %s", model, msg[:160])
+                    break
         log.warning("LLM: all models failed; caller will use plain text")
         return ""
 

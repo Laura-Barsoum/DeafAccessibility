@@ -95,6 +95,24 @@ class PersonalizerFeedbackTests(unittest.TestCase):
         # Default base 0.90 → 0.92 after one negative-feedback bump.
         self.assertAlmostEqual(r["threshold"], 0.92, places=5)
 
+    def test_negative_feedback_tightens_the_prototypical_gate(self):
+        # Regression: rejection used to change only the cosine threshold, which
+        # the default prototypical matcher never reads.
+        events = self.p.match(b"x" * 32000, threshold=0.0)
+        mid = events[0].to_dict()["extra"]["match_id"]
+        before = self.p.profile["sounds"]["test_doorbell"].get("proto_gate")
+        r = self.p.feedback(mid, is_positive=False)
+        after = self.p.profile["sounds"]["test_doorbell"]["proto_gate"]
+        self.assertIn("proto_gate", r)
+        self.assertLess(after, before if before is not None else pm.PROTO_GATE_FLOOR + 1e-9)
+
+    def test_repeated_rejection_never_makes_a_sound_unmatchable(self):
+        self.p.profile["sounds"]["test_doorbell"]["proto_gate"] = 0.10
+        for _ in range(60):
+            events = self.p.match(b"x" * 32000, threshold=0.0)
+            self.p.feedback(events[0].to_dict()["extra"]["match_id"], is_positive=False)
+        self.assertGreaterEqual(self.p.profile["sounds"]["test_doorbell"]["proto_gate"], 0.02)
+
     def test_negative_feedback_caps_at_0_95(self):
         # Hammer it 20 times — must never exceed 0.95
         self.p.profile["sounds"]["test_doorbell"]["threshold"] = 0.90

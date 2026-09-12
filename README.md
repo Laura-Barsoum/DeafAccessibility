@@ -26,7 +26,7 @@ personalisation with open-set rejection, and graceful degradation.
 
 | Channel | Model | Status |
 |---|---|---|
-| Speech transcription | Whisper (faster-whisper, `small`) | Working |
+| Speech transcription | Whisper (faster-whisper, `distil-small.en` finals, `tiny` live partials) | Working, 6.9% WER on a LibriSpeech sample |
 | Environmental sound classification | Audio Spectrogram Transformer (AudioSet) | Working, 77.8% top-3 on ESC-50 |
 | Personal sound recognition | YamNet embeddings + prototypical networks | Working, few-shot enrolment |
 | Visual hazard detection | YOLOv11 | Working |
@@ -102,9 +102,9 @@ Copy `.env.example` to `.env` and fill in the values you need. **Never commit
 | Variable | Purpose | Required? |
 |---|---|---|
 | `GROQ_API_KEY` | LLM for gloss polishing and alert composition | Optional, degrades to plain text |
-| `ACCESSIBILITY_LLM_MODEL` | Model id, default `openai/gpt-oss-120b` | Optional |
+| `ACCESSIBILITY_LLM_MODEL` | Model id, default `openai/gpt-oss-20b` | Optional |
 | `ELEVENLABS_API_KEY` | Neural voice for sign-to-speech | Optional, falls back to system TTS |
-| `ACCESSIBILITY_WHISPER_SIZE` | `tiny`/`base`/`small`, default `small` | Optional |
+| `ACCESSIBILITY_WHISPER_SIZE` | `tiny`/`base`/`small`/`distil-small.en`, default `distil-small.en` | Optional |
 | `HF_TOKEN` | HuggingFace, for gated model downloads | Optional |
 | `PYANNOTE_TOKEN` | Speaker diarization | Optional, off by default |
 
@@ -149,7 +149,7 @@ cd backend && source venv/bin/activate
 python -m pytest tests/ -q
 ```
 
-112 unit and integration tests. Unit tests cover pure logic (fusion ranking,
+130 unit and integration tests. Unit tests cover pure logic (fusion ranking,
 priority mapping, prototypical matching, the feedback loop, fingerspelling,
 name matching). Integration tests exercise the HTTP layer, including graceful
 degradation when audio or frames are absent.
@@ -168,6 +168,13 @@ python scripts/run_eval_matrix.py      # runs all, writes docs/EVAL_MATRIX.md
 
 Datasets are not committed. Each folder under `backend/data/*_eval/` contains a
 README with the recording protocol and expected layout.
+
+The exact experiments behind the final report (model comparisons, the
+personal-sound calibration, the Whisper decoding ablation, the language-model
+benchmark and latency on recorded media) are in
+`backend/scripts/report_experiments/`, with their JSON results committed in
+`backend/eval_results/`. See that folder's README for which script produces
+which table or figure.
 
 ## Project structure
 
