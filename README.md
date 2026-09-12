@@ -4,8 +4,9 @@ Final-year project, BSc Computer Science, University of London.
 Project template: CM3020 Artificial Intelligence, 4.1 Project Idea 1:
 *Orchestrating AI models to achieve a goal*.
 
-A browser-based assistant that runs **seven pre-trained AI models concurrently
-on a laptop CPU** to provide situational awareness beyond speech captioning.
+A browser-based assistant that combines **eight pre-trained perception models
+and a language model on a laptop CPU** to provide situational awareness beyond
+speech captioning.
 It transcribes speech, classifies environmental sounds, recognises sounds the
 user has personally enrolled, detects visual hazards, describes the scene,
 reads emotional tone, and interprets a constrained sign vocabulary. Detections
@@ -39,9 +40,10 @@ personalisation with open-set rejection, and graceful degradation.
 
 ### Feedback from target users
 
-The prototype has been demonstrated informally to Deaf and hard-of-hearing
-users. This was unstructured formative feedback, with no measures collected
-and nothing recorded, so it is design input rather than research data. The
+Five Deaf and hard-of-hearing people tried the prototype informally at several
+stages of development. This was unstructured feedback, with no measures
+collected and nothing recorded; it was not collected as research data and is not
+presented as research findings. The
 reception was positive, and the response that best captures the intent was
 that this is *"finally an app that lets us hear the world, not the other way
 around"*.
