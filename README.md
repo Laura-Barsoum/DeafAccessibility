@@ -1,8 +1,8 @@
 # A Multimodal AI Accessibility Assistant for Deaf and Hard-of-Hearing Users
 
 Final-year project, BSc Computer Science, University of London.
-Module CM3020 Artificial Intelligence, Template 4.1: *Orchestrating AI Models
-to Achieve a Goal*.
+Project template: CM3020 Artificial Intelligence, 4.1 Project Idea 1:
+*Orchestrating AI models to achieve a goal*.
 
 A browser-based assistant that runs **seven pre-trained AI models concurrently
 on a laptop CPU** to provide situational awareness beyond speech captioning.
