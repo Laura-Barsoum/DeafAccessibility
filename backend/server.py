@@ -237,12 +237,15 @@ def index():
 
 @app.route("/health")
 def health():
-    """Liveness probe returning service metadata."""
+    """Liveness probe returning service metadata and the active sound
+    classifier, so a silent downgrade from AST is visible."""
     return jsonify({
         "ok": True,
         "service": "Deaf/HoH Accessibility Assistant",
         "version": "0.1.0",
         "timestamp": time.time(),
+        # Reads state only; it never triggers a model load.
+        "sound_classifier": get_audio_scene().status(),
     })
 
 

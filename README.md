@@ -29,14 +29,17 @@ personalisation with open-set rejection, and graceful degradation.
 |---|---|---|
 | Speech transcription | Whisper (faster-whisper, `distil-small.en` finals, `tiny` live partials) | Working, 6.9% WER on a LibriSpeech sample |
 | Environmental sound classification | Audio Spectrogram Transformer (AudioSet) | Working, 77.8% top-3 on ESC-50 |
-| Personal sound recognition | YamNet embeddings + prototypical networks | Working, few-shot enrolment |
-| Visual hazard detection | YOLOv11 | Working |
+| Personal sound recognition | YamNet embeddings + prototypical networks | Working, but recall 0.32 on an ESC-50 household proxy |
+| Visual hazard detection | YOLOv11n | Working |
 | Scene description | BLIP | Working, throttled to every 4th tick |
 | Emotion (tone) | DeepFace + wav2vec2, confidence-weighted fusion | Working |
 | Sign recognition | MediaPipe Tasks + geometric rules + fingerspelling | Partial, see limitations |
-| Sign to speech | LLM gloss polishing + neural TTS | Working |
+| Sign to speech | LLM gloss polishing (`gpt-oss-20b` via Groq) + neural TTS | Working |
 | Name and keyword alerts | Transcript matching, word-boundary safe | Working |
 | Caption reliability | Heuristic scorer from lip motion | Working (**not** lip reading) |
+
+Which models were tested and rejected, and why, is summarised in
+[`docs/MODEL_EVALUATION.md`](docs/MODEL_EVALUATION.md).
 
 ### Feedback from target users
 
@@ -57,9 +60,19 @@ conducted; no claim of measured benefit is made on the basis of this feedback.
 ### Honest limitations
 
 - **Sign recognition is constrained.** The TGCN tier trained on WLASL is
-  inactive because no public checkpoint could be obtained, so vocabulary falls
-  back to roughly 20 curated signs plus fingerspelling. Measured 5.9% top-1 on
-  a 17-clip WLASL sample; see `docs/WLASL_EVAL_RESULTS.md`.
+  inactive because no public checkpoint could be obtained, so recognition falls
+  back to a small curated vocabulary of conversational and safety signs plus
+  fingerspelling. Measured 5.9% top-1 on 17 WLASL clips covering 15 signs; see
+  `docs/WLASL_EVAL_RESULTS.md`.
+- **Personal sounds are often missed.** On a household-class proxy built from
+  ESC-50, the calibrated matcher recalls 0.32 of enrolled sounds with a 20.6%
+  false-alarm rate. It has not been evaluated on recordings from real homes.
+- **Fusion repeats events.** On 35 scripted scenes, each run three times, 39%
+  of headline slots repeated an event already shown (for example "Siren" and
+  "Police car (siren)"), and the merge step removed none of 159 extra
+  detections, because it joins only identical labels. Whisper also turned
+  non-speech sounds into short transcripts that took 19% of headline slots.
+  See `backend/eval_results/fusion_eval.json`.
 - **No lip reading.** `lip_reader.py` computes a transcript *reliability score*
   from mouth movement. It does not run AV-HuBERT or any audio-visual speech
   model.
@@ -83,7 +96,7 @@ conducted; no claim of measured benefit is made on the basis of this feedback.
 ## Installation
 
 ```bash
-git clone <your-repo-url>
+git clone https://github.com/Laura-Barsoum/DeafAccessibility.git
 cd DeafAccessibility
 
 python3 -m venv backend/venv
@@ -126,6 +139,11 @@ On first start the server downloads model weights and prewarms them, which
 takes roughly 20 to 60 seconds. Wait for `Models prewarmed ... ready` in the
 log before clicking **Start Listening**, otherwise the first tick is slow.
 
+`http://localhost:5051/health` reports which sound classifier is active. If
+the Hugging Face Hub cannot be reached, AST loads from the local cache;
+`"degraded": true` means it could not load at all and a weaker fallback is
+classifying sounds.
+
 ### Usage walkthrough
 
 1. **Live tab.** Click *Start Listening* and grant microphone and camera
@@ -151,46 +169,51 @@ cd backend && source venv/bin/activate
 python -m pytest tests/ -q
 ```
 
-130 unit and integration tests. Unit tests cover pure logic (fusion ranking,
+137 unit and integration tests. Unit tests cover pure logic (fusion ranking,
 priority mapping, prototypical matching, the feedback loop, fingerspelling,
-name matching). Integration tests exercise the HTTP layer, including graceful
-degradation when audio or frames are absent.
+name matching, the language-model fallback chain). Integration tests exercise
+the HTTP layer, including graceful degradation when audio or frames are absent.
 
 ## Evaluation
 
-Scripts live in `backend/scripts/`. Each writes a JSON results file.
+The experiments behind every table and figure in the final report's evaluation
+chapter are in `backend/scripts/report_experiments/`. Each writes JSON to
+`backend/eval_results/`, and the committed JSON files are the exact results the
+report quotes. That folder's README maps each script to its table or figure.
 
 ```bash
-python scripts/eval_audio_scene.py     # ESC-50, sound classification
-python scripts/eval_wlasl.py           # WLASL, sign recognition
-python scripts/eval_personalizer.py    # personal sounds, precision/recall
-python scripts/eval_whisper.py         # LibriSpeech, word error rate
-python scripts/run_eval_matrix.py      # runs all, writes docs/EVAL_MATRIX.md
+cd backend && source venv/bin/activate
+python scripts/report_experiments/yamnet_esc50.py               # YamNet on ESC-50, compared with AST
+python scripts/report_experiments/fewshot_calibrate.py          # personal-sound calibration
+python scripts/report_experiments/extract_librispeech_sample.py # speech sample, needed by the next line
+python scripts/report_experiments/whisper_ablation.py           # WER by Whisper model and decoding setting
+python scripts/report_experiments/llm_benchmark.py              # language-model benchmark, needs GROQ_API_KEY
+python scripts/report_experiments/latency_on_recorded_media.py  # per-stage and end-to-end tick latency
+python scripts/report_experiments/fusion_scenes.py              # fusion on scripted scenes with known events
 ```
 
-Datasets are not committed. Each folder under `backend/data/*_eval/` contains a
-README with the recording protocol and expected layout.
-
-The exact experiments behind the final report (model comparisons, the
-personal-sound calibration, the Whisper decoding ablation, the language-model
-benchmark and latency on recorded media) are in
-`backend/scripts/report_experiments/`, with their JSON results committed in
-`backend/eval_results/`. See that folder's README for which script produces
-which table or figure.
+The per-channel scripts directly in `backend/scripts/` (`eval_*.py`) came
+first. `eval_audio_scene.py` still produces the AST result on ESC-50, and
+`run_eval_matrix.py` runs the per-channel scripts and writes
+`docs/EVAL_MATRIX.md`. Datasets are not committed: ESC-50 is fetched by
+`scripts/download_esc50.py`, and each folder under `backend/data/*_eval/`
+contains a README with the expected layout.
 
 ## Project structure
 
 ```
 backend/
-  server.py            Flask app, 29 endpoints, the /process orchestration tick
-  modules/             22 modules, one concern each, uniform Event interface
-  scripts/             evaluation and dataset utilities
-  tests/               unit and integration tests
+  server.py              Flask app, 29 endpoints, the /process orchestration tick
+  modules/               23 modules, one concern each, uniform Event interface
+  scripts/               per-channel evaluation and dataset utilities
+    report_experiments/  the experiments behind the final report
+  eval_results/          committed JSON results quoted in the report
+  tests/                 unit and integration tests
 frontend/
-  index.html           single page, six live panels
-  app.js               tick loop, streaming captions, rendering, enrolment
+  index.html             single page, six live panels
+  app.js                 tick loop, streaming captions, rendering, enrolment
   style.css
-docs/                  evaluation results and model notes
+docs/                    model selection summary, WLASL results, evaluation matrix
 ```
 
 Architecture, data flow and the fusion algorithm are documented in the project
@@ -198,10 +221,14 @@ report (Chapter 3).
 
 ## Privacy
 
-Audio and video are processed on the device and never transmitted or written
-to disk. Only derived representations persist: mean embeddings for enrolled
-sounds and people, and a diary of event labels, priorities and timestamps with
-no audio. This is a structural property of the design, not a policy statement.
+Raw audio and video never leave the machine and are not kept. Camera frames
+stay in memory; each audio chunk is written to temporary files for decoding,
+which are deleted as soon as each decoding or model call finishes. Only derived
+data persists: mean embeddings for enrolled sounds and people, a diary of event
+labels, priorities and timestamps with no audio, and cached speech for sentences
+the assistant has already spoken. Short text does leave the machine: sign
+glosses, alert and summary text go to the language model, and sentences to be
+spoken go to an online voice service when one is used.
 
 ## Licence
 

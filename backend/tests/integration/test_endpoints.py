@@ -206,6 +206,14 @@ class EndpointShapeTests(unittest.TestCase):
         self.assertEqual(r.status_code, 200)
         self.assertFalse(r.get_json()["ok"])
 
+    # ── /health ──────────────────────────────────────────────────────
+    def test_health_reports_sound_classifier_backend(self):
+        r = self.client.get("/health")
+        self.assertEqual(r.status_code, 200)
+        sc = r.get_json()["sound_classifier"]
+        self.assertIn(sc["backend"], ("not_loaded", "ast", "yamnet", "heuristic"))
+        self.assertIn("degraded", sc)
+
     # ── /tts/status ──────────────────────────────────────────────────
     def test_tts_status_shape(self):
         r = self.client.get("/tts/status")

@@ -96,7 +96,25 @@ class AudioSceneClassifier:
     def __init__(self) -> None:
         self._model = None
         self._labels: Optional[List[str]] = None
+        self._backend: Optional[str] = None
+        self._load_error: Optional[str] = None       # last AST load failure, if any
+        self._ast_from_local_cache = False
         log.info("AudioSceneClassifier initialised (lazy load)")
+
+    def status(self) -> Dict[str, Any]:
+        """Report which classifier is active, without triggering a load.
+
+        AST is the evaluated choice (ESC-50 top-3 77.8% against YamNet's
+        64.5%). A "yamnet" or "heuristic" backend means the classifier has
+        degraded, which is otherwise invisible because inference carries on;
+        /health returns this so the downgrade can be noticed.
+        """
+        return {
+            "backend": self._backend or "not_loaded",
+            "degraded": self._backend is not None and self._backend != "ast",
+            "loaded_from_local_cache": self._ast_from_local_cache,
+            "ast_load_error": self._load_error,
+        }
 
     def _ensure_loaded(self) -> None:
         """
@@ -104,6 +122,8 @@ class AudioSceneClassifier:
 
         - Preferred: AST (Audio Spectrogram Transformer) via HuggingFace
           `MIT/ast-finetuned-audioset-10-10-0.4593` — works on Python 3.13.
+          If the Hub cannot be reached, AST is loaded from the local cache
+          before any fallback is considered.
           Trained on AudioSet (Gemmeke et al. 2017) with 527 classes.
         - Secondary: TF-Hub YamNet (AST was preferred after both were evaluated on ESC-50).
         - Tertiary: heuristic energy/centroid fallback.
@@ -116,23 +136,33 @@ class AudioSceneClassifier:
             return
 
         # ── Attempt 1: HuggingFace AST (most compatible)
-        try:
-            from transformers import AutoFeatureExtractor, AutoModelForAudioClassification
-            import torch
-            mid = os.environ.get(
-                "ACCESSIBILITY_AUDIO_SCENE_MODEL",
-                "MIT/ast-finetuned-audioset-10-10-0.4593",
-            )
-            self._extractor = AutoFeatureExtractor.from_pretrained(mid)
-            self._model = AutoModelForAudioClassification.from_pretrained(mid)
-            self._model.eval()
-            self._labels = list(self._model.config.id2label.values())
-            self._backend = "ast"
-            log.info("AST audio-scene model loaded: %s (%d labels)",
-                     mid, len(self._labels))
-            return
-        except Exception as e:
-            log.warning("AST audio-scene unavailable (%s) — trying YamNet", e)
+        # transformers asks the Hub about a model before using its cache, so a
+        # network failure at start-up used to drop straight to YamNet, the
+        # classifier the evaluation rejected. Retry once from the local cache.
+        mid = os.environ.get(
+            "ACCESSIBILITY_AUDIO_SCENE_MODEL",
+            "MIT/ast-finetuned-audioset-10-10-0.4593",
+        )
+        for local_only in (False, True):
+            try:
+                from transformers import AutoFeatureExtractor, AutoModelForAudioClassification
+                import torch  # noqa: F401  (AST inference runs on torch)
+                self._extractor = AutoFeatureExtractor.from_pretrained(mid, local_files_only=local_only)
+                self._model = AutoModelForAudioClassification.from_pretrained(mid, local_files_only=local_only)
+                self._model.eval()
+                self._labels = list(self._model.config.id2label.values())
+                self._backend = "ast"
+                self._ast_from_local_cache = local_only
+                log.info("AST audio-scene model loaded%s: %s (%d labels)",
+                         " from the local cache" if local_only else "", mid, len(self._labels))
+                return
+            except Exception as e:
+                self._model = None
+                self._load_error = f"{type(e).__name__}: {e}"
+                if not local_only:
+                    log.warning("AST online load failed (%s); retrying from the local cache", e)
+                else:
+                    log.warning("AST audio-scene unavailable (%s); trying YamNet", e)
 
         # ── Attempt 2: TF-Hub YamNet
         try:
