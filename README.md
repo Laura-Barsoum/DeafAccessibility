@@ -225,7 +225,8 @@ Raw audio and video never leave the machine and are not kept. Camera frames
 stay in memory; each audio chunk is written to temporary files for decoding,
 which are deleted as soon as each decoding or model call finishes. Only derived
 data persists: mean embeddings for enrolled sounds and people, a diary of event
-labels, priorities and timestamps with no audio, and cached speech for sentences
+labels, priorities and timestamps with no audio (for speech, the label is the
+first 80 characters of each final caption), and cached speech for sentences
 the assistant has already spoken. Short text does leave the machine: sign
 glosses, alert and summary text go to the language model, and sentences to be
 spoken go to an online voice service when one is used.

@@ -6,8 +6,9 @@ Persists events for longitudinal queries:
     - "How many times did the dog bark this week?"
     - "When did the smoke alarm go off?"
 
-Anonymous-by-design: stores label + priority + timestamp, never the audio
-itself.
+Stores label + priority + timestamp, never the audio itself. For speech the
+label is the first 80 characters of the caption, so the diary does keep what
+was said, in text.
 """
 from __future__ import annotations
 

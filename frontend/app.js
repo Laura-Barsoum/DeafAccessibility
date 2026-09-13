@@ -1585,7 +1585,7 @@ async function generateSummary() {
     const data = await response.json();
     
     el.summaryText.textContent = data.summary || 'No significant events found in the recent window.';
-    el.summaryStats.textContent = `Based on ${data.stats?.events_count || 0} environmental events.`;
+    el.summaryStats.textContent = `Based on ${data.stats?.total_events || 0} environmental events.`;
   } catch (err) {
     console.error('Summary error:', err);
     el.summaryText.textContent = 'Error contacting the AI summarizer.';

@@ -205,6 +205,54 @@ res["shipped_rejection_breakdown_test"] = dict(
                                                np.exp(-D - (-D).max(axis=1, keepdims=True)).sum(axis=1, keepdims=True)))(T["Dp"])
         for T in test]))),
 )
+# uncertainty for Table 5.2: resample the 30 test trials (the independent unit), not individual queries,
+# because queries within a trial share the same enrolled prototypes
+def per_trial(S, count_fn, params):
+    return np.array([count_fn([T], *params) for T in S])
+
+
+def boot_metrics(per, n_boot=2000, seed=1):
+    rng = np.random.default_rng(seed)
+    draws = {k: [] for k in ("recall", "precision", "f1", "far")}
+    for _ in range(n_boot):
+        m = metrics(tuple(int(v) for v in per[rng.integers(0, len(per), len(per))].sum(axis=0)))
+        for k in draws:
+            draws[k].append(m[k])
+    return {k: [float(np.percentile(v, 2.5)), float(np.percentile(v, 97.5))] for k, v in draws.items()}
+
+
+def boot_f1_difference(per_a, per_b, n_boot=2000, seed=2):
+    rng = np.random.default_rng(seed)
+    diffs = []
+    for _ in range(n_boot):
+        idx = rng.integers(0, len(per_a), len(per_a))
+        diffs.append(metrics(tuple(int(v) for v in per_a[idx].sum(axis=0)))["f1"]
+                     - metrics(tuple(int(v) for v in per_b[idx].sum(axis=0)))["f1"])
+    return [float(np.percentile(diffs, 2.5)), float(np.percentile(diffs, 97.5))]
+
+
+cal = res["selection"]["far<=5%"]
+rows = dict(
+    cosine_shipped=(cos_counts, (0.90,)),
+    cosine_calibrated=(cos_counts, (cal["cosine"]["params"],)),
+    prototypical_shipped=(proto_counts, shipped_p),
+    prototypical_calibrated=(proto_counts, tuple(cal["prototypical"]["params"])),
+)
+PER = {name: per_trial(test, fn, params) for name, (fn, params) in rows.items()}
+for name, (fn, params) in rows.items():  # per-trial counts must add up to the pooled figures reported
+    assert tuple(int(v) for v in PER[name].sum(axis=0)) == tuple(fn(test, *params)), name
+res["test_intervals_95"] = dict(
+    method="percentile bootstrap over the 30 test trials, 2000 resamples",
+    **{name: boot_metrics(per) for name, per in PER.items()},
+)
+res["test_f1_difference_95"] = dict(
+    calibrated_minus_shipped_prototypical=boot_f1_difference(PER["prototypical_calibrated"], PER["prototypical_shipped"]),
+    prototypical_minus_cosine_calibrated=boot_f1_difference(PER["prototypical_calibrated"], PER["cosine_calibrated"]),
+)
+res["test_per_trial_counts"] = dict(
+    columns=["tp", "fp", "false_alarms", "n_pos", "n_neg"],
+    **{name: per.tolist() for name, per in PER.items()},
+)
 json.dump(res, open(os.path.join(SP, "fewshot_tune.json"), "w"), indent=1, default=float)
 
 def line(name, m):
