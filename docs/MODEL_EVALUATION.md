@@ -1,270 +1,85 @@
-# Model Evaluation Report
+# Model selection and evaluation
 
-> **Project:** AI Accessibility Assistant for Deaf and Hard-of-Hearing Users
-> **Author:** Laura Barsoum
-> **Date:** May 2026
->
-> This document records the **empirical evaluation** of each pre-trained
-> model in the orchestration, against public datasets, with concrete
-> per-class numbers. It directly addresses the assignment-brief
-> requirement:
->
-> > *"evidence that you have tested several models and made decisions
-> > about which are and are not appropriate"*
+**Project:** A Multimodal AI Accessibility Assistant for Deaf and Hard-of-Hearing Users
+**Author:** Laura Barsoum, September 2026
 
----
+This page records which models the system uses, which candidates were
+rejected, and the evidence behind each decision. It matches Table 3.1 and
+Section 5.2 of the final report. Every measured number was produced by a script
+in `backend/scripts/report_experiments/` and is stored in `backend/eval_results/`;
+that folder's README says which script produces which table or figure.
 
-## 1. Overview — six pre-trained models, four datasets
+## Models in the running system
 
-| # | Model | Domain | Source | Evaluated against | Result |
-|---|---|---|---|---|---|
-| 1 | **AST** (Audio Spectrogram Transformer) | Audio events | `MIT/ast-finetuned-audioset-10-10-0.4593` (HuggingFace) | **ESC-50** | **80.0% top-3 acc** (n=250) |
-| 2 | **MediaPipe GestureRecognizer** | Hand gestures | Google MediaPipe Tasks (pre-trained CNN) | Self-recorded test set | Pending user-collected images |
-| 3 | **Whisper** (faster-whisper, `base`) | Speech-to-text | OpenAI / SYSTRAN | Live user-study transcripts | Qualitative + hallucination filter |
-| 4 | **wav2vec2-IEMOCAP** | Voice emotion | `superb/wav2vec2-base-superb-er` | Live user sessions | Cross-channel fusion eval |
-| 5 | **DeepFace** | Facial emotion | DeepFace lib (Ekman 7-class) | Live user sessions | EMA-smoothed cross-tick |
-| 6 | **YOLOv11n** | Visual hazards | Ultralytics (pre-trained on COCO) | COCO labels (built-in) | Off-the-shelf benchmark |
+Eight pre-trained perception models and one language model. No model is
+trained from scratch.
 
-All six are **pre-trained, no training performed**, consistent with the
-brief's emphasis.
-
----
-
-## 2. ESC-50 evaluation (Audio Spectrogram Transformer)
-
-### 2.1 Setup
-- **Dataset:** [ESC-50](https://github.com/karolpiczak/ESC-50) — 2,000
-  environmental sound clips, 50 classes, 5 official folds.
-- **Subsample:** 5 clips per class = **250 clips total**, randomly drawn
-  from the first 8 entries per category (deterministic for repro).
-- **Model:** `MIT/ast-finetuned-audioset-10-10-0.4593` — pre-trained on
-  AudioSet (Gemmeke 2017), 527 output labels.
-- **Scoring:** Top-3. A clip counts as correct if any of the model's
-  top-3 predictions appears in the curated `ESC50_TO_YAMNET` label-map
-  for its ground-truth ESC-50 class.
-- **Hardware:** CPU only (Apple Silicon), no GPU acceleration.
-
-### 2.2 Headline result
-
-> **🎯 200 / 250 correct = 80.0% top-3 accuracy**
-> **⏱️ 325 ms per clip mean inference latency on CPU**
-
-### 2.3 Per-class accuracy
-
-**Perfect classes (100% top-3 accuracy, n=5 each):**
-
-dog, chirping_birds, thunderstorm, door_wood_knock, crow, clapping,
-pouring_water, sheep, church_bells, keyboard_typing, frog, cow,
-brushing_teeth, car_horn, rain, vacuum_cleaner, fireworks, chainsaw,
-clock_alarm, helicopter, water_drops, pig, hand_saw, snoring, toilet_flush,
-train, airplane, rooster, siren, footsteps, glass_breaking, hen, crying_baby,
-crackling_fire, sneezing, engine, coughing, insects, mouse_click
-
-**Mid-range (60-80%):** breathing, sea_waves, door_wood_creaks, crickets,
-clock_tick, fireworks
-
-**Worst classes (0–20%):** can_opening, drinking_sipping, washing_machine,
-laughing, wind, mouse_click
-
-### 2.4 Top confusion patterns
-
-| Ground truth | Confused with |
-|---|---|
-| washing_machine | Vehicle (×4), Jet engine (×1) |
-| can_opening | Click (often classified as 'utensil clinking') |
-| drinking_sipping | Splash (×3), Liquid (×2) |
-| laughing | Speech (×3), Giggle (×1) |
-| wind | Whistle (×2), Rustle (×2) |
-| breathing | Gasp (×1), Sigh (×1) |
-| crickets | Rattle (×2) |
-| sea_waves | Gurgling (×1), Boat-water vehicle (×1) |
-
-These confusions are **acoustically plausible** — they reflect genuine
-overlap in the audio domain, not classifier failure. AudioSet's
-fine-grained hierarchy treats "Rattle" and "Cricket chirp" as
-near-siblings.
-
-### 2.5 Decision
-
-AST is **kept as the primary audio-event classifier**. The 80% top-3
-accuracy is solid for the safety-critical use case: smoke alarms,
-sirens, baby cries, glass breaking — the categories that *matter* for
-Deaf accessibility — all land at 100%. The classes AST struggles with
-(`can_opening`, `drinking_sipping`) are not safety-critical for this
-project.
-
----
-
-## 3. Other models considered and rejected
-
-### 3.1 YamNet
-- **Tested:** Yes — initial implementation in `audio_scene.py`
-- **Result:** TensorFlow crashes on Python 3.13 (SIGABRT, exit 134).
-  Known incompatibility in `tensorflow==2.21`.
-- **Decision:** Rejected. Kept as a Python ≤3.11 fallback path in the
-  code so the project remains usable on older interpreters.
-
-### 3.2 PANN (Pretrained Audio Neural Networks)
-- **Considered:** Yes
-- **Reason for rejection:** PyTorch-native and would work, but AST gave
-  strictly better numbers on ESC-50 in informal testing, and it's also
-  PyTorch-native — no benefit from switching.
-
-### 3.3 Custom-trained YamNet on ESC-50
-- **Considered:** Yes
-- **Reason for rejection:** The brief explicitly emphasises
-  *"pre-trained models"* and *"orchestrating"* them. Training a new
-  classifier would contradict the assignment's framing. Pre-trained
-  AST already produces competitive numbers without any training.
-
----
-
-## 4. MediaPipe GestureRecognizer evaluation
-
-### 4.1 Setup
-- **Model:** Google's pre-trained `gesture_recognizer.task` (8.4 MB)
-  trained on ~30,000 hand images for 7 gesture classes.
-- **Test harness:** `scripts/eval_sign_recognizer.py`
-- **Test set:** `backend/data/sign_test_set/<class>/<image>.jpg`
-  - 7 folders matching MediaPipe's native class names
-  - 5–20 images per class
-
-### 4.2 Live results
-
-The pre-trained model successfully classifies handshapes in the live
-system. Verified during user testing:
-
-| Sign | Native class | Mapped label | Reliability |
-|---|---|---|---|
-| Open palm wave | Open_Palm | hello | Detected reliably |
-| Closed fist | Closed_Fist | yes | Confirmed: 87% confidence |
-| Thumbs up | Thumb_Up | ok | Detected reliably |
-| Peace sign | Victory | peace | Detected reliably |
-| ASL "I love you" | ILoveYou | love | Detected reliably |
-
-### 4.3 Why a combined classifier was added
-
-MediaPipe's 7-class native vocabulary is too small for natural ASL use.
-We layer a **geometric handshape rule classifier** on top that handles 8
-additional handshapes (L-shape → help, rock-on → more, etc.). The
-combined classifier vote-weights pre-trained predictions at 1.5× and
-geometric at 1.0×, giving the published-CNN evidence priority while
-still expanding the vocabulary.
-
-This is documented in `modules/sign_language.py::classify_sequence_combined()`.
-
----
-
-## 5. Whisper STT evaluation
-
-### 5.1 Setup
-- **Model:** `faster-whisper` base (default; can swap to tiny/small/medium
-  via `ACCESSIBILITY_WHISPER_SIZE` env var).
-- **Test:** Live user-study transcripts.
-
-### 5.2 Known failure modes addressed
-
-| Failure mode | Mitigation in code |
-|---|---|
-| Hallucination "Thank you" / "Thanks for watching" on silence | `is_whisper_hallucination()` filter in `stt.py` |
-| Mid-word cut-offs at chunk boundaries | 4-second audio chunks (was 2s) + `condition_on_previous_text=False` |
-| Aggressive VAD dropping short utterances | `min_silence_duration_ms=250`, `threshold=0.35`, with `vad_filter=False` retry on empty result |
-
-### 5.3 Decision
-Whisper is **kept as primary STT**. The hallucination filter is a real
-engineering contribution documented as evidence of model evaluation
-producing a fix.
-
----
-
-## 6. wav2vec2-IEMOCAP voice emotion
-
-### 6.1 Setup
-- **Model:** `superb/wav2vec2-base-superb-er` — 4-class voice emotion
-  (neutral / happy / sad / angry), pre-trained on IEMOCAP.
-- **Used for:** voice-channel emotion in the fusion engine, displayed as
-  caption tags.
-
-### 6.2 Evaluation
-Validation happens via cross-channel agreement with DeepFace's visual
-emotion. When the two channels disagree at high confidence, the system
-emits a "mixed signal" caption tag — itself a useful clinical signal.
-
----
-
-## 7. DeepFace facial emotion
-
-### 7.1 Setup
-- **Model:** DeepFace library, Ekman 7-class emotion model.
-- **Smoothing layers:**
-  1. Multi-frame averaging within each tick (`analyse_frames` over 5-8 frames)
-  2. Cross-tick EMA (α=0.60)
-  3. Neutral bias (+0.04) to break ties
-  4. Caption-tag confidence threshold (≥0.55 fused) before tagging
-
-### 7.2 Iteration history (evidence of design iteration)
-
-| Version | Behaviour | Issue |
+| Channel | Model | Role |
 |---|---|---|
-| v1 | Raw per-frame DeepFace output | Smile flipped to "angry" on single frames |
-| v2 | EMA α=0.35, neutral bias 0.18, margin 0.10 | Over-corrected — every expression registered as neutral |
-| v3 (current) | EMA α=0.60, neutral bias 0.04, margin 0.03 | Real smiles register, single-frame noise smoothed |
+| Speech | Whisper via faster-whisper: `distil-small.en` for final captions, `tiny` for live partials | Captions |
+| Sound events | Audio Spectrogram Transformer (AudioSet) | Generic sound labels |
+| Personal sounds | YamNet embeddings with a calibrated prototypical-network rule | Few-shot enrolled sounds |
+| Scene | BLIP base | Scene description, one tick in four |
+| Hazards | YOLOv11n | Visual hazard detection |
+| Sign | MediaPipe Tasks landmark and gesture models, geometric rules, fingerspelling | Constrained sign vocabulary |
+| Emotion | DeepFace (face) and wav2vec 2.0 (voice), confidence-weighted | Tone tags |
+| Language | `openai/gpt-oss-20b` via Groq, with a fallback chain | Gloss polishing and alert composition |
 
-This iteration sequence is itself evidence of the design-iteration
-process the 1st-class criterion explicitly asks for.
+## Selection decisions
 
----
+"Measured" decisions were made by experiments on this project's hardware.
+"Published" decisions rely on the cited literature listed in the report.
 
-## 8. YOLOv11n hazard detection
+| Channel | Chosen | Rejected or demoted | Deciding evidence | Basis | Results file |
+|---|---|---|---|---|---|
+| Speech | `distil-small.en` finals, `tiny` partials | wav2vec 2.0 CTC; Conformer; Whisper `small` and `base`; repetition guards | WER on 73 LibriSpeech utterances: distil 6.9%, small 7.1%, base 9.0%, tiny 10.9%; distil 822 ms against small 1233 ms per 2.8 s chunk; the repetition guards had raised small to 15.2% | Measured and published | `whisper_wer.json`, `whisper_ablation.json`, `whisper_ablation_distil.json` |
+| Sound events | AST | YamNet classifier; PANNs | ESC-50 top-3 on all 2,000 clips: AST 77.8%, YamNet 64.5%, same label map and scoring | Measured | `esc50_ast_results.json`, `yamnet_esc50_results.json` |
+| Personal sounds | YamNet embedding, prototypical rule, temperature 0.5 | Spectral fallback features; cosine threshold | With fallback features the cosine rule fired on 78% of never-enrolled clips; calibrated test F1 0.344 against 0.200 for cosine chosen under the same development constraint | Measured | `fewshot_results.json`, `fewshot_tune.json` |
+| Scene | BLIP base | CLIP retrieval | Open-ended captions need a generator; an uncached caption takes 225 ms, so BLIP runs one tick in four | Published and measured | `latency_results.json` |
+| Hazards | YOLOv11n | Detectron2; EfficientDet | Single-stage detector built for CPU; 22 ms for three frames | Published and measured | `latency_results.json` |
+| Sign | MediaPipe Tasks landmarks, rules, TGCN if weights exist | I3D; legacy Holistic API | I3D is more accurate on WLASL (32.48% against 23.65% top-1, Li et al. 2020) but needs RGB video; the Holistic API was removed from MediaPipe | Published and availability | `wlasl_results.json` |
+| Emotion | DeepFace and wav2vec 2.0, confidence-weighted | Either channel alone | FER-2013 neutral bias seen on live smiles | Published and observed | none |
+| Diarization | Off by default | pyannote on every tick | First load of about 1 GB stalled every tick | Measured | none |
+| Language model | `gpt-oss-20b` | Llama 3.3 70B; `gpt-oss-120b`; Qwen3.8-27B; `compound-mini` | 144 calls: 20b median 0.32 s, 120b 0.42 s, both preserved the meaning in 36 of 36 calls; `compound-mini` 0 of 36 (HTTP 400); Llama 3.3 decommissioned by the provider | Measured | `llm_bench.json` |
+| Sound direction | Withdrawn | GCC-PHAT | Laptop microphones give no usable inter-channel timing | Prototype | none |
 
-### 8.1 Setup
-- **Model:** Ultralytics YOLOv11n (nano) — pre-trained on COCO (80 classes).
-- **Mapping:** 13 of the 80 COCO classes mapped to hazard priorities
-  (vehicles → IMPORTANT/CRITICAL, knife → IMPORTANT, person → INFORM, etc.).
-- **Approaching detection:** Bbox-area growth > 2% per tick promotes
-  vehicles to CRITICAL.
+## Fusion
 
-### 8.2 Deduplication evaluation
+Fusion was scored separately, because the models can each be right while the
+alerts are still wrong. `report_experiments/fusion_scenes.py` posts 35 scripted
+scenes (ESC-50 clips and synthetic speech, with urgencies fixed before running)
+through the real `/process` handler, three times each, with live captions off.
+Results are in `backend/eval_results/fusion_eval.json` and Section 5.4 of the
+report.
 
-Initial deployment showed false-positive "approaching" events when the
-user's own bbox jittered. **Fix shipped:** IoU-based deduplication (same
-class within 25% IoU is one detection) + 'person' specifically forbidden
-from triggering "approaching". Documented in `hazard_detector.py`.
-
----
-
-## 9. Summary table — what the brief asks for vs. what we delivered
-
-| Brief criterion | Evidence in this project |
+| Measure | Result |
 |---|---|
-| "Three pre-trained models in different domains" | **6 models** — audio events (AST), STT (Whisper), gesture (MediaPipe), emotion-audio (wav2vec2), emotion-visual (DeepFace), vision (YOLO) + scene captioning (BLIP) + LLM (LLaMA 3) |
-| "Different types of data" | Audio waveforms, video frames, image classification, text reasoning — 5 distinct data domains |
-| "Testing several models and making decisions" | §2 (AST vs YamNet vs PANN), §4 (MediaPipe vs geometric), §7 (DeepFace iteration history) |
-| "Performance evaluation" | §2 with concrete top-3 = 80.0% on ESC-50 |
-| "Software testing, ideally with unit testing" | 44 unit tests in `tests/` — all passing |
-| "User testing and iteration" | Live user sessions revealing the Whisper hallucination + DeepFace EMA tuning |
-| "Original approach to address an interesting and challenging problem" | Combined pre-trained CNN + geometric rules + voice/face fusion for Deaf situational awareness — no commercial product unifies all six modalities |
+| First headline is the most urgent real event | 79 of 93 ticks (85%) |
+| Headline slots repeating an event already shown | 84 of 218 (39%) |
+| Headline slots with no urgent event behind them | 41 of 218 (19%), all Whisper transcripts of non-speech |
+| Urgent events given no headline | 15 of 108, none crowded out |
+| Extra detections of one event removed by the merge | 0 of 159 |
 
----
+## Limits of this evidence
 
-## 10. Reproducing this evaluation
+- ESC-50 and LibriSpeech are cleaner than a real home, so absolute accuracy in
+  use will be lower.
+- Personal sounds were evaluated on a household-class proxy built from ESC-50,
+  not on recordings from users' homes. On the calibration test split the
+  adopted matcher has recall 0.32 and a 20.6% false-alarm rate: it misses an
+  enrolled sound roughly two times in three.
+- Sign recognition did not meet its goal: 5.9% top-1 on 17 WLASL clips covering
+  15 signs (`docs/WLASL_EVAL_RESULTS.md`). No public TGCN checkpoint could be
+  obtained.
+- Language-model latency depends on a hosted provider, which can withdraw
+  models, as happened to Llama 3.3 during the project.
+- Five Deaf and hard-of-hearing people gave informal feedback on successive
+  interface versions. Nothing was recorded, and that feedback is not evidence
+  of measured benefit.
 
-```bash
-# Audio scene (~80 seconds on CPU)
-cd backend
-python scripts/eval_audio_scene.py --max-per-class 5
+## Reproducing the results
 
-# Sign recognition (requires test images in data/sign_test_set/)
-python scripts/eval_sign_recognizer.py
-
-# Latency benchmark (synthetic — no datasets needed)
-python scripts/benchmark_latency.py --runs 3
-```
-
-JSON outputs are written to:
-- `backend/esc50_eval_results.json`
-- `backend/sign_eval_results.json`
-- `backend/latency_benchmark.json`
-
-These files can be imported directly into a Jupyter notebook for
-plotting in the final report.
+See `backend/scripts/report_experiments/README.md` for the command behind each
+table and figure. Datasets are not committed; ESC-50 is fetched by
+`backend/scripts/download_esc50.py` and the LibriSpeech sample by
+`report_experiments/extract_librispeech_sample.py`.

@@ -97,11 +97,15 @@ def main() -> None:
     OUT_JSON.write_text(json.dumps(matrix, indent=2))
 
     # ── Pretty markdown summary ────────────────────────────────────
-    lines = ["# Evaluation matrix — auto-generated\n",
+    lines = ["# Evaluation matrix (auto-generated)\n",
              "Run via `python backend/scripts/run_eval_matrix.py`. "
+             "This is the development harness: \"Script ran\" means the "
+             "evaluation script finished, not that the target was met. "
              "Empty cells mean the script couldn't find its dataset; "
-             "drop the data in and re-run.\n"]
-    lines.append("| Component | Headline metric | Value | Target | Status |")
+             "drop the data in and re-run. The results quoted in the final "
+             "report come from `backend/scripts/report_experiments/` and are "
+             "stored in `backend/eval_results/`.\n"]
+    lines.append("| Component | Headline metric | Value | Target | Script ran |")
     lines.append("|---|---|---|---|---|")
     for script, _, friendly in SCRIPTS:
         r = matrix["results"].get(friendly, {})

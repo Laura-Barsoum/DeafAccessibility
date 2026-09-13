@@ -6,7 +6,7 @@ exact results the report quotes. Run from `backend/` with the project venv.
 
 | Script | Produces | Report location |
 |---|---|---|
-| `../eval_audio_scene.py` | AST top-3 on all 2,000 ESC-50 clips (`esc50_ast_results.json`) | 5.2, Figure 5.1a |
+| `../eval_audio_scene.py --out eval_results/esc50_ast_results.json` | AST top-3 on all 2,000 ESC-50 clips | 5.2, Figure 5.1a |
 | `yamnet_esc50.py` | YamNet on the same clips and label map | 5.2, Figure 5.1a |
 | `fewshot_esc50.py` | Cosine vs prototypical, YamNet vs fallback embedding | 5.2, Figure 5.2b |
 | `fewshot_calibrate.py` | Development/test calibration of the matcher | 5.2, Table 5.2, Figure 5.2a |
@@ -15,6 +15,7 @@ exact results the report quotes. Run from `backend/` with the project venv.
 | `whisper_ablation.py`, `whisper_ablation_distil.py` | WER by model and decoding configuration | 5.2, Table 5.1, Figure 5.1b |
 | `llm_benchmark.py` | 144-call language-model benchmark (needs `GROQ_API_KEY`) | 5.2, Figure 5.1c |
 | `latency_on_recorded_media.py` | Per-stage and end-to-end tick latency | 5.3, Figures 3.2 and 5.3 |
+| `fusion_scenes.py` | Fusion on scripted scenes with known events: duplicate headlines, first-headline correctness, merge removals | 5.4, Table 5.3 |
 | `codec_margin_check.py` | One held-out clip against the calibrated gate, with and without Opus | 5.2 |
 | `capture_screenshots.py` | Live screenshots on recorded test media (needs Playwright) | Figures 4.3 to 4.5 |
 
