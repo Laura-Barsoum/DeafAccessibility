@@ -71,7 +71,7 @@ def main() -> None:
         return
 
     # ── Load detector via the same import path the server uses ────
-    from modules.hazards import HazardDetector
+    from modules.hazard_detector import HazardDetector
     det = HazardDetector()
 
     # Warm-up

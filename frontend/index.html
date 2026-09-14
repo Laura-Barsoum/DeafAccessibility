@@ -75,7 +75,7 @@
         <div class="card">
           <h3>🛰️ Hazard Radar</h3>
           <canvas id="radar-canvas" width="320" height="320" class="radar"></canvas>
-          <small class="muted">YOLOv11 — 25 fps real-time hazard detection.</small>
+          <small class="muted">YOLOv11n on three camera frames per tick.</small>
         </div>
         <div class="card">
           <h3>🔔 Name &amp; Keyword Alerts</h3>
@@ -273,8 +273,9 @@
       <div class="card">
         <h2>Soundscape Diary</h2>
         <p class="muted">
-          Longitudinal log of detected events. No audio is stored — only
-          labels, priorities, and timestamps.
+          Longitudinal log of detected events. No audio is stored: only
+          labels (for speech, the first 80 characters of each caption),
+          priorities and timestamps.
         </p>
         <div class="controls">
           <label>Time window:

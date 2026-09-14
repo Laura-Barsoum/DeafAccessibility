@@ -38,7 +38,7 @@ trained from scratch.
 | Scene | BLIP base | CLIP retrieval | Open-ended captions need a generator; an uncached caption takes 225 ms, so BLIP runs one tick in four | Published and measured | `latency_results.json` |
 | Hazards | YOLOv11n | Detectron2; EfficientDet | Single-stage detector built for CPU; 22 ms for three frames | Published and measured | `latency_results.json` |
 | Sign | MediaPipe Tasks landmarks, rules, TGCN if weights exist | I3D; legacy Holistic API | I3D is more accurate on WLASL (32.48% against 23.65% top-1, Li et al. 2020) but needs RGB video; the Holistic API was removed from MediaPipe | Published and availability | `wlasl_results.json` |
-| Emotion | DeepFace and wav2vec 2.0, confidence-weighted | Either channel alone | FER-2013 neutral bias seen on live smiles | Published and observed | none |
+| Emotion | DeepFace and wav2vec 2.0, confidence-weighted | Either channel alone | FER-2013 private test (3,589 faces): accuracy 54.7% (95% interval 53.1% to 56.3%), macro-F1 0.51, happy F1 0.76, fear F1 0.37; the neutral-bias recalibration left accuracy almost unchanged (54.9% without it); neutral bias also seen on live smiles | Measured and observed | `emotion_fer2013.json` |
 | Diarization | Off by default | pyannote on every tick | First load of about 1 GB stalled every tick | Measured | none |
 | Language model | `gpt-oss-20b` | Llama 3.3 70B; `gpt-oss-120b`; Qwen3.8-27B; `compound-mini` | 144 calls: 20b median 0.32 s, 120b 0.42 s, both preserved the meaning in 36 of 36 calls; `compound-mini` 0 of 36 (HTTP 400); Llama 3.3 decommissioned by the provider | Measured | `llm_bench.json` |
 | Sound direction | Withdrawn | GCC-PHAT | Laptop microphones give no usable inter-channel timing | Prototype | none |

@@ -53,3 +53,6 @@ backend/eval_results/shots_media/
 backend/eval_results/shots/
 backend/eval_results/*.npz
 backend/eval_results/*.log
+
+# FER-2013 test split for the facial-emotion benchmark (third-party dataset, not versioned)
+backend/data/emotion_eval/fer2013/

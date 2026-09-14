@@ -32,7 +32,7 @@ personalisation with open-set rejection, and graceful degradation.
 | Personal sound recognition | YamNet embeddings + prototypical networks | Working, but recall 0.32 on an ESC-50 household proxy |
 | Visual hazard detection | YOLOv11n | Working |
 | Scene description | BLIP | Working, throttled to every 4th tick |
-| Emotion (tone) | DeepFace + wav2vec2, confidence-weighted fusion | Working |
+| Emotion (tone) | DeepFace + wav2vec2, confidence-weighted fusion | Working, 54.7% on FER-2013 test faces (an upper bound for webcam frames) |
 | Sign recognition | MediaPipe Tasks + geometric rules + fingerspelling | Partial, see limitations |
 | Sign to speech | LLM gloss polishing (`gpt-oss-20b` via Groq) + neural TTS | Working |
 | Name and keyword alerts | Transcript matching, word-boundary safe | Working |
@@ -52,10 +52,12 @@ that this is *"finally an app that lets us hear the world, not the other way
 around"*.
 
 Participants independently suggested the ability to enrol specific people so
-the system recognises who is present and alerts on your own name, which
-converges with the People feature and the name-alert channel already in the
-build. A formal within-subjects study with measured outcomes is still to be
-conducted; no claim of measured benefit is made on the basis of this feedback.
+the system recognises who is present and alerts on your own name. That became
+the People feature and the name alerts, and the same testers used the interface
+both before and after it was added. The formal within-subjects study planned in
+the preliminary report was not run because too few participants could be
+recruited in time; no claim of measured benefit is made on the basis of this
+feedback.
 
 ### Honest limitations
 
@@ -79,9 +81,13 @@ conducted; no claim of measured benefit is made on the basis of this feedback.
 - **Sound localisation was withdrawn.** GCC-PHAT direction-of-arrival is not
   feasible on laptop microphones (mono, closely spaced, browser audio
   processing removes the cues). It was replaced by name and keyword alerts.
-- **No formal user study yet.** All current *quantitative* results are
-  technical. Deaf and hard-of-hearing users have tried the prototype and
-  responded positively, but that feedback was informal and unmeasured.
+- **No formal user study yet.** Too few participants could be recruited in
+  time, so all *quantitative* results are technical. Deaf and hard-of-hearing
+  users have tried the prototype and responded positively, but that feedback
+  was informal and unmeasured.
+- **Scene and hazard accuracy are unmeasured.** BLIP and YOLOv11n have
+  latency measurements only; facial emotion scored 54.7% on FER-2013 test
+  faces, a dataset DeepFace was trained on.
 
 ---
 
