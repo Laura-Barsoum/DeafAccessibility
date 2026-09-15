@@ -29,7 +29,7 @@ personalisation with open-set rejection, and graceful degradation.
 |---|---|---|
 | Speech transcription | Whisper (faster-whisper, `distil-small.en` finals, `tiny` live partials) | Working, 6.9% WER on a LibriSpeech sample |
 | Environmental sound classification | Audio Spectrogram Transformer (AudioSet) | Working, 77.8% top-3 on ESC-50 |
-| Personal sound recognition | YamNet embeddings + prototypical networks | Working, but recall 0.32 on an ESC-50 household proxy |
+| Personal sound recognition | AST embeddings + prototypical networks | Working, recall 0.64 at 4.9% false alarms on an ESC-50 household proxy |
 | Visual hazard detection | YOLOv11n | Working |
 | Scene description | BLIP | Working, throttled to every 4th tick |
 | Emotion (tone) | DeepFace + wav2vec2, confidence-weighted fusion | Working, 54.7% on FER-2013 test faces (an upper bound for webcam frames) |
@@ -61,20 +61,26 @@ feedback.
 
 ### Honest limitations
 
-- **Sign recognition is constrained.** The TGCN tier trained on WLASL is
-  inactive because no public checkpoint could be obtained, so recognition falls
-  back to a small curated vocabulary of conversational and safety signs plus
-  fingerspelling. Measured 5.9% top-1 on 17 WLASL clips covering 15 signs; see
+- **Sign recognition is constrained.** Recognition uses a small curated
+  vocabulary of conversational and safety signs plus fingerspelling: 1% top-1
+  on 100 official WLASL100 test clips. Published TGCN weights for WLASL were
+  found, but on MediaPipe keypoints they score at chance (6 of 100 within the
+  top five), most likely because they were trained on OpenPose keypoints, so
+  that tier is off unless `ACCESSIBILITY_ENABLE_TGCN=1`. See
   `docs/WLASL_EVAL_RESULTS.md`.
-- **Personal sounds are often missed.** On a household-class proxy built from
-  ESC-50, the calibrated matcher recalls 0.32 of enrolled sounds with a 20.6%
-  false-alarm rate. It has not been evaluated on recordings from real homes.
-- **Fusion repeats events.** On 35 scripted scenes, each run three times, 39%
-  of headline slots repeated an event already shown (for example "Siren" and
-  "Police car (siren)"), and the merge step removed none of 159 extra
-  detections, because it joins only identical labels. Whisper also turned
-  non-speech sounds into short transcripts that took 19% of headline slots.
-  See `backend/eval_results/fusion_eval.json`.
+- **Personal sounds miss about a third of plays.** On a household-class proxy
+  built from ESC-50 and passed through the browser's Opus codec, the matcher
+  recalls 0.64 of an enrolled sound's plays at a 4.9% false-alarm rate (0.63 at
+  7.9% with three sounds enrolled). AST embeddings replaced YamNet's, which
+  recalled 0.32 at 20.6% even on clean clips. It has not been evaluated on
+  recordings from real homes.
+- **Fusion depends on detection.** Merging related labels and ignoring
+  transcripts when AST hears no speech removed repeated headlines on 35 scripted
+  scenes (39% of slots before, none after). On a held-out scene set written
+  before the change, the most urgent event led 84% of ticks (77% before). The
+  remaining failures are sounds AST never labels as urgent, and on the original
+  set 12 transcripts of sirens and crying still passed the speech gate. See
+  `backend/eval_results/fusion_eval*.json`.
 - **No lip reading.** `lip_reader.py` computes a transcript *reliability score*
   from mouth movement. It does not run AV-HuBERT or any audio-visual speech
   model.
@@ -175,7 +181,7 @@ cd backend && source venv/bin/activate
 python -m pytest tests/ -q
 ```
 
-137 unit and integration tests. Unit tests cover pure logic (fusion ranking,
+157 unit and integration tests. Unit tests cover pure logic (fusion ranking,
 priority mapping, prototypical matching, the feedback loop, fingerspelling,
 name matching, the language-model fallback chain). Integration tests exercise
 the HTTP layer, including graceful degradation when audio or frames are absent.
@@ -195,7 +201,11 @@ python scripts/report_experiments/extract_librispeech_sample.py # speech sample,
 python scripts/report_experiments/whisper_ablation.py           # WER by Whisper model and decoding setting
 python scripts/report_experiments/llm_benchmark.py              # language-model benchmark, needs GROQ_API_KEY
 python scripts/report_experiments/latency_on_recorded_media.py  # per-stage and end-to-end tick latency
+python scripts/report_experiments/fewshot_embeddings.py         # personal sounds: AST against YamNet embeddings
+python scripts/report_experiments/fewshot_deployment.py         # AST personal-sound settings on browser-coded ticks
+python scripts/report_experiments/sign_wlasl100.py --select     # then without --select: WLASL100 test clips
 python scripts/report_experiments/fusion_scenes.py              # fusion on scripted scenes with known events
+python scripts/report_experiments/fusion_scenes.py --scene-set heldout --out fusion_eval_heldout_after.json
 ```
 
 The per-channel scripts directly in `backend/scripts/` (`eval_*.py`) came
@@ -242,4 +252,6 @@ spoken go to an online voice service when one is used.
 Academic coursework, submitted for assessment. Third-party models remain under
 their own licences (Whisper MIT, BLIP BSD-3, YOLOv11 AGPL-3.0, MediaPipe
 Apache-2.0, DeepFace MIT). Note the AGPL-3.0 term attaching to YOLOv11 if this
-work is ever distributed.
+work is ever distributed. `backend/data/audioset_ontology.json`, used by fusion to
+relate sound labels, is Google's AudioSet ontology
+(github.com/audioset/ontology, Gemmeke et al. 2017), under CC BY-SA 4.0.

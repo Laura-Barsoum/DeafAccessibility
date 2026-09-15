@@ -27,9 +27,10 @@ excess detections of one event merge_events removed.
 
 Profiles and the diary go to a temporary directory; the language-model
 notification is disabled because it runs after ranking. Model weights load
-from the local cache, and the script refuses to score unless AST and YamNet
-are the loaded backends: in a trial run a failed network request during
-loading silently replaced AST with the YamNet classifier. The scene set runs
+from the local cache, and the script refuses to score unless AST is the loaded
+classifier and the personal sound is embedded as the application embeds it
+(YamNet, then AST once personal sounds moved to AST embeddings): in a trial run
+a failed network request during loading silently replaced AST with YamNet. The scene set runs
 three times, because Whisper's temperature fallback makes its transcripts of
 non-speech sounds vary from run to run. Writes eval_results/fusion_eval.json.
 """
@@ -60,6 +61,13 @@ pp.PROFILE_DIR, pp.PROFILE_PATH = TMP, os.path.join(TMP, "people.json")
 import server  # noqa: E402
 from modules import fusion as fusion_mod  # noqa: E402
 from modules.events import Priority  # noqa: E402
+
+import argparse  # noqa: E402
+_ap = argparse.ArgumentParser()
+_ap.add_argument("--scene-set", choices=("original", "heldout"), default="original",
+                 help="heldout uses different clips and sentences, written before any fusion change was made")
+_ap.add_argument("--out", default="fusion_eval.json")
+ARGS = _ap.parse_args()
 
 SELF_NAME = "Laura"
 PERSONAL = "Kitchen alarm"
@@ -189,23 +197,49 @@ SENTENCES = {
 SOUNDS = {"siren": 3, "crying_baby": 3, "glass_breaking": 3, "door_wood_knock": 2, "dog": 2,
           "clock_alarm": 2, "rain": 0, "keyboard_typing": 0}
 
-SCENES = []
-for cat in ("siren", "crying_baby", "glass_breaking", "door_wood_knock", "dog"):
-    SCENES += [("sound only", None, (cat, i)) for i in (0, 1, 2)]
-SCENES += [("sound only", None, ("clock_alarm", i)) for i in (3, 4, 5)]  # clips 0-2 are enrolled
-SCENES += [("background only", None, (cat, i)) for cat in ("rain", "keyboard_typing") for i in (0, 1)]
-SCENES += [("speech only", key, None) for key in ("plain_a", "plain_b", "safety", "name")]
-SCENES += [
-    ("speech and sound", "plain_a", ("siren", 3)),
-    ("speech and sound", "plain_a", ("crying_baby", 3)),
-    ("speech and sound", "plain_b", ("glass_breaking", 3)),
-    ("speech and sound", "plain_b", ("rain", 2)),
-    ("speech and sound", "plain_a", ("keyboard_typing", 2)),
-    ("speech and sound", "safety", ("dog", 3)),
-    ("speech and sound", "safety", ("rain", 3)),
-    ("speech and sound", "name", ("door_wood_knock", 3)),
-    ("speech and sound", "name", ("keyboard_typing", 3)),
-]
+if ARGS.scene_set == "original":
+    SCENES = []
+    for cat in ("siren", "crying_baby", "glass_breaking", "door_wood_knock", "dog"):
+        SCENES += [("sound only", None, (cat, i)) for i in (0, 1, 2)]
+    SCENES += [("sound only", None, ("clock_alarm", i)) for i in (3, 4, 5)]  # clips 0-2 are enrolled
+    SCENES += [("background only", None, (cat, i)) for cat in ("rain", "keyboard_typing") for i in (0, 1)]
+    SCENES += [("speech only", key, None) for key in ("plain_a", "plain_b", "safety", "name")]
+    SCENES += [
+        ("speech and sound", "plain_a", ("siren", 3)),
+        ("speech and sound", "plain_a", ("crying_baby", 3)),
+        ("speech and sound", "plain_b", ("glass_breaking", 3)),
+        ("speech and sound", "plain_b", ("rain", 2)),
+        ("speech and sound", "plain_a", ("keyboard_typing", 2)),
+        ("speech and sound", "safety", ("dog", 3)),
+        ("speech and sound", "safety", ("rain", 3)),
+        ("speech and sound", "name", ("door_wood_knock", 3)),
+        ("speech and sound", "name", ("keyboard_typing", 3)),
+    ]
+else:
+    # Held-out set: same urgency rules and categories, but clips and sentences the fusion changes never saw.
+    SENTENCES.update({
+        "plain_c": ("Your taxi will be here in about five minutes.", 2),
+        "plain_d": ("Can you pass me the remote control?", 2),
+        "safety2": ("Stop, the pan on the stove is on fire!", 3),
+        "name2": (f"{SELF_NAME}, your phone is ringing in the hall.", 3),
+    })
+    SCENES = []
+    for cat in ("siren", "crying_baby", "glass_breaking", "door_wood_knock", "dog"):
+        SCENES += [("sound only", None, (cat, i)) for i in (6, 7, 8)]
+    SCENES += [("sound only", None, ("clock_alarm", i)) for i in (6, 7, 8)]  # clips 0-2 are enrolled
+    SCENES += [("background only", None, (cat, i)) for cat in ("rain", "keyboard_typing") for i in (6, 7)]
+    SCENES += [("speech only", key, None) for key in ("plain_c", "plain_d", "safety2", "name2")]
+    SCENES += [
+        ("speech and sound", "plain_c", ("siren", 9)),
+        ("speech and sound", "plain_c", ("crying_baby", 9)),
+        ("speech and sound", "plain_d", ("glass_breaking", 9)),
+        ("speech and sound", "plain_d", ("rain", 4)),
+        ("speech and sound", "plain_c", ("keyboard_typing", 4)),
+        ("speech and sound", "safety2", ("dog", 9)),
+        ("speech and sound", "safety2", ("rain", 5)),
+        ("speech and sound", "name2", ("door_wood_knock", 9)),
+        ("speech and sound", "name2", ("keyboard_typing", 5)),
+    ]
 
 SPEECH_LIKE = re.compile(r"speech|speak|narrat|conversation|talk|whisper|\bmale\b|female", re.I)
 
@@ -251,10 +285,12 @@ for _ in range(3):
 server.process._scene_tick_counter = 0
 post("/reset", {})
 
+EXPECTED_EMBEDDING = "ast" if getattr(P, "_ast_embed", None) is not None else "yamnet"
 BACKENDS = dict(sound_classifier=getattr(server.get_audio_scene(), "_backend", None),
-                personal_embedding="fallback" if P._yamnet in (None, "placeholder") else "yamnet")
+                personal_embedding=P.profile["sounds"].get(PERSONAL, {}).get("embedder")
+                or ("fallback" if P._yamnet in (None, "placeholder") else "yamnet"))
 print("backends:", BACKENDS, flush=True)
-if BACKENDS != {"sound_classifier": "ast", "personal_embedding": "yamnet"}:
+if BACKENDS != {"sound_classifier": "ast", "personal_embedding": EXPECTED_EMBEDDING}:
     sys.exit(f"refusing to score: the shipped models are not loaded ({BACKENDS})")
 
 
@@ -279,7 +315,7 @@ for rep, (k, (kind, sent, snd)) in [(r, item) for r in range(REPEATS) for item i
         parts.append(level(clip(cat, i)))
         real["sound"] = SOUNDS[cat]
     WARN.msgs.clear()
-    d = tick(webm(sum(parts), f"scene_{k:02d}"))
+    d = tick(webm(sum(parts), f"{ARGS.scene_set}_scene_{k:02d}"))
     has_speech = sent is not None
 
     heads = [(h["source"], h["label"], h["priority_name"]) for h in d.get("headlines", [])]
@@ -373,10 +409,10 @@ for rep in range(REPEATS):
     ))
 summary["merge_hit_rate"] = (round(summary["removed_by_merge"] / summary["excess_detections_before_merge"], 3)
                              if summary["excess_detections_before_merge"] else None)
-json.dump(dict(method=__doc__, backends=BACKENDS, rules=dict(sentences=SENTENCES, sounds=SOUNDS, self_name=SELF_NAME,
+json.dump(dict(method=__doc__, scene_set=ARGS.scene_set, backends=BACKENDS, rules=dict(sentences=SENTENCES, sounds=SOUNDS, self_name=SELF_NAME,
                                           personal_sound=PERSONAL),
                enrolment=ENROLMENT, summary=summary, ticks=records),
-          open(os.path.join(SP, "fusion_eval.json"), "w"), indent=1)
+          open(os.path.join(SP, ARGS.out), "w"), indent=1)
 print(json.dumps(summary, indent=1))
 print("DONE fusion", flush=True)
 sys.stderr.flush()

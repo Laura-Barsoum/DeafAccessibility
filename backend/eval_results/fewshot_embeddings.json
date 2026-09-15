@@ -1,0 +1,193 @@
+{
+ "method": "[Final report: Section 5.2 personal sounds]\n\nWhich embedding and how many enrolment clips give the best personal-sound\noperating point? Compares the shipped YamNet embedding with AST's pooled\nembedding (the same forward pass the sound classifier already runs every tick),\nat three and five enrolment clips, under the calibration protocol of\nfewshot_calibrate.py.\n\nFor every (embedding, K) the prototypical rule's temperature, probability\nthreshold and gate multiplier are chosen on the DEV split (40 non-household\nclasses) as the highest recall with a false-alarm rate of at most 5%, and only\nthen applied to the TEST split (10 household classes). Nothing is chosen on test.\nTest results carry 95% bootstrap intervals over the 30 trials, and the adopted\nchoice is compared with the shipped YamNet, K=3 rule by a paired bootstrap on\nthe same trials.\n\nAST's speech-family probability for every ESC-50 clip is saved as well; none of\nESC-50 is speech, so it sets the transcript gate used by fusion.\nWrites eval_results/fewshot_embeddings.json.\n",
+ "results": {
+  "yamnet_K3": {
+   "params": [
+    0.5,
+    0.55,
+    0.5
+   ],
+   "dev": {
+    "recall": 0.3930930930930931,
+    "precision": 0.6973894512519979,
+    "f1": 0.502784712886499,
+    "far": 0.04756756756756757,
+    "n_pos": 3330,
+    "n_neg": 11100
+   },
+   "test": {
+    "recall": 0.32222222222222224,
+    "precision": 0.3692360633172746,
+    "f1": 0.3441308531109686,
+    "far": 0.20642857142857143,
+    "n_pos": 3330,
+    "n_neg": 8400
+   },
+   "test_95": {
+    "recall": [
+     0.26005255255255255,
+     0.38288288288288286
+    ],
+    "precision": [
+     0.3295227584352139,
+     0.4176901952492942
+    ],
+    "f1": [
+     0.30087882740093974,
+     0.3845246953771742
+    ],
+    "far": [
+     0.1530892857142857,
+     0.25797916666666665
+    ]
+   }
+  },
+  "yamnet_K5": {
+   "params": [
+    0.5,
+    0.7,
+    0.5
+   ],
+   "dev": {
+    "recall": 0.44063492063492066,
+    "precision": 0.7103377686796315,
+    "f1": 0.5438871473354232,
+    "far": 0.04873873873873874,
+    "n_pos": 3150,
+    "n_neg": 11100
+   },
+   "test": {
+    "recall": 0.32476190476190475,
+    "precision": 0.35520833333333335,
+    "f1": 0.3393034825870646,
+    "far": 0.21476190476190476,
+    "n_pos": 3150,
+    "n_neg": 8400
+   },
+   "test_95": {
+    "recall": [
+     0.2511111111111111,
+     0.4063571428571428
+    ],
+    "precision": [
+     0.3142340000314728,
+     0.400001711156742
+    ],
+    "f1": [
+     0.28952732487799676,
+     0.38529982700336274
+    ],
+    "far": [
+     0.15499702380952382,
+     0.2755952380952381
+    ]
+   }
+  },
+  "ast_K3": {
+   "params": [
+    0.5,
+    0.55,
+    1.75
+   ],
+   "dev": {
+    "recall": 0.9096096096096096,
+    "precision": 0.8479843225083986,
+    "f1": 0.8777166038829326,
+    "far": 0.04882882882882883,
+    "n_pos": 3330,
+    "n_neg": 11100
+   },
+   "test": {
+    "recall": 0.830930930930931,
+    "precision": 0.7146177685950413,
+    "f1": 0.7683976673146348,
+    "far": 0.13142857142857142,
+    "n_pos": 3330,
+    "n_neg": 8400
+   },
+   "test_95": {
+    "recall": [
+     0.7804729729729729,
+     0.8771846846846846
+    ],
+    "precision": [
+     0.6769682897737764,
+     0.7550359322826596
+    ],
+    "f1": [
+     0.7299864156113073,
+     0.8026699006666745
+    ],
+    "far": [
+     0.10833035714285714,
+     0.1533363095238095
+    ]
+   }
+  },
+  "ast_K5": {
+   "params": [
+    0.2,
+    0.85,
+    2.75
+   ],
+   "dev": {
+    "recall": 0.9088888888888889,
+    "precision": 0.8500593824228029,
+    "f1": 0.8784903344584228,
+    "far": 0.045495495495495496,
+    "n_pos": 3150,
+    "n_neg": 11100
+   },
+   "test": {
+    "recall": 0.8171428571428572,
+    "precision": 0.7320819112627986,
+    "f1": 0.7722772277227723,
+    "far": 0.11214285714285714,
+    "n_pos": 3150,
+    "n_neg": 8400
+   },
+   "test_95": {
+    "recall": [
+     0.7584126984126984,
+     0.8682619047619048
+    ],
+    "precision": [
+     0.6884663209905629,
+     0.7765436466551016
+    ],
+    "f1": [
+     0.7269605195250466,
+     0.8113046536000796
+    ],
+    "far": [
+     0.08952083333333333,
+     0.13405059523809523
+    ]
+   }
+  }
+ },
+ "chosen_on_dev": "ast_K3",
+ "paired_vs_shipped_95": {
+  "recall": [
+   0.4384384384384384,
+   0.5810885885885885
+  ],
+  "f1": [
+   0.3709774087056566,
+   0.4797887974774097
+  ],
+  "far": [
+   -0.13107738095238097,
+   -0.01903869047619054
+  ]
+ },
+ "ast_speech_probability_esc50": {
+  "percentiles": {
+   "50": 0.01670642849057913,
+   "90": 0.08598611131310466,
+   "95": 0.18160187676548947,
+   "99": 0.4996674972772598
+  },
+  "n": 2000
+ }
+}

@@ -56,3 +56,7 @@ backend/eval_results/*.log
 
 # FER-2013 test split for the facial-emotion benchmark (third-party dataset, not versioned)
 backend/data/emotion_eval/fer2013/
+
+# Sign-recognition test clips and the TGCN checkpoint (third-party, not versioned)
+backend/data/WLASL-master/videos_test100/
+backend/data/tgcn/

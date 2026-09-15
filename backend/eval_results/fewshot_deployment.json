@@ -1,0 +1,165 @@
+{
+ "method": "[Final report: Section 5.2 personal sounds]\n\nPersonal-sound settings for AST embeddings as the application meets them.\n\nfewshot_embeddings.py chose AST over YamNet on whole, clean ESC-50 clips with\nthree sounds enrolled at once. In the scripted fusion scenes those settings\nmatched a single enrolled alarm on every tick. With one enrolled sound the\nsoftmax probability is always 1, so only the distance gate can reject, and a\ngate chosen with three sounds enrolled is too loose on its own; the scenes also\ndeliver Opus-coded 2.8-second chunks, not clean five-second clips.\n\nHere every ESC-50 clip is first prepared as the browser delivers a tick (the\nloudest 2.8 seconds, levelled as fusion_scenes.py levels sound, Opus at\n32 kbit/s, decoded by the server's own converter) and then embedded by AST.\nTemperature, probability threshold and gate multiplier are chosen on the DEV\nsplit (40 non-household classes) as the highest mean recall with a false-alarm\nrate of at most 5% both with one and with three sounds enrolled, and only then\napplied to the TEST split (10 household classes). Nothing is chosen on the test\nsplit or on the fusion scenes. The earlier AST settings are scored on the same\ntrials for comparison. Writes eval_results/fewshot_deployment.json.\n",
+ "chosen": {
+  "params": [
+   0.5,
+   0.4,
+   0.7415
+  ],
+  "temperature": 0.5,
+  "prob_threshold": 0.4,
+  "radius_k": 2.2245,
+  "gate_floor": 0.1483,
+  "enrolled_1": {
+   "dev": {
+    "recall": 0.663963963963964,
+    "precision": 0.6946277097078228,
+    "f1": 0.6789497927222478,
+    "far": 0.027692307692307693,
+    "n_pos": 1110,
+    "n_neg": 11700
+   },
+   "test": {
+    "recall": 0.6396396396396397,
+    "precision": 0.571658615136876,
+    "f1": 0.6037414965986394,
+    "far": 0.04925925925925926,
+    "n_pos": 1110,
+    "n_neg": 10800
+   },
+   "test_95": {
+    "recall": [
+     0.5540540540540541,
+     0.7198423423423422
+    ],
+    "precision": [
+     0.4136447658023248,
+     0.7656258197416944
+    ],
+    "f1": [
+     0.5023128821666907,
+     0.7005649316077484
+    ],
+    "far": [
+     0.018796296296296297,
+     0.09648611111111109
+    ]
+   }
+  },
+  "enrolled_3": {
+   "dev": {
+    "recall": 0.639039039039039,
+    "precision": 0.8051456678017405,
+    "f1": 0.7125397622635191,
+    "far": 0.04531531531531532,
+    "n_pos": 3330,
+    "n_neg": 11100
+   },
+   "test": {
+    "recall": 0.6318318318318318,
+    "precision": 0.7503566333808844,
+    "f1": 0.6860123899576134,
+    "far": 0.07880952380952382,
+    "n_pos": 3330,
+    "n_neg": 8400
+   },
+   "test_95": {
+    "recall": [
+     0.5903828828828829,
+     0.6723723723723724
+    ],
+    "precision": [
+     0.6831043137004897,
+     0.816077569134347
+    ],
+    "f1": [
+     0.6512649905553126,
+     0.7199933292318991
+    ],
+    "far": [
+     0.051663690476190474,
+     0.11191369047619043
+    ]
+   }
+  }
+ },
+ "previous": {
+  "params": [
+   0.5,
+   0.55,
+   1.75
+  ],
+  "enrolled_1": {
+   "dev": {
+    "recall": 0.9756756756756757,
+    "precision": 0.1456428187197418,
+    "f1": 0.25345190732506434,
+    "far": 0.542991452991453,
+    "n_pos": 1110,
+    "n_neg": 11700
+   },
+   "test": {
+    "recall": 0.9855855855855856,
+    "precision": 0.13383900171274773,
+    "f1": 0.23567427832830676,
+    "far": 0.6555555555555556,
+    "n_pos": 1110,
+    "n_neg": 10800
+   },
+   "test_95": {
+    "recall": [
+     0.9630405405405406,
+     0.9981981981981982
+    ],
+    "precision": [
+     0.11375228708552279,
+     0.16379349436469168
+    ],
+    "f1": [
+     0.20417561684474075,
+     0.2805899980048949
+    ],
+    "far": [
+     0.5115601851851852,
+     0.7948333333333333
+    ]
+   }
+  },
+  "enrolled_3": {
+   "dev": {
+    "recall": 0.8012012012012012,
+    "precision": 0.823965410747375,
+    "f1": 0.8124238733252132,
+    "far": 0.05108108108108108,
+    "n_pos": 3330,
+    "n_neg": 11100
+   },
+   "test": {
+    "recall": 0.7360360360360361,
+    "precision": 0.7318602567930725,
+    "f1": 0.7339422069172031,
+    "far": 0.10666666666666667,
+    "n_pos": 3330,
+    "n_neg": 8400
+   },
+   "test_95": {
+    "recall": [
+     0.657957957957958,
+     0.8081156156156155
+    ],
+    "precision": [
+     0.6891138945848678,
+     0.7797579763700113
+    ],
+    "f1": [
+     0.68050025126776,
+     0.7801162112050094
+    ],
+    "far": [
+     0.0830922619047619,
+     0.12905059523809523
+    ]
+   }
+  }
+ }
+}

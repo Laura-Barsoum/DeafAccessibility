@@ -14,11 +14,14 @@ Pre-trained checkpoints (~3 MB to ~50 MB each) cover four vocabulary sizes:
 
 Loading
 -------
-The wrapper class `TGCNSignRecognizer` tries to download the requested variant
-from HuggingFace on first use. The HuggingFace repo is configurable via the
-env var `ACCESSIBILITY_TGCN_REPO`. If download fails (offline, missing repo,
-no torch) the recognizer silently disables itself — the system keeps working
-via MediaPipe + geometric rules.
+The wrapper class `TGCNSignRecognizer` loads backend/data/tgcn/<variant>/
+pytorch_model.bin when present, otherwise downloads the variant from Hugging
+Face (sharonn18/tgcn-wlasl, or the repo in ACCESSIBILITY_TGCN_REPO). A
+checkpoint whose weights do not all fit the network is refused: this file once
+defined an attention block and a flattening classifier that no checkpoint
+contains and loaded with strict=False, so the model predicted with random
+weights. Without a checkpoint the recognizer disables itself and the system
+keeps working via MediaPipe + geometric rules.
 
 Inference path
 --------------
@@ -47,9 +50,10 @@ import numpy as np
 log = logging.getLogger("accessibility.tgcn")
 
 
-# Default WLASL-100 vocabulary order — the ORIGINAL order that the asl100
-# checkpoint was trained against. If a checkpoint ships its own class
-# mapping, that takes priority.
+# The WLASL-100 glosses in the order of WLASL_v0.3.json. Whether the asl100
+# checkpoint uses this order or sorted order is set by CLASS_ORDER. A class
+# file next to the checkpoint takes priority. (This list once had 102
+# entries; "wait" and "yellow" are not among the 100 glosses.)
 WLASL100_DEFAULT_ORDER = [
     "book", "drink", "computer", "before", "chair", "go", "clothes", "who",
     "candy", "cousin", "deaf", "fine", "help", "no", "thin", "walk", "year",
@@ -63,7 +67,7 @@ WLASL100_DEFAULT_ORDER = [
     "want", "work", "africa", "basketball", "birthday", "brown", "but",
     "cheat", "city", "cook", "decide", "full", "how", "jacket", "letter",
     "medicine", "need", "paint", "paper", "pull", "purple", "right", "same",
-    "son", "tell", "thursday", "wait", "yellow",
+    "son", "tell", "thursday",
 ]
 
 
@@ -119,8 +123,9 @@ def build_TGCN(num_class: int, hidden_feature: int, num_stage: int,
                input_feature: int = 100, p_dropout: float = 0.3,
                node_n: int = 55):
     """
-    Construct the full `GCN_muti_att` network — multi-stage residual GCN
-    with a multi-head attention block in the middle.
+    Construct `GCN_muti_att` as released with WLASL: an input graph
+    convolution, `num_stage` residual GC_Blocks, a mean over the 55 keypoints
+    and a linear classifier, matching the published checkpoints key for key.
     """
     torch, nn, F = _build_modules()
     GraphConvolution = make_GraphConvolution(node_n)
@@ -149,10 +154,8 @@ def build_TGCN(num_class: int, hidden_feature: int, num_stage: int,
             return y + x
 
     class GCN_muti_att(nn.Module):
-        """The full WLASL TGCN (Li et al., 2020): an input graph-conv layer,
-        `num_stage` residual GC_Blocks, an 8-head self-attention block over
-        the keypoint dimension, a final graph-conv, and a linear classifier
-        over the sign vocabulary. Input is (B, 55 keypoints, 100 features)."""
+        """The WLASL TGCN (Li et al., 2020). Input is (B, 55 keypoints,
+        100 features): each keypoint's x and y over 50 frames."""
         def __init__(self):
             super().__init__()
             self.num_stage = num_stage
@@ -161,40 +164,35 @@ def build_TGCN(num_class: int, hidden_feature: int, num_stage: int,
             self.gcbs = nn.ModuleList([
                 GC_Block(hidden_feature, p_dropout) for _ in range(num_stage)
             ])
-            self.attention = nn.MultiheadAttention(hidden_feature, num_heads=8)
-            self.gc7 = GraphConvolution(hidden_feature, hidden_feature)
             self.do = nn.Dropout(p_dropout)
             self.act_f = nn.Tanh()
-            self.fc = nn.Linear(node_n * hidden_feature, num_class)
+            self.fc_out = nn.Linear(hidden_feature, num_class)
 
         def forward(self, x):
-            # x: (B, 55, 100)
             y = self.gc1(x)
             b, n, f = y.shape
             y = self.bn1(y.view(b, -1)).view(b, n, f)
             y = self.act_f(y); y = self.do(y)
             for gcb in self.gcbs:
                 y = gcb(y)
-            y_perm = y.permute(1, 0, 2)               # (55, B, hidden)
-            attn_out, _ = self.attention(y_perm, y_perm, y_perm)
-            y = attn_out.permute(1, 0, 2)
-            y = self.gc7(y)
-            b, n, f = y.shape
-            y = self.act_f(y); y = self.do(y)
-            return self.fc(y.view(b, -1))
+            return self.fc_out(torch.mean(y, dim=1))
 
     return GCN_muti_att()
 
 
 # ---------------------------------------------------------------------------
-# MediaPipe Holistic → 55-keypoint extractor
+# MediaPipe → 55-keypoint extractor
 # ---------------------------------------------------------------------------
 
-# Map the 55 keypoints the TGCN expects.
-#   13 upper-body landmarks from MediaPipe pose (indices into pose[0..32])
-#   21 right-hand landmarks
-#   21 left-hand landmarks
-#   = 55 total
+# How the 55 keypoints are laid out, their coordinate range and the class
+# order. The checkpoints were trained on OpenPose keypoints and the release
+# does not state these, so they were settled on 17 WLASL clips outside the
+# test split (scripts/report_experiments/sign_wlasl100.py --select).
+KEYPOINT_LAYOUT = "openpose"
+KEYPOINT_COORDS = "signed"
+CLASS_ORDER = "alphabetical"
+
+# "legacy": the layout this file used before the checkpoint was checked.
 POSE_INDICES_55 = [
     0,   # nose
     2, 5,    # eyes (inner)
@@ -206,44 +204,63 @@ POSE_INDICES_55 = [
 ]
 assert len(POSE_INDICES_55) == 13
 
+# "openpose": the 13 BODY_25 points WLASL keeps, in OpenPose order (nose, neck,
+# right arm, left arm, mid-hip, eyes, ears), from MediaPipe pose indices; a
+# pair is the midpoint of two landmarks. Left/right are the signer's own.
+OPENPOSE_POSE_13 = [0, (11, 12), 12, 14, 16, 11, 13, 15, (23, 24), 5, 2, 8, 7]
 
-def extract_55_keypoints(holistic_result) -> Optional[np.ndarray]:
+
+def extract_55_keypoints(holistic_result, layout: Optional[str] = None) -> Optional[np.ndarray]:
     """
-    Returns a (55, 2) array of (x, y) normalized coordinates for one frame,
-    or None if no usable pose/hand information was detected.
+    Returns a (55, 2) array of (x, y) coordinates in [0, 1] for one frame,
+    or None if no usable pose/hand information was detected. Missing points
+    stay at 0, as OpenPose leaves them.
+
+    MediaPipe names hands as if the image were mirrored, so on camera or
+    video frames its "Right" hand is the signer's left. "openpose" puts that
+    hand first, as OpenPose's hand_left comes first; "openpose_swapped" puts
+    it second.
     """
     if holistic_result is None:
         return None
+    layout = layout or KEYPOINT_LAYOUT
 
     pts = np.zeros((55, 2), dtype=np.float32)
     have_any = False
 
-    # ── Pose (13) ────────────────────────────────────────────────────────
     pose_lms = getattr(holistic_result, "pose_landmarks", None)
     if pose_lms:
         have_any = True
-        for i, src in enumerate(POSE_INDICES_55):
-            lm = pose_lms.landmark[src]
-            pts[i, 0] = lm.x
-            pts[i, 1] = lm.y
+        lm = pose_lms.landmark
+        if layout == "legacy":
+            for i, src in enumerate(POSE_INDICES_55):
+                pts[i] = (lm[src].x, lm[src].y)
+        else:
+            for i, src in enumerate(OPENPOSE_POSE_13):
+                if isinstance(src, tuple):
+                    a, b = lm[src[0]], lm[src[1]]
+                    pts[i] = ((a.x + b.x) / 2, (a.y + b.y) / 2)
+                else:
+                    pts[i] = (lm[src].x, lm[src].y)
 
-    # ── Right hand (21) ──────────────────────────────────────────────────
     rh = getattr(holistic_result, "right_hand_landmarks", None)
-    if rh:
-        have_any = True
-        for i, lm in enumerate(rh.landmark):
-            pts[13 + i, 0] = lm.x
-            pts[13 + i, 1] = lm.y
-
-    # ── Left hand (21) ───────────────────────────────────────────────────
     lh = getattr(holistic_result, "left_hand_landmarks", None)
-    if lh:
-        have_any = True
-        for i, lm in enumerate(lh.landmark):
-            pts[34 + i, 0] = lm.x
-            pts[34 + i, 1] = lm.y
+    first, second = (lh, rh) if layout == "openpose_swapped" else (rh, lh)
+    for offset, hand in ((13, first), (34, second)):
+        if hand:
+            have_any = True
+            for i, p in enumerate(hand.landmark):
+                pts[offset + i] = (p.x, p.y)
 
     return pts if have_any else None
+
+
+def to_model_coords(keypoint_seq: List[np.ndarray], coords: Optional[str] = None) -> List[np.ndarray]:
+    """[0, 1] image coordinates as the model expects them: unchanged ("unit")
+    or mapped to [-1, 1] as WLASL maps OpenPose pixels ("signed")."""
+    if (coords or KEYPOINT_COORDS) == "signed":
+        return [2.0 * p - 1.0 for p in keypoint_seq]
+    return list(keypoint_seq)
 
 
 def _resample_frames(keypoint_seq: List[np.ndarray], target_frames: int = 50
@@ -296,11 +313,8 @@ class TGCNSignRecognizer:
     }
 
     # Repos to try in order. The user can override with ACCESSIBILITY_TGCN_REPO.
-    DEFAULT_REPOS = [
-        "kasrahabib/tgcn-wlasl",
-        "zhengshu/tgcn-wlasl",
-        "asl-research/tgcn-wlasl",
-    ]
+    DEFAULT_REPOS = ["sharonn18/tgcn-wlasl"]
+    LOCAL_DIR = Path(__file__).resolve().parent.parent / "data" / "tgcn"
 
     def __init__(self, variant: str = "asl100") -> None:
         if variant not in self.VARIANT_CONFIG:
@@ -355,11 +369,12 @@ class TGCNSignRecognizer:
             # Some checkpoints prefix with "module." — strip it
             state = {k.replace("module.", ""): v for k, v in state.items()}
             missing, unexpected = model.load_state_dict(state, strict=False)
-            if missing:
-                log.warning("TGCN load: %d missing keys (first: %s)",
-                            len(missing), missing[:3])
-            if unexpected:
-                log.warning("TGCN load: %d unexpected keys", len(unexpected))
+            if missing or unexpected:
+                # Untrained layers would predict at random; refuse the checkpoint.
+                log.warning("TGCN checkpoint does not fit the network (%d missing, %d unexpected keys, "
+                            "first missing: %s); TGCN disabled", len(missing), len(unexpected), missing[:3])
+                self._load_failed = True
+                return False
             model.eval()
             self.model = model
 
@@ -381,6 +396,10 @@ class TGCNSignRecognizer:
         if local and os.path.exists(local):
             log.info("TGCN: using local checkpoint %s", local)
             return local
+        bundled = self.LOCAL_DIR / self.variant / "pytorch_model.bin"
+        if bundled.exists():
+            log.info("TGCN: using local checkpoint %s", bundled)
+            return str(bundled)
 
         # 2. HuggingFace download
         try:
@@ -427,9 +446,10 @@ class TGCNSignRecognizer:
             f = ckpt_dir / fname
             if f.exists():
                 return [line.strip() for line in f.read_text().splitlines() if line.strip()]
-        # Fall back to the WLASL-100 default order for asl100
+        # Fall back to the WLASL-100 glosses for asl100, in the selected order
         if self.variant == "asl100":
-            return list(WLASL100_DEFAULT_ORDER)
+            order = list(WLASL100_DEFAULT_ORDER)
+            return sorted(order) if CLASS_ORDER == "alphabetical" else order
         # Otherwise generate placeholder labels
         n = self.VARIANT_CONFIG[self.variant]["num_class"]
         return [f"wlasl_{i:04d}" for i in range(n)]
@@ -455,7 +475,7 @@ class TGCNSignRecognizer:
 
         try:
             import torch
-            x = _resample_frames(keypoint_seq, target_frames=50)   # (55, 100)
+            x = _resample_frames(to_model_coords(keypoint_seq), target_frames=50)   # (55, 100)
             x = torch.from_numpy(x).unsqueeze(0)                    # (1, 55, 100)
             with torch.no_grad():
                 logits = self.model(x).squeeze(0)

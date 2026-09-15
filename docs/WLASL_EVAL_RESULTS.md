@@ -1,5 +1,52 @@
 # WLASL Evaluation Results
 
+## Update, September 2026: official test clips and the TGCN tier
+
+This supersedes the May 2026 run further down, which is kept for the record.
+
+**Test clips.** 100 of the 258 official WLASL100 test clips could still be
+obtained (the Voxel51 mirror on Hugging Face), each trimmed to its annotated
+frame range. They are not committed (`backend/data/WLASL-master/videos_test100/`).
+
+**TGCN weights.** An asl100 checkpoint was found at
+`huggingface.co/sharonn18/tgcn-wlasl` (64 hidden features, 20 stages, 50
+frames). Loading it exposed a defect: `tgcn_sign_model.py` defined an attention
+block, an extra graph convolution and a flattening classifier that no
+checkpoint contains, and loaded with `strict=False`, so those layers would have
+kept random weights. The network now matches the released `GCN_muti_att` key
+for key, and a checkpoint that does not fit is refused.
+
+**Input conventions.** The checkpoint was trained on OpenPose keypoints and its
+release does not state the keypoint order, coordinate range or class order.
+These were chosen on 14 older local WLASL clips outside the test split
+(`backend/eval_results/sign_wlasl100_select.json`) before any test clip was
+scored: OpenPose order, coordinates in [-1, 1], alphabetical classes. The best
+variant got 3 of 14 right within its top five.
+
+| Configuration, 100 test clips | Top-1 | Top-5 |
+|---|---|---|
+| Pipeline without the TGCN tier (as shipped) | 1% | 1% |
+| Pipeline with the TGCN tier | 1% | 2% |
+| TGCN model alone | 1% | 6% (95% Wilson interval 3% to 12%) |
+
+Top-5 chance for 100 signs is 5%, so the published weights perform at chance
+on MediaPipe keypoints, most likely because weights learned on OpenPose
+keypoints do not transfer. The tier is therefore off by default
+(`ACCESSIBILITY_ENABLE_TGCN=1` turns it on), because a confident wrong sign is
+worse than none. The realistic fix is retraining the TGCN on MediaPipe
+keypoints extracted from the WLASL training videos.
+
+Commands, from `backend/`:
+```
+python scripts/report_experiments/sign_wlasl100.py --select
+python scripts/report_experiments/sign_wlasl100.py
+```
+Results: `backend/eval_results/sign_wlasl100.json`.
+
+---
+
+## May 2026 run (superseded)
+
 **Date run:** 2026-05-13
 **Subset:** WLASL v0.3 — top 25 most-instanced glosses, 2 videos per gloss attempted
 **Final clips evaluated:** 17 (after dropping HTML/dead URLs)

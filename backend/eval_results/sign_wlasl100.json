@@ -1,0 +1,3838 @@
+{
+ "method": "[Final report: Section 5.2 signing, Table 5.1]\n\nWord-level sign recognition on the WLASL100 test split (Li et al., 2020), before\nand after the TGCN tier is available, through the application's own classifier.\n\nClips: the 100 official WLASL100 test clips that could still be obtained (of 258),\nfrom the Voxel51 mirror on Hugging Face, each trimmed to its annotated frame range\n(backend/data/WLASL-master/videos_test100, not committed). Frames are sampled as\neval_wlasl.py samples them and passed to\nSignLanguageRecognizer.classify_all_frames_combined, the method behind\n/sign/recognize: once with the TGCN tier disabled (the configuration reported so\nfar) and once with the asl100 checkpoint from huggingface.co/sharonn18/tgcn-wlasl.\nThe ASL letter tier needs a model that is not cached here, so it is off in both\nruns; the model is loaded from the local cache only.\n\nThe checkpoint's documentation leaves three things open: how MediaPipe's\nlandmarks map onto the 55 OpenPose keypoints it was trained on (the app's old\nlayout, OpenPose order, or OpenPose order with the hands swapped), whether\ncoordinates are in [0, 1] or [-1, 1], and the class order. `--select` settles\nall three on the 17 older local WLASL clips, none of which is in the test split,\nbefore any test clip is scored. The model's own top-1 and top-5 on the test clips are reported alongside\nthe pipeline's. Writes eval_results/sign_wlasl100.json (or sign_wlasl100_select.json).\n",
+ "checkpoint": "huggingface.co/sharonn18/tgcn-wlasl checkpoints/asl100",
+ "checkpoint_load": {
+  "missing": 0,
+  "unexpected": 0
+ },
+ "variant": "openpose/signed/alphabetical",
+ "test_clips": 100,
+ "official_test_clips": 258,
+ "before": {
+  "top1": {
+   "n": 1,
+   "of": 100,
+   "rate": 0.01,
+   "ci95": [
+    0.0017673865655472645,
+    0.0544875247609346
+   ]
+  },
+  "top5": {
+   "n": 1,
+   "of": 100,
+   "rate": 0.01,
+   "ci95": [
+    0.0017673865655472645,
+    0.0544875247609346
+   ]
+  }
+ },
+ "after": {
+  "top1": {
+   "n": 1,
+   "of": 100,
+   "rate": 0.01,
+   "ci95": [
+    0.0017673865655472645,
+    0.0544875247609346
+   ]
+  },
+  "top5": {
+   "n": 2,
+   "of": 100,
+   "rate": 0.02,
+   "ci95": [
+    0.005501852234968185,
+    0.07001316294199365
+   ]
+  }
+ },
+ "model": {
+  "top1": {
+   "n": 1,
+   "of": 100,
+   "rate": 0.01,
+   "ci95": [
+    0.0017673865655472645,
+    0.0544875247609346
+   ]
+  },
+  "top5": {
+   "n": 6,
+   "of": 100,
+   "rate": 0.06,
+   "ci95": [
+    0.02778574526665662,
+    0.12476968531222507
+   ]
+  }
+ },
+ "median_ms": {
+  "before": 1743.5,
+  "after": 1730.5
+ },
+ "records": [
+  {
+   "video": "00625",
+   "gloss": "accident",
+   "frames": 30,
+   "before": {
+    "labels": [],
+    "top1": false,
+    "top5": false,
+    "tgcn": null,
+    "ms": 3786
+   },
+   "after": {
+    "labels": [
+     "book"
+    ],
+    "top1": false,
+    "top5": false,
+    "tgcn": [
+     "book",
+     0.38058286905288696
+    ],
+    "ms": 1718
+   },
+   "model": {
+    "keypoint_frames": 30,
+    "top5": [
+     "book",
+     "tall",
+     "later",
+     "cousin",
+     "no"
+    ],
+    "top1_hit": false,
+    "top5_hit": false
+   }
+  },
+  {
+   "video": "00634",
+   "gloss": "accident",
+   "frames": 30,
+   "before": {
+    "labels": [
+     "ok"
+    ],
+    "top1": false,
+    "top5": false,
+    "tgcn": null,
+    "ms": 2063
+   },
+   "after": {
+    "labels": [
+     "ok",
+     "cousin"
+    ],
+    "top1": false,
+    "top5": false,
+    "tgcn": [
+     "cousin",
+     0.4774618148803711
+    ],
+    "ms": 2070
+   },
+   "model": {
+    "keypoint_frames": 30,
+    "top5": [
+     "cousin",
+     "candy",
+     "bed",
+     "help",
+     "no"
+    ],
+    "top1_hit": false,
+    "top5_hit": false
+   }
+  },
+  {
+   "video": "01386",
+   "gloss": "africa",
+   "frames": 30,
+   "before": {
+    "labels": [
+     "yes",
+     "ok"
+    ],
+    "top1": false,
+    "top5": false,
+    "tgcn": null,
+    "ms": 1741
+   },
+   "after": {
+    "labels": [
+     "yes",
+     "ok",
+     "tall"
+    ],
+    "top1": false,
+    "top5": false,
+    "tgcn": [
+     "tall",
+     0.41857975721359253
+    ],
+    "ms": 1747
+   },
+   "model": {
+    "keypoint_frames": 30,
+    "top5": [
+     "tall",
+     "later",
+     "no",
+     "dog",
+     "all"
+    ],
+    "top1_hit": false,
+    "top5_hit": false
+   }
+  },
+  {
+   "video": "01986",
+   "gloss": "all",
+   "frames": 30,
+   "before": {
+    "labels": [
+     "hello"
+    ],
+    "top1": false,
+    "top5": false,
+    "tgcn": null,
+    "ms": 1758
+   },
+   "after": {
+    "labels": [
+     "hello",
+     "book"
+    ],
+    "top1": false,
+    "top5": false,
+    "tgcn": [
+     "book",
+     0.6249428391456604
+    ],
+    "ms": 1744
+   },
+   "model": {
+    "keypoint_frames": 30,
+    "top5": [
+     "book",
+     "meet",
+     "bed",
+     "cousin",
+     "cool"
+    ],
+    "top1_hit": false,
+    "top5_hit": false
+   }
+  },
+  {
+   "video": "05727",
+   "gloss": "before",
+   "frames": 30,
+   "before": {
+    "labels": [],
+    "top1": false,
+    "top5": false,
+    "tgcn": null,
+    "ms": 2043
+   },
+   "after": {
+    "labels": [
+     "book"
+    ],
+    "top1": false,
+    "top5": false,
+    "tgcn": [
+     "book",
+     0.9344872832298279
+    ],
+    "ms": 2038
+   },
+   "model": {
+    "keypoint_frames": 30,
+    "top5": [
+     "book",
+     "meet",
+     "bed",
+     "cool",
+     "candy"
+    ],
+    "top1_hit": false,
+    "top5_hit": false
+   }
+  },
+  {
+   "video": "05739",
+   "gloss": "before",
+   "frames": 30,
+   "before": {
+    "labels": [],
+    "top1": false,
+    "top5": false,
+    "tgcn": null,
+    "ms": 2116
+   },
+   "after": {
+    "labels": [
+     "bed"
+    ],
+    "top1": false,
+    "top5": false,
+    "tgcn": [
+     "bed",
+     0.45480483770370483
+    ],
+    "ms": 2105
+   },
+   "model": {
+    "keypoint_frames": 30,
+    "top5": [
+     "bed",
+     "book",
+     "meet",
+     "cool",
+     "dark"
+    ],
+    "top1_hit": false,
+    "top5_hit": false
+   }
+  },
+  {
+   "video": "05741",
+   "gloss": "before",
+   "frames": 30,
+   "before": {
+    "labels": [
+     "hello"
+    ],
+    "top1": false,
+    "top5": false,
+    "tgcn": null,
+    "ms": 1633
+   },
+   "after": {
+    "labels": [
+     "hello"
+    ],
+    "top1": false,
+    "top5": false,
+    "tgcn": null,
+    "ms": 1658
+   },
+   "model": {
+    "keypoint_frames": 30,
+    "top5": [
+     "no",
+     "later",
+     "tall",
+     "dog",
+     "short"
+    ],
+    "top1_hit": false,
+    "top5_hit": false
+   }
+  },
+  {
+   "video": "06335",
+   "gloss": "bird",
+   "frames": 30,
+   "before": {
+    "labels": [
+     "you",
+     "yes",
+     "you"
+    ],
+    "top1": false,
+    "top5": false,
+    "tgcn": null,
+    "ms": 1430
+   },
+   "after": {
+    "labels": [
+     "book",
+     "you",
+     "yes",
+     "you"
+    ],
+    "top1": false,
+    "top5": false,
+    "tgcn": [
+     "book",
+     0.6903336644172668
+    ],
+    "ms": 1437
+   },
+   "model": {
+    "keypoint_frames": 29,
+    "top5": [
+     "book",
+     "meet",
+     "tall",
+     "bed",
+     "cousin"
+    ],
+    "top1_hit": false,
+    "top5_hit": false
+   }
+  },
+  {
+   "video": "06360",
+   "gloss": "birthday",
+   "frames": 30,
+   "before": {
+    "labels": [],
+    "top1": false,
+    "top5": false,
+    "tgcn": null,
+    "ms": 1399
+   },
+   "after": {
+    "labels": [
+     "book"
+    ],
+    "top1": false,
+    "top5": false,
+    "tgcn": [
+     "book",
+     0.5532953143119812
+    ],
+    "ms": 1425
+   },
+   "model": {
+    "keypoint_frames": 29,
+    "top5": [
+     "book",
+     "meet",
+     "bed",
+     "family",
+     "kiss"
+    ],
+    "top1_hit": false,
+    "top5_hit": false
+   }
+  },
+  {
+   "video": "06845",
+   "gloss": "blue",
+   "frames": 30,
+   "before": {
+    "labels": [],
+    "top1": false,
+    "top5": false,
+    "tgcn": null,
+    "ms": 1751
+   },
+   "after": {
+    "labels": [
+     "book"
+    ],
+    "top1": false,
+    "top5": false,
+    "tgcn": [
+     "book",
+     0.885636031627655
+    ],
+    "ms": 1740
+   },
+   "model": {
+    "keypoint_frames": 29,
+    "top5": [
+     "book",
+     "cousin",
+     "tall",
+     "family",
+     "meet"
+    ],
+    "top1_hit": false,
+    "top5_hit": false
+   }
+  },
+  {
+   "video": "07400",
+   "gloss": "bowling",
+   "frames": 30,
+   "before": {
+    "labels": [
+     "ok"
+    ],
+    "top1": false,
+    "top5": false,
+    "tgcn": null,
+    "ms": 2089
+   },
+   "after": {
+    "labels": [
+     "ok",
+     "tall"
+    ],
+    "top1": false,
+    "top5": false,
+    "tgcn": [
+     "tall",
+     0.5480871200561523
+    ],
+    "ms": 2091
+   },
+   "model": {
+    "keypoint_frames": 30,
+    "top5": [
+     "tall",
+     "short",
+     "no",
+     "later",
+     "blue"
+    ],
+    "top1_hit": false,
+    "top5_hit": false
+   }
+  },
+  {
+   "video": "08425",
+   "gloss": "but",
+   "frames": 30,
+   "before": {
+    "labels": [
+     "you"
+    ],
+    "top1": false,
+    "top5": false,
+    "tgcn": null,
+    "ms": 2018
+   },
+   "after": {
+    "labels": [
+     "you",
+     "tall"
+    ],
+    "top1": false,
+    "top5": false,
+    "tgcn": [
+     "tall",
+     0.5646547675132751
+    ],
+    "ms": 2098
+   },
+   "model": {
+    "keypoint_frames": 30,
+    "top5": [
+     "tall",
+     "cousin",
+     "no",
+     "short",
+     "pizza"
+    ],
+    "top1_hit": false,
+    "top5_hit": false
+   }
+  },
+  {
+   "video": "08429",
+   "gloss": "but",
+   "frames": 30,
+   "before": {
+    "labels": [
+     "you",
+     "yes"
+    ],
+    "top1": false,
+    "top5": false,
+    "tgcn": null,
+    "ms": 1707
+   },
+   "after": {
+    "labels": [
+     "you",
+     "yes",
+     "book"
+    ],
+    "top1": false,
+    "top5": false,
+    "tgcn": [
+     "book",
+     0.5627943277359009
+    ],
+    "ms": 1678
+   },
+   "model": {
+    "keypoint_frames": 30,
+    "top5": [
+     "book",
+     "tall",
+     "cousin",
+     "bed",
+     "later"
+    ],
+    "top1_hit": false,
+    "top5_hit": false
+   }
+  },
+  {
+   "video": "08915",
+   "gloss": "candy",
+   "frames": 30,
+   "before": {
+    "labels": [
+     "you"
+    ],
+    "top1": false,
+    "top5": false,
+    "tgcn": null,
+    "ms": 1327
+   },
+   "after": {
+    "labels": [
+     "book",
+     "you"
+    ],
+    "top1": false,
+    "top5": false,
+    "tgcn": [
+     "book",
+     0.8154569268226624
+    ],
+    "ms": 1379
+   },
+   "model": {
+    "keypoint_frames": 30,
+    "top5": [
+     "book",
+     "meet",
+     "tall",
+     "cousin",
+     "bed"
+    ],
+    "top1_hit": false,
+    "top5_hit": false
+   }
+  },
+  {
+   "video": "08925",
+   "gloss": "candy",
+   "frames": 30,
+   "before": {
+    "labels": [],
+    "top1": false,
+    "top5": false,
+    "tgcn": null,
+    "ms": 1643
+   },
+   "after": {
+    "labels": [
+     "no"
+    ],
+    "top1": false,
+    "top5": false,
+    "tgcn": [
+     "no",
+     0.3404756188392639
+    ],
+    "ms": 1632
+   },
+   "model": {
+    "keypoint_frames": 30,
+    "top5": [
+     "later",
+     "no",
+     "tall",
+     "dog",
+     "short"
+    ],
+    "top1_hit": false,
+    "top5_hit": false
+   }
+  },
+  {
+   "video": "09950",
+   "gloss": "change",
+   "frames": 30,
+   "before": {
+    "labels": [
+     "you"
+    ],
+    "top1": false,
+    "top5": false,
+    "tgcn": null,
+    "ms": 1616
+   },
+   "after": {
+    "labels": [
+     "you",
+     "book"
+    ],
+    "top1": false,
+    "top5": false,
+    "tgcn": [
+     "book",
+     0.9482795596122742
+    ],
+    "ms": 1742
+   },
+   "model": {
+    "keypoint_frames": 30,
+    "top5": [
+     "book",
+     "meet",
+     "cousin",
+     "tall",
+     "cool"
+    ],
+    "top1_hit": false,
+    "top5_hit": false
+   }
+  },
+  {
+   "video": "10159",
+   "gloss": "cheat",
+   "frames": 30,
+   "before": {
+    "labels": [],
+    "top1": false,
+    "top5": false,
+    "tgcn": null,
+    "ms": 2123
+   },
+   "after": {
+    "labels": [
+     "candy"
+    ],
+    "top1": false,
+    "top5": false,
+    "tgcn": [
+     "candy",
+     0.32303184270858765
+    ],
+    "ms": 2087
+   },
+   "model": {
+    "keypoint_frames": 30,
+    "top5": [
+     "candy",
+     "dog",
+     "tell",
+     "no",
+     "book"
+    ],
+    "top1_hit": false,
+    "top5_hit": false
+   }
+  },
+  {
+   "video": "11311",
+   "gloss": "clothes",
+   "frames": 30,
+   "before": {
+    "labels": [
+     "ok"
+    ],
+    "top1": false,
+    "top5": false,
+    "tgcn": null,
+    "ms": 1746
+   },
+   "after": {
+    "labels": [
+     "ok",
+     "book"
+    ],
+    "top1": false,
+    "top5": false,
+    "tgcn": [
+     "book",
+     0.3085950016975403
+    ],
+    "ms": 1722
+   },
+   "model": {
+    "keypoint_frames": 29,
+    "top5": [
+     "book",
+     "tall",
+     "meet",
+     "city",
+     "cousin"
+    ],
+    "top1_hit": false,
+    "top5_hit": false
+   }
+  },
+  {
+   "video": "11772",
+   "gloss": "color",
+   "frames": 30,
+   "before": {
+    "labels": [
+     "hello"
+    ],
+    "top1": false,
+    "top5": false,
+    "tgcn": null,
+    "ms": 2125
+   },
+   "after": {
+    "labels": [
+     "hello"
+    ],
+    "top1": false,
+    "top5": false,
+    "tgcn": null,
+    "ms": 1880
+   },
+   "model": {
+    "keypoint_frames": 30,
+    "top5": [
+     "bed",
+     "book",
+     "meet",
+     "graduate",
+     "tall"
+    ],
+    "top1_hit": false,
+    "top5_hit": false
+   }
+  },
+  {
+   "video": "12320",
+   "gloss": "computer",
+   "frames": 30,
+   "before": {
+    "labels": [
+     "love",
+     "hello"
+    ],
+    "top1": false,
+    "top5": false,
+    "tgcn": null,
+    "ms": 1675
+   },
+   "after": {
+    "labels": [
+     "love",
+     "hello",
+     "book"
+    ],
+    "top1": false,
+    "top5": false,
+    "tgcn": [
+     "book",
+     0.46791478991508484
+    ],
+    "ms": 1798
+   },
+   "model": {
+    "keypoint_frames": 29,
+    "top5": [
+     "book",
+     "meet",
+     "bed",
+     "dark",
+     "candy"
+    ],
+    "top1_hit": false,
+    "top5_hit": false
+   }
+  },
+  {
+   "video": "13196",
+   "gloss": "cool",
+   "frames": 30,
+   "before": {
+    "labels": [],
+    "top1": false,
+    "top5": false,
+    "tgcn": null,
+    "ms": 1659
+   },
+   "after": {
+    "labels": [
+     "tall"
+    ],
+    "top1": false,
+    "top5": false,
+    "tgcn": [
+     "tall",
+     0.8914828896522522
+    ],
+    "ms": 1613
+   },
+   "model": {
+    "keypoint_frames": 30,
+    "top5": [
+     "tall",
+     "book",
+     "cousin",
+     "all",
+     "later"
+    ],
+    "top1_hit": false,
+    "top5_hit": false
+   }
+  },
+  {
+   "video": "13198",
+   "gloss": "cool",
+   "frames": 30,
+   "before": {
+    "labels": [],
+    "top1": false,
+    "top5": false,
+    "tgcn": null,
+    "ms": 1688
+   },
+   "after": {
+    "labels": [
+     "tall"
+    ],
+    "top1": false,
+    "top5": false,
+    "tgcn": [
+     "tall",
+     0.9726206660270691
+    ],
+    "ms": 1687
+   },
+   "model": {
+    "keypoint_frames": 30,
+    "top5": [
+     "tall",
+     "later",
+     "all",
+     "short",
+     "dog"
+    ],
+    "top1_hit": false,
+    "top5_hit": false
+   }
+  },
+  {
+   "video": "13325",
+   "gloss": "corn",
+   "frames": 30,
+   "before": {
+    "labels": [
+     "ok"
+    ],
+    "top1": false,
+    "top5": false,
+    "tgcn": null,
+    "ms": 1870
+   },
+   "after": {
+    "labels": [
+     "book",
+     "ok"
+    ],
+    "top1": false,
+    "top5": false,
+    "tgcn": [
+     "book",
+     0.9056354761123657
+    ],
+    "ms": 1875
+   },
+   "model": {
+    "keypoint_frames": 30,
+    "top5": [
+     "book",
+     "meet",
+     "cousin",
+     "bed",
+     "tall"
+    ],
+    "top1_hit": false,
+    "top5_hit": false
+   }
+  },
+  {
+   "video": "13334",
+   "gloss": "corn",
+   "frames": 30,
+   "before": {
+    "labels": [],
+    "top1": false,
+    "top5": false,
+    "tgcn": null,
+    "ms": 1942
+   },
+   "after": {
+    "labels": [
+     "later"
+    ],
+    "top1": false,
+    "top5": false,
+    "tgcn": [
+     "later",
+     0.6050856709480286
+    ],
+    "ms": 1942
+   },
+   "model": {
+    "keypoint_frames": 30,
+    "top5": [
+     "later",
+     "dog",
+     "tall",
+     "no",
+     "all"
+    ],
+    "top1_hit": false,
+    "top5_hit": false
+   }
+  },
+  {
+   "video": "13635",
+   "gloss": "cousin",
+   "frames": 30,
+   "before": {
+    "labels": [],
+    "top1": false,
+    "top5": false,
+    "tgcn": null,
+    "ms": 1439
+   },
+   "after": {
+    "labels": [
+     "book"
+    ],
+    "top1": false,
+    "top5": false,
+    "tgcn": [
+     "book",
+     0.569781482219696
+    ],
+    "ms": 1535
+   },
+   "model": {
+    "keypoint_frames": 29,
+    "top5": [
+     "book",
+     "tall",
+     "bed",
+     "meet",
+     "cousin"
+    ],
+    "top1_hit": false,
+    "top5_hit": true
+   }
+  },
+  {
+   "video": "13710",
+   "gloss": "cow",
+   "frames": 30,
+   "before": {
+    "labels": [],
+    "top1": false,
+    "top5": false,
+    "tgcn": null,
+    "ms": 1648
+   },
+   "after": {
+    "labels": [
+     "tall"
+    ],
+    "top1": false,
+    "top5": false,
+    "tgcn": [
+     "tall",
+     0.5668724775314331
+    ],
+    "ms": 1671
+   },
+   "model": {
+    "keypoint_frames": 29,
+    "top5": [
+     "tall",
+     "book",
+     "cousin",
+     "all",
+     "later"
+    ],
+    "top1_hit": false,
+    "top5_hit": false
+   }
+  },
+  {
+   "video": "14673",
+   "gloss": "dark",
+   "frames": 30,
+   "before": {
+    "labels": [
+     "hello"
+    ],
+    "top1": false,
+    "top5": false,
+    "tgcn": null,
+    "ms": 2115
+   },
+   "after": {
+    "labels": [
+     "hello"
+    ],
+    "top1": false,
+    "top5": false,
+    "tgcn": null,
+    "ms": 2138
+   },
+   "model": {
+    "keypoint_frames": 30,
+    "top5": [
+     "short",
+     "no",
+     "cousin",
+     "secretary",
+     "all"
+    ],
+    "top1_hit": false,
+    "top5_hit": false
+   }
+  },
+  {
+   "video": "14685",
+   "gloss": "dark",
+   "frames": 30,
+   "before": {
+    "labels": [],
+    "top1": false,
+    "top5": false,
+    "tgcn": null,
+    "ms": 1739
+   },
+   "after": {
+    "labels": [
+     "book"
+    ],
+    "top1": false,
+    "top5": false,
+    "tgcn": [
+     "book",
+     0.6179618835449219
+    ],
+    "ms": 1727
+   },
+   "model": {
+    "keypoint_frames": 29,
+    "top5": [
+     "book",
+     "meet",
+     "cousin",
+     "dark",
+     "city"
+    ],
+    "top1_hit": false,
+    "top5_hit": true
+   }
+  },
+  {
+   "video": "14883",
+   "gloss": "deaf",
+   "frames": 30,
+   "before": {
+    "labels": [
+     "you"
+    ],
+    "top1": false,
+    "top5": false,
+    "tgcn": null,
+    "ms": 1766
+   },
+   "after": {
+    "labels": [
+     "you",
+     "tall"
+    ],
+    "top1": false,
+    "top5": false,
+    "tgcn": [
+     "tall",
+     0.8976423740386963
+    ],
+    "ms": 1793
+   },
+   "model": {
+    "keypoint_frames": 30,
+    "top5": [
+     "tall",
+     "later",
+     "all",
+     "no",
+     "cousin"
+    ],
+    "top1_hit": false,
+    "top5_hit": false
+   }
+  },
+  {
+   "video": "14888",
+   "gloss": "deaf",
+   "frames": 30,
+   "before": {
+    "labels": [
+     "you"
+    ],
+    "top1": false,
+    "top5": false,
+    "tgcn": null,
+    "ms": 1449
+   },
+   "after": {
+    "labels": [
+     "you",
+     "book"
+    ],
+    "top1": false,
+    "top5": false,
+    "tgcn": [
+     "book",
+     0.7454447150230408
+    ],
+    "ms": 1490
+   },
+   "model": {
+    "keypoint_frames": 29,
+    "top5": [
+     "book",
+     "meet",
+     "tall",
+     "cousin",
+     "bed"
+    ],
+    "top1_hit": false,
+    "top5_hit": false
+   }
+  },
+  {
+   "video": "17020",
+   "gloss": "doctor",
+   "frames": 30,
+   "before": {
+    "labels": [],
+    "top1": false,
+    "top5": false,
+    "tgcn": null,
+    "ms": 2265
+   },
+   "after": {
+    "labels": [
+     "book"
+    ],
+    "top1": false,
+    "top5": false,
+    "tgcn": [
+     "book",
+     0.6777651906013489
+    ],
+    "ms": 2205
+   },
+   "model": {
+    "keypoint_frames": 30,
+    "top5": [
+     "book",
+     "bed",
+     "cousin",
+     "candy",
+     "meet"
+    ],
+    "top1_hit": false,
+    "top5_hit": false
+   }
+  },
+  {
+   "video": "17097",
+   "gloss": "dog",
+   "frames": 30,
+   "before": {
+    "labels": [],
+    "top1": false,
+    "top5": false,
+    "tgcn": null,
+    "ms": 1526
+   },
+   "after": {
+    "labels": [
+     "book"
+    ],
+    "top1": false,
+    "top5": false,
+    "tgcn": [
+     "book",
+     0.7585947513580322
+    ],
+    "ms": 1369
+   },
+   "model": {
+    "keypoint_frames": 29,
+    "top5": [
+     "book",
+     "cousin",
+     "tall",
+     "family",
+     "city"
+    ],
+    "top1_hit": false,
+    "top5_hit": false
+   }
+  },
+  {
+   "video": "17713",
+   "gloss": "drink",
+   "frames": 30,
+   "before": {
+    "labels": [
+     "hello"
+    ],
+    "top1": false,
+    "top5": false,
+    "tgcn": null,
+    "ms": 1776
+   },
+   "after": {
+    "labels": [
+     "book",
+     "hello"
+    ],
+    "top1": false,
+    "top5": false,
+    "tgcn": [
+     "book",
+     0.8246762156486511
+    ],
+    "ms": 1876
+   },
+   "model": {
+    "keypoint_frames": 29,
+    "top5": [
+     "book",
+     "meet",
+     "bed",
+     "family",
+     "cousin"
+    ],
+    "top1_hit": false,
+    "top5_hit": false
+   }
+  },
+  {
+   "video": "21890",
+   "gloss": "fine",
+   "frames": 30,
+   "before": {
+    "labels": [],
+    "top1": false,
+    "top5": false,
+    "tgcn": null,
+    "ms": 1821
+   },
+   "after": {
+    "labels": [
+     "book"
+    ],
+    "top1": false,
+    "top5": false,
+    "tgcn": [
+     "book",
+     0.6566903591156006
+    ],
+    "ms": 2003
+   },
+   "model": {
+    "keypoint_frames": 29,
+    "top5": [
+     "book",
+     "meet",
+     "bed",
+     "cousin",
+     "kiss"
+    ],
+    "top1_hit": false,
+    "top5_hit": false
+   }
+  },
+  {
+   "video": "21944",
+   "gloss": "finish",
+   "frames": 30,
+   "before": {
+    "labels": [],
+    "top1": false,
+    "top5": false,
+    "tgcn": null,
+    "ms": 1733
+   },
+   "after": {
+    "labels": [
+     "tall"
+    ],
+    "top1": false,
+    "top5": false,
+    "tgcn": [
+     "tall",
+     0.7274271845817566
+    ],
+    "ms": 1962
+   },
+   "model": {
+    "keypoint_frames": 30,
+    "top5": [
+     "tall",
+     "all",
+     "book",
+     "later",
+     "cousin"
+    ],
+    "top1_hit": false,
+    "top5_hit": false
+   }
+  },
+  {
+   "video": "22117",
+   "gloss": "fish",
+   "frames": 30,
+   "before": {
+    "labels": [
+     "ok"
+    ],
+    "top1": false,
+    "top5": false,
+    "tgcn": null,
+    "ms": 2107
+   },
+   "after": {
+    "labels": [
+     "ok",
+     "book"
+    ],
+    "top1": false,
+    "top5": false,
+    "tgcn": [
+     "book",
+     0.5372220277786255
+    ],
+    "ms": 2416
+   },
+   "model": {
+    "keypoint_frames": 29,
+    "top5": [
+     "book",
+     "meet",
+     "bed",
+     "cousin",
+     "family"
+    ],
+    "top1_hit": false,
+    "top5_hit": false
+   }
+  },
+  {
+   "video": "22954",
+   "gloss": "forget",
+   "frames": 30,
+   "before": {
+    "labels": [
+     "hello",
+     "you"
+    ],
+    "top1": false,
+    "top5": false,
+    "tgcn": null,
+    "ms": 2585
+   },
+   "after": {
+    "labels": [
+     "hello",
+     "you",
+     "tall"
+    ],
+    "top1": false,
+    "top5": false,
+    "tgcn": [
+     "tall",
+     0.9176740646362305
+    ],
+    "ms": 2490
+   },
+   "model": {
+    "keypoint_frames": 30,
+    "top5": [
+     "tall",
+     "later",
+     "all",
+     "book",
+     "cousin"
+    ],
+    "top1_hit": false,
+    "top5_hit": false
+   }
+  },
+  {
+   "video": "23767",
+   "gloss": "full",
+   "frames": 30,
+   "before": {
+    "labels": [
+     "hello"
+    ],
+    "top1": false,
+    "top5": false,
+    "tgcn": null,
+    "ms": 3561
+   },
+   "after": {
+    "labels": [
+     "book",
+     "hello"
+    ],
+    "top1": false,
+    "top5": false,
+    "tgcn": [
+     "book",
+     0.8873563408851624
+    ],
+    "ms": 3327
+   },
+   "model": {
+    "keypoint_frames": 30,
+    "top5": [
+     "book",
+     "candy",
+     "meet",
+     "cousin",
+     "cool"
+    ],
+    "top1_hit": false,
+    "top5_hit": false
+   }
+  },
+  {
+   "video": "24636",
+   "gloss": "give",
+   "frames": 30,
+   "before": {
+    "labels": [],
+    "top1": false,
+    "top5": false,
+    "tgcn": null,
+    "ms": 2650
+   },
+   "after": {
+    "labels": [
+     "book"
+    ],
+    "top1": false,
+    "top5": false,
+    "tgcn": [
+     "book",
+     0.8315443992614746
+    ],
+    "ms": 2740
+   },
+   "model": {
+    "keypoint_frames": 30,
+    "top5": [
+     "book",
+     "meet",
+     "cousin",
+     "city",
+     "bed"
+    ],
+    "top1_hit": false,
+    "top5_hit": false
+   }
+  },
+  {
+   "video": "24649",
+   "gloss": "give",
+   "frames": 30,
+   "before": {
+    "labels": [],
+    "top1": false,
+    "top5": false,
+    "tgcn": null,
+    "ms": 3397
+   },
+   "after": {
+    "labels": [
+     "book"
+    ],
+    "top1": false,
+    "top5": false,
+    "tgcn": [
+     "book",
+     0.5700249075889587
+    ],
+    "ms": 3439
+   },
+   "model": {
+    "keypoint_frames": 30,
+    "top5": [
+     "book",
+     "cousin",
+     "bed",
+     "candy",
+     "tall"
+    ],
+    "top1_hit": false,
+    "top5_hit": false
+   }
+  },
+  {
+   "video": "24960",
+   "gloss": "go",
+   "frames": 30,
+   "before": {
+    "labels": [],
+    "top1": false,
+    "top5": false,
+    "tgcn": null,
+    "ms": 1811
+   },
+   "after": {
+    "labels": [
+     "book"
+    ],
+    "top1": false,
+    "top5": false,
+    "tgcn": [
+     "book",
+     0.35242894291877747
+    ],
+    "ms": 1707
+   },
+   "model": {
+    "keypoint_frames": 30,
+    "top5": [
+     "book",
+     "bed",
+     "meet",
+     "kiss",
+     "cousin"
+    ],
+    "top1_hit": false,
+    "top5_hit": false
+   }
+  },
+  {
+   "video": "27209",
+   "gloss": "help",
+   "frames": 30,
+   "before": {
+    "labels": [
+     "ok"
+    ],
+    "top1": false,
+    "top5": false,
+    "tgcn": null,
+    "ms": 1839
+   },
+   "after": {
+    "labels": [
+     "ok",
+     "book"
+    ],
+    "top1": false,
+    "top5": false,
+    "tgcn": [
+     "book",
+     0.48414215445518494
+    ],
+    "ms": 2003
+   },
+   "model": {
+    "keypoint_frames": 29,
+    "top5": [
+     "book",
+     "meet",
+     "bed",
+     "medicine",
+     "dark"
+    ],
+    "top1_hit": false,
+    "top5_hit": false
+   }
+  },
+  {
+   "video": "27213",
+   "gloss": "help",
+   "frames": 30,
+   "before": {
+    "labels": [
+     "ok"
+    ],
+    "top1": false,
+    "top5": false,
+    "tgcn": null,
+    "ms": 1870
+   },
+   "after": {
+    "labels": [
+     "ok",
+     "book"
+    ],
+    "top1": false,
+    "top5": false,
+    "tgcn": [
+     "book",
+     0.803896427154541
+    ],
+    "ms": 2043
+   },
+   "model": {
+    "keypoint_frames": 30,
+    "top5": [
+     "book",
+     "cousin",
+     "candy",
+     "tall",
+     "bed"
+    ],
+    "top1_hit": false,
+    "top5_hit": false
+   }
+  },
+  {
+   "video": "28201",
+   "gloss": "how",
+   "frames": 30,
+   "before": {
+    "labels": [
+     "love",
+     "ok"
+    ],
+    "top1": false,
+    "top5": false,
+    "tgcn": null,
+    "ms": 2094
+   },
+   "after": {
+    "labels": [
+     "book",
+     "love",
+     "ok"
+    ],
+    "top1": false,
+    "top5": false,
+    "tgcn": [
+     "book",
+     0.8463290333747864
+    ],
+    "ms": 2513
+   },
+   "model": {
+    "keypoint_frames": 30,
+    "top5": [
+     "book",
+     "meet",
+     "cool",
+     "graduate",
+     "bed"
+    ],
+    "top1_hit": false,
+    "top5_hit": false
+   }
+  },
+  {
+   "video": "31749",
+   "gloss": "kiss",
+   "frames": 30,
+   "before": {
+    "labels": [],
+    "top1": false,
+    "top5": false,
+    "tgcn": null,
+    "ms": 3099
+   },
+   "after": {
+    "labels": [
+     "book"
+    ],
+    "top1": false,
+    "top5": false,
+    "tgcn": [
+     "book",
+     0.9099230766296387
+    ],
+    "ms": 3146
+   },
+   "model": {
+    "keypoint_frames": 30,
+    "top5": [
+     "book",
+     "dog",
+     "tell",
+     "meet",
+     "graduate"
+    ],
+    "top1_hit": false,
+    "top5_hit": false
+   }
+  },
+  {
+   "video": "31750",
+   "gloss": "kiss",
+   "frames": 30,
+   "before": {
+    "labels": [],
+    "top1": false,
+    "top5": false,
+    "tgcn": null,
+    "ms": 3008
+   },
+   "after": {
+    "labels": [
+     "cousin"
+    ],
+    "top1": false,
+    "top5": false,
+    "tgcn": [
+     "cousin",
+     0.3654593229293823
+    ],
+    "ms": 2902
+   },
+   "model": {
+    "keypoint_frames": 30,
+    "top5": [
+     "cousin",
+     "book",
+     "city",
+     "meet",
+     "kiss"
+    ],
+    "top1_hit": false,
+    "top5_hit": true
+   }
+  },
+  {
+   "video": "32157",
+   "gloss": "language",
+   "frames": 30,
+   "before": {
+    "labels": [],
+    "top1": false,
+    "top5": false,
+    "tgcn": null,
+    "ms": 3422
+   },
+   "after": {
+    "labels": [
+     "tall"
+    ],
+    "top1": false,
+    "top5": false,
+    "tgcn": [
+     "tall",
+     0.38163259625434875
+    ],
+    "ms": 3120
+   },
+   "model": {
+    "keypoint_frames": 30,
+    "top5": [
+     "tall",
+     "cousin",
+     "book",
+     "later",
+     "meet"
+    ],
+    "top1_hit": false,
+    "top5_hit": false
+   }
+  },
+  {
+   "video": "32167",
+   "gloss": "language",
+   "frames": 30,
+   "before": {
+    "labels": [
+     "ok"
+    ],
+    "top1": false,
+    "top5": false,
+    "tgcn": null,
+    "ms": 2641
+   },
+   "after": {
+    "labels": [
+     "ok",
+     "book"
+    ],
+    "top1": false,
+    "top5": false,
+    "tgcn": [
+     "book",
+     0.7010433077812195
+    ],
+    "ms": 2864
+   },
+   "model": {
+    "keypoint_frames": 29,
+    "top5": [
+     "book",
+     "meet",
+     "bed",
+     "cousin",
+     "kiss"
+    ],
+    "top1_hit": false,
+    "top5_hit": false
+   }
+  },
+  {
+   "video": "32246",
+   "gloss": "last",
+   "frames": 30,
+   "before": {
+    "labels": [],
+    "top1": false,
+    "top5": false,
+    "tgcn": null,
+    "ms": 1929
+   },
+   "after": {
+    "labels": [
+     "book"
+    ],
+    "top1": false,
+    "top5": false,
+    "tgcn": [
+     "book",
+     0.38152554631233215
+    ],
+    "ms": 1733
+   },
+   "model": {
+    "keypoint_frames": 30,
+    "top5": [
+     "book",
+     "meet",
+     "bed",
+     "kiss",
+     "candy"
+    ],
+    "top1_hit": false,
+    "top5_hit": false
+   }
+  },
+  {
+   "video": "32253",
+   "gloss": "last",
+   "frames": 30,
+   "before": {
+    "labels": [
+     "hello"
+    ],
+    "top1": false,
+    "top5": false,
+    "tgcn": null,
+    "ms": 1563
+   },
+   "after": {
+    "labels": [
+     "hello"
+    ],
+    "top1": false,
+    "top5": false,
+    "tgcn": null,
+    "ms": 1561
+   },
+   "model": {
+    "keypoint_frames": 30,
+    "top5": [
+     "no",
+     "later",
+     "tall",
+     "dog",
+     "short"
+    ],
+    "top1_hit": false,
+    "top5_hit": false
+   }
+  },
+  {
+   "video": "32950",
+   "gloss": "letter",
+   "frames": 30,
+   "before": {
+    "labels": [
+     "ok"
+    ],
+    "top1": false,
+    "top5": false,
+    "tgcn": null,
+    "ms": 1467
+   },
+   "after": {
+    "labels": [
+     "ok",
+     "book"
+    ],
+    "top1": false,
+    "top5": false,
+    "tgcn": [
+     "book",
+     0.7605879306793213
+    ],
+    "ms": 1459
+   },
+   "model": {
+    "keypoint_frames": 29,
+    "top5": [
+     "book",
+     "meet",
+     "cousin",
+     "bed",
+     "city"
+    ],
+    "top1_hit": false,
+    "top5_hit": false
+   }
+  },
+  {
+   "video": "33286",
+   "gloss": "like",
+   "frames": 30,
+   "before": {
+    "labels": [],
+    "top1": false,
+    "top5": false,
+    "tgcn": null,
+    "ms": 1431
+   },
+   "after": {
+    "labels": [
+     "book"
+    ],
+    "top1": false,
+    "top5": false,
+    "tgcn": [
+     "book",
+     0.7966339588165283
+    ],
+    "ms": 1438
+   },
+   "model": {
+    "keypoint_frames": 29,
+    "top5": [
+     "book",
+     "cousin",
+     "meet",
+     "kiss",
+     "bed"
+    ],
+    "top1_hit": false,
+    "top5_hit": false
+   }
+  },
+  {
+   "video": "35513",
+   "gloss": "meet",
+   "frames": 30,
+   "before": {
+    "labels": [
+     "you"
+    ],
+    "top1": false,
+    "top5": false,
+    "tgcn": null,
+    "ms": 1675
+   },
+   "after": {
+    "labels": [
+     "you",
+     "bed"
+    ],
+    "top1": false,
+    "top5": false,
+    "tgcn": [
+     "bed",
+     0.35671576857566833
+    ],
+    "ms": 1693
+   },
+   "model": {
+    "keypoint_frames": 29,
+    "top5": [
+     "bed",
+     "book",
+     "meet",
+     "graduate",
+     "change"
+    ],
+    "top1_hit": false,
+    "top5_hit": true
+   }
+  },
+  {
+   "video": "38525",
+   "gloss": "no",
+   "frames": 30,
+   "before": {
+    "labels": [
+     "yes"
+    ],
+    "top1": false,
+    "top5": false,
+    "tgcn": null,
+    "ms": 1601
+   },
+   "after": {
+    "labels": [
+     "yes",
+     "tall"
+    ],
+    "top1": false,
+    "top5": false,
+    "tgcn": [
+     "tall",
+     0.6593409180641174
+    ],
+    "ms": 1604
+   },
+   "model": {
+    "keypoint_frames": 30,
+    "top5": [
+     "tall",
+     "book",
+     "dog",
+     "later",
+     "all"
+    ],
+    "top1_hit": false,
+    "top5_hit": false
+   }
+  },
+  {
+   "video": "38991",
+   "gloss": "now",
+   "frames": 30,
+   "before": {
+    "labels": [],
+    "top1": false,
+    "top5": false,
+    "tgcn": null,
+    "ms": 1422
+   },
+   "after": {
+    "labels": [
+     "book"
+    ],
+    "top1": false,
+    "top5": false,
+    "tgcn": [
+     "book",
+     0.6597127914428711
+    ],
+    "ms": 1424
+   },
+   "model": {
+    "keypoint_frames": 30,
+    "top5": [
+     "book",
+     "city",
+     "meet",
+     "candy",
+     "cousin"
+    ],
+    "top1_hit": false,
+    "top5_hit": false
+   }
+  },
+  {
+   "video": "42960",
+   "gloss": "pizza",
+   "frames": 30,
+   "before": {
+    "labels": [
+     "yes"
+    ],
+    "top1": false,
+    "top5": false,
+    "tgcn": null,
+    "ms": 1916
+   },
+   "after": {
+    "labels": [
+     "tall",
+     "yes"
+    ],
+    "top1": false,
+    "top5": false,
+    "tgcn": [
+     "tall",
+     0.9803844690322876
+    ],
+    "ms": 1675
+   },
+   "model": {
+    "keypoint_frames": 30,
+    "top5": [
+     "tall",
+     "later",
+     "all",
+     "no",
+     "dog"
+    ],
+    "top1_hit": false,
+    "top5_hit": false
+   }
+  },
+  {
+   "video": "43171",
+   "gloss": "play",
+   "frames": 30,
+   "before": {
+    "labels": [
+     "yes",
+     "ok",
+     "yes",
+     "ok"
+    ],
+    "top1": false,
+    "top5": false,
+    "tgcn": null,
+    "ms": 1827
+   },
+   "after": {
+    "labels": [
+     "yes",
+     "ok",
+     "yes",
+     "ok"
+    ],
+    "top1": false,
+    "top5": false,
+    "tgcn": null,
+    "ms": 1819
+   },
+   "model": {
+    "keypoint_frames": 29,
+    "top5": [
+     "tall",
+     "short",
+     "cousin",
+     "candy",
+     "graduate"
+    ],
+    "top1_hit": false,
+    "top5_hit": false
+   }
+  },
+  {
+   "video": "48115",
+   "gloss": "right",
+   "frames": 30,
+   "before": {
+    "labels": [],
+    "top1": false,
+    "top5": false,
+    "tgcn": null,
+    "ms": 2082
+   },
+   "after": {
+    "labels": [
+     "book"
+    ],
+    "top1": false,
+    "top5": false,
+    "tgcn": [
+     "book",
+     0.3594266474246979
+    ],
+    "ms": 2082
+   },
+   "model": {
+    "keypoint_frames": 30,
+    "top5": [
+     "book",
+     "tall",
+     "cousin",
+     "candy",
+     "dog"
+    ],
+    "top1_hit": false,
+    "top5_hit": false
+   }
+  },
+  {
+   "video": "48126",
+   "gloss": "right",
+   "frames": 30,
+   "before": {
+    "labels": [
+     "you"
+    ],
+    "top1": false,
+    "top5": false,
+    "tgcn": null,
+    "ms": 1582
+   },
+   "after": {
+    "labels": [
+     "book",
+     "you"
+    ],
+    "top1": false,
+    "top5": false,
+    "tgcn": [
+     "book",
+     0.911009669303894
+    ],
+    "ms": 1587
+   },
+   "model": {
+    "keypoint_frames": 29,
+    "top5": [
+     "book",
+     "cousin",
+     "tall",
+     "family",
+     "city"
+    ],
+    "top1_hit": false,
+    "top5_hit": false
+   }
+  },
+  {
+   "video": "49173",
+   "gloss": "same",
+   "frames": 30,
+   "before": {
+    "labels": [],
+    "top1": false,
+    "top5": false,
+    "tgcn": null,
+    "ms": 1537
+   },
+   "after": {
+    "labels": [
+     "book"
+    ],
+    "top1": false,
+    "top5": false,
+    "tgcn": [
+     "book",
+     0.8296633362770081
+    ],
+    "ms": 1543
+   },
+   "model": {
+    "keypoint_frames": 30,
+    "top5": [
+     "book",
+     "meet",
+     "tall",
+     "cousin",
+     "bed"
+    ],
+    "top1_hit": false,
+    "top5_hit": false
+   }
+  },
+  {
+   "video": "50041",
+   "gloss": "secretary",
+   "frames": 30,
+   "before": {
+    "labels": [
+     "ok",
+     "hello"
+    ],
+    "top1": false,
+    "top5": false,
+    "tgcn": null,
+    "ms": 1822
+   },
+   "after": {
+    "labels": [
+     "ok",
+     "hello"
+    ],
+    "top1": false,
+    "top5": false,
+    "tgcn": null,
+    "ms": 1833
+   },
+   "model": {
+    "keypoint_frames": 29,
+    "top5": [
+     "candy",
+     "book",
+     "tall",
+     "meet",
+     "tell"
+    ],
+    "top1_hit": false,
+    "top5_hit": false
+   }
+  },
+  {
+   "video": "51066",
+   "gloss": "shirt",
+   "frames": 30,
+   "before": {
+    "labels": [
+     "ok"
+    ],
+    "top1": false,
+    "top5": false,
+    "tgcn": null,
+    "ms": 1627
+   },
+   "after": {
+    "labels": [
+     "book",
+     "ok"
+    ],
+    "top1": false,
+    "top5": false,
+    "tgcn": [
+     "book",
+     0.7070823907852173
+    ],
+    "ms": 1630
+   },
+   "model": {
+    "keypoint_frames": 30,
+    "top5": [
+     "book",
+     "bed",
+     "meet",
+     "cousin",
+     "tall"
+    ],
+    "top1_hit": false,
+    "top5_hit": false
+   }
+  },
+  {
+   "video": "51068",
+   "gloss": "shirt",
+   "frames": 30,
+   "before": {
+    "labels": [],
+    "top1": false,
+    "top5": false,
+    "tgcn": null,
+    "ms": 1628
+   },
+   "after": {
+    "labels": [
+     "tall"
+    ],
+    "top1": false,
+    "top5": false,
+    "tgcn": [
+     "tall",
+     0.8193653225898743
+    ],
+    "ms": 1622
+   },
+   "model": {
+    "keypoint_frames": 30,
+    "top5": [
+     "tall",
+     "later",
+     "cousin",
+     "dog",
+     "book"
+    ],
+    "top1_hit": false,
+    "top5_hit": false
+   }
+  },
+  {
+   "video": "51233",
+   "gloss": "short",
+   "frames": 30,
+   "before": {
+    "labels": [
+     "yes"
+    ],
+    "top1": false,
+    "top5": false,
+    "tgcn": null,
+    "ms": 1634
+   },
+   "after": {
+    "labels": [
+     "yes",
+     "book"
+    ],
+    "top1": false,
+    "top5": false,
+    "tgcn": [
+     "book",
+     0.6543443202972412
+    ],
+    "ms": 1631
+   },
+   "model": {
+    "keypoint_frames": 30,
+    "top5": [
+     "book",
+     "meet",
+     "bed",
+     "tall",
+     "cousin"
+    ],
+    "top1_hit": false,
+    "top5_hit": false
+   }
+  },
+  {
+   "video": "55375",
+   "gloss": "study",
+   "frames": 30,
+   "before": {
+    "labels": [
+     "ok"
+    ],
+    "top1": false,
+    "top5": false,
+    "tgcn": null,
+    "ms": 1691
+   },
+   "after": {
+    "labels": [
+     "tall",
+     "ok"
+    ],
+    "top1": false,
+    "top5": false,
+    "tgcn": [
+     "tall",
+     0.7535712122917175
+    ],
+    "ms": 1691
+   },
+   "model": {
+    "keypoint_frames": 29,
+    "top5": [
+     "tall",
+     "book",
+     "cousin",
+     "meet",
+     "later"
+    ],
+    "top1_hit": false,
+    "top5_hit": false
+   }
+  },
+  {
+   "video": "56843",
+   "gloss": "tall",
+   "frames": 30,
+   "before": {
+    "labels": [
+     "hello"
+    ],
+    "top1": false,
+    "top5": false,
+    "tgcn": null,
+    "ms": 1481
+   },
+   "after": {
+    "labels": [
+     "hello",
+     "tall"
+    ],
+    "top1": false,
+    "top5": true,
+    "tgcn": [
+     "tall",
+     0.7648327946662903
+    ],
+    "ms": 1482
+   },
+   "model": {
+    "keypoint_frames": 29,
+    "top5": [
+     "tall",
+     "later",
+     "all",
+     "no",
+     "book"
+    ],
+    "top1_hit": true,
+    "top5_hit": true
+   }
+  },
+  {
+   "video": "57278",
+   "gloss": "tell",
+   "frames": 30,
+   "before": {
+    "labels": [
+     "ok"
+    ],
+    "top1": false,
+    "top5": false,
+    "tgcn": null,
+    "ms": 1530
+   },
+   "after": {
+    "labels": [
+     "ok",
+     "book"
+    ],
+    "top1": false,
+    "top5": false,
+    "tgcn": [
+     "book",
+     0.47725987434387207
+    ],
+    "ms": 1540
+   },
+   "model": {
+    "keypoint_frames": 29,
+    "top5": [
+     "book",
+     "bed",
+     "meet",
+     "cousin",
+     "tall"
+    ],
+    "top1_hit": false,
+    "top5_hit": false
+   }
+  },
+  {
+   "video": "57640",
+   "gloss": "thanksgiving",
+   "frames": 30,
+   "before": {
+    "labels": [],
+    "top1": false,
+    "top5": false,
+    "tgcn": null,
+    "ms": 1635
+   },
+   "after": {
+    "labels": [
+     "book"
+    ],
+    "top1": false,
+    "top5": false,
+    "tgcn": [
+     "book",
+     0.48359933495521545
+    ],
+    "ms": 1636
+   },
+   "model": {
+    "keypoint_frames": 30,
+    "top5": [
+     "book",
+     "bed",
+     "meet",
+     "tall",
+     "cousin"
+    ],
+    "top1_hit": false,
+    "top5_hit": false
+   }
+  },
+  {
+   "video": "57941",
+   "gloss": "thin",
+   "frames": 30,
+   "before": {
+    "labels": [
+     "hello"
+    ],
+    "top1": false,
+    "top5": false,
+    "tgcn": null,
+    "ms": 1795
+   },
+   "after": {
+    "labels": [
+     "tall",
+     "hello"
+    ],
+    "top1": false,
+    "top5": false,
+    "tgcn": [
+     "tall",
+     0.9427775144577026
+    ],
+    "ms": 1794
+   },
+   "model": {
+    "keypoint_frames": 30,
+    "top5": [
+     "tall",
+     "later",
+     "dog",
+     "all",
+     "no"
+    ],
+    "top1_hit": false,
+    "top5_hit": false
+   }
+  },
+  {
+   "video": "57943",
+   "gloss": "thin",
+   "frames": 30,
+   "before": {
+    "labels": [
+     "you"
+    ],
+    "top1": false,
+    "top5": false,
+    "tgcn": null,
+    "ms": 1433
+   },
+   "after": {
+    "labels": [
+     "book",
+     "you"
+    ],
+    "top1": false,
+    "top5": false,
+    "tgcn": [
+     "book",
+     0.8208416700363159
+    ],
+    "ms": 1433
+   },
+   "model": {
+    "keypoint_frames": 29,
+    "top5": [
+     "book",
+     "meet",
+     "cousin",
+     "bed",
+     "tall"
+    ],
+    "top1_hit": false,
+    "top5_hit": false
+   }
+  },
+  {
+   "video": "58502",
+   "gloss": "time",
+   "frames": 30,
+   "before": {
+    "labels": [
+     "you"
+    ],
+    "top1": false,
+    "top5": false,
+    "tgcn": null,
+    "ms": 2118
+   },
+   "after": {
+    "labels": [
+     "you",
+     "tall"
+    ],
+    "top1": false,
+    "top5": false,
+    "tgcn": [
+     "tall",
+     0.35595881938934326
+    ],
+    "ms": 2116
+   },
+   "model": {
+    "keypoint_frames": 30,
+    "top5": [
+     "tall",
+     "dog",
+     "candy",
+     "tell",
+     "no"
+    ],
+    "top1_hit": false,
+    "top5_hit": false
+   }
+  },
+  {
+   "video": "62160",
+   "gloss": "walk",
+   "frames": 30,
+   "before": {
+    "labels": [
+     "no",
+     "ok"
+    ],
+    "top1": false,
+    "top5": false,
+    "tgcn": null,
+    "ms": 2004
+   },
+   "after": {
+    "labels": [
+     "tall",
+     "no",
+     "ok"
+    ],
+    "top1": false,
+    "top5": false,
+    "tgcn": [
+     "tall",
+     0.996479332447052
+    ],
+    "ms": 2005
+   },
+   "model": {
+    "keypoint_frames": 30,
+    "top5": [
+     "tall",
+     "later",
+     "all",
+     "cousin",
+     "book"
+    ],
+    "top1_hit": false,
+    "top5_hit": false
+   }
+  },
+  {
+   "video": "62247",
+   "gloss": "want",
+   "frames": 30,
+   "before": {
+    "labels": [
+     "yes"
+    ],
+    "top1": false,
+    "top5": false,
+    "tgcn": null,
+    "ms": 1899
+   },
+   "after": {
+    "labels": [
+     "yes",
+     "tall"
+    ],
+    "top1": false,
+    "top5": false,
+    "tgcn": [
+     "tall",
+     0.509096622467041
+    ],
+    "ms": 1900
+   },
+   "model": {
+    "keypoint_frames": 30,
+    "top5": [
+     "tall",
+     "later",
+     "graduate",
+     "cousin",
+     "meet"
+    ],
+    "top1_hit": false,
+    "top5_hit": false
+   }
+  },
+  {
+   "video": "62967",
+   "gloss": "what",
+   "frames": 30,
+   "before": {
+    "labels": [
+     "hello"
+    ],
+    "top1": false,
+    "top5": false,
+    "tgcn": null,
+    "ms": 1959
+   },
+   "after": {
+    "labels": [
+     "tall",
+     "hello"
+    ],
+    "top1": false,
+    "top5": false,
+    "tgcn": [
+     "tall",
+     0.9923439621925354
+    ],
+    "ms": 1958
+   },
+   "model": {
+    "keypoint_frames": 30,
+    "top5": [
+     "tall",
+     "later",
+     "cousin",
+     "all",
+     "book"
+    ],
+    "top1_hit": false,
+    "top5_hit": false
+   }
+  },
+  {
+   "video": "62975",
+   "gloss": "what",
+   "frames": 30,
+   "before": {
+    "labels": [],
+    "top1": false,
+    "top5": false,
+    "tgcn": null,
+    "ms": 2120
+   },
+   "after": {
+    "labels": [
+     "book"
+    ],
+    "top1": false,
+    "top5": false,
+    "tgcn": [
+     "book",
+     0.6873771548271179
+    ],
+    "ms": 2116
+   },
+   "model": {
+    "keypoint_frames": 30,
+    "top5": [
+     "book",
+     "meet",
+     "bed",
+     "cousin",
+     "city"
+    ],
+    "top1_hit": false,
+    "top5_hit": false
+   }
+  },
+  {
+   "video": "62987",
+   "gloss": "what",
+   "frames": 30,
+   "before": {
+    "labels": [],
+    "top1": false,
+    "top5": false,
+    "tgcn": null,
+    "ms": 1485
+   },
+   "after": {
+    "labels": [
+     "book"
+    ],
+    "top1": false,
+    "top5": false,
+    "tgcn": [
+     "book",
+     0.8443434834480286
+    ],
+    "ms": 1480
+   },
+   "model": {
+    "keypoint_frames": 29,
+    "top5": [
+     "book",
+     "meet",
+     "cousin",
+     "bed",
+     "tall"
+    ],
+    "top1_hit": false,
+    "top5_hit": false
+   }
+  },
+  {
+   "video": "63201",
+   "gloss": "white",
+   "frames": 30,
+   "before": {
+    "labels": [],
+    "top1": false,
+    "top5": false,
+    "tgcn": null,
+    "ms": 1427
+   },
+   "after": {
+    "labels": [
+     "tall"
+    ],
+    "top1": false,
+    "top5": false,
+    "tgcn": [
+     "tall",
+     0.671103835105896
+    ],
+    "ms": 1426
+   },
+   "model": {
+    "keypoint_frames": 30,
+    "top5": [
+     "tall",
+     "book",
+     "cousin",
+     "later",
+     "all"
+    ],
+    "top1_hit": false,
+    "top5_hit": false
+   }
+  },
+  {
+   "video": "63226",
+   "gloss": "who",
+   "frames": 30,
+   "before": {
+    "labels": [],
+    "top1": false,
+    "top5": false,
+    "tgcn": null,
+    "ms": 1507
+   },
+   "after": {
+    "labels": [
+     "tall"
+    ],
+    "top1": false,
+    "top5": false,
+    "tgcn": [
+     "tall",
+     0.6315937042236328
+    ],
+    "ms": 1508
+   },
+   "model": {
+    "keypoint_frames": 30,
+    "top5": [
+     "tall",
+     "book",
+     "dog",
+     "later",
+     "cousin"
+    ],
+    "top1_hit": false,
+    "top5_hit": false
+   }
+  },
+  {
+   "video": "63664",
+   "gloss": "woman",
+   "frames": 30,
+   "before": {
+    "labels": [],
+    "top1": false,
+    "top5": false,
+    "tgcn": null,
+    "ms": 1279
+   },
+   "after": {
+    "labels": [
+     "book"
+    ],
+    "top1": false,
+    "top5": false,
+    "tgcn": [
+     "book",
+     0.8079051375389099
+    ],
+    "ms": 1288
+   },
+   "model": {
+    "keypoint_frames": 30,
+    "top5": [
+     "book",
+     "meet",
+     "cousin",
+     "candy",
+     "bed"
+    ],
+    "top1_hit": false,
+    "top5_hit": false
+   }
+  },
+  {
+   "video": "63789",
+   "gloss": "work",
+   "frames": 30,
+   "before": {
+    "labels": [
+     "yes",
+     "you",
+     "yes"
+    ],
+    "top1": false,
+    "top5": false,
+    "tgcn": null,
+    "ms": 1504
+   },
+   "after": {
+    "labels": [
+     "book",
+     "yes",
+     "you",
+     "yes"
+    ],
+    "top1": false,
+    "top5": false,
+    "tgcn": [
+     "book",
+     0.7606990337371826
+    ],
+    "ms": 1507
+   },
+   "model": {
+    "keypoint_frames": 30,
+    "top5": [
+     "book",
+     "meet",
+     "cousin",
+     "bed",
+     "kiss"
+    ],
+    "top1_hit": false,
+    "top5_hit": false
+   }
+  },
+  {
+   "video": "64097",
+   "gloss": "wrong",
+   "frames": 30,
+   "before": {
+    "labels": [
+     "ok"
+    ],
+    "top1": false,
+    "top5": false,
+    "tgcn": null,
+    "ms": 1490
+   },
+   "after": {
+    "labels": [
+     "book",
+     "ok"
+    ],
+    "top1": false,
+    "top5": false,
+    "tgcn": [
+     "book",
+     0.7339630126953125
+    ],
+    "ms": 1495
+   },
+   "model": {
+    "keypoint_frames": 29,
+    "top5": [
+     "book",
+     "cousin",
+     "tall",
+     "meet",
+     "bed"
+    ],
+    "top1_hit": false,
+    "top5_hit": false
+   }
+  },
+  {
+   "video": "64209",
+   "gloss": "year",
+   "frames": 30,
+   "before": {
+    "labels": [],
+    "top1": false,
+    "top5": false,
+    "tgcn": null,
+    "ms": 1576
+   },
+   "after": {
+    "labels": [
+     "book"
+    ],
+    "top1": false,
+    "top5": false,
+    "tgcn": [
+     "book",
+     0.5552809238433838
+    ],
+    "ms": 1572
+   },
+   "model": {
+    "keypoint_frames": 30,
+    "top5": [
+     "book",
+     "meet",
+     "cousin",
+     "candy",
+     "graduate"
+    ],
+    "top1_hit": false,
+    "top5_hit": false
+   }
+  },
+  {
+   "video": "64210",
+   "gloss": "year",
+   "frames": 30,
+   "before": {
+    "labels": [],
+    "top1": false,
+    "top5": false,
+    "tgcn": null,
+    "ms": 1928
+   },
+   "after": {
+    "labels": [],
+    "top1": false,
+    "top5": false,
+    "tgcn": null,
+    "ms": 1927
+   },
+   "model": {
+    "keypoint_frames": 30,
+    "top5": [
+     "tall",
+     "short",
+     "book",
+     "dog",
+     "no"
+    ],
+    "top1_hit": false,
+    "top5_hit": false
+   }
+  },
+  {
+   "video": "64293",
+   "gloss": "yes",
+   "frames": 30,
+   "before": {
+    "labels": [
+     "yes",
+     "no"
+    ],
+    "top1": true,
+    "top5": true,
+    "tgcn": null,
+    "ms": 1642
+   },
+   "after": {
+    "labels": [
+     "yes",
+     "no",
+     "book"
+    ],
+    "top1": true,
+    "top5": true,
+    "tgcn": [
+     "book",
+     0.6163685917854309
+    ],
+    "ms": 1644
+   },
+   "model": {
+    "keypoint_frames": 30,
+    "top5": [
+     "book",
+     "tall",
+     "meet",
+     "bed",
+     "all"
+    ],
+    "top1_hit": false,
+    "top5_hit": false
+   }
+  },
+  {
+   "video": "65300",
+   "gloss": "candy",
+   "frames": 30,
+   "before": {
+    "labels": [
+     "ok"
+    ],
+    "top1": false,
+    "top5": false,
+    "tgcn": null,
+    "ms": 1731
+   },
+   "after": {
+    "labels": [
+     "book",
+     "ok"
+    ],
+    "top1": false,
+    "top5": false,
+    "tgcn": [
+     "book",
+     0.9220296144485474
+    ],
+    "ms": 1728
+   },
+   "model": {
+    "keypoint_frames": 30,
+    "top5": [
+     "book",
+     "tall",
+     "cousin",
+     "family",
+     "meet"
+    ],
+    "top1_hit": false,
+    "top5_hit": false
+   }
+  },
+  {
+   "video": "65415",
+   "gloss": "cousin",
+   "frames": 30,
+   "before": {
+    "labels": [],
+    "top1": false,
+    "top5": false,
+    "tgcn": null,
+    "ms": 1396
+   },
+   "after": {
+    "labels": [
+     "book"
+    ],
+    "top1": false,
+    "top5": false,
+    "tgcn": [
+     "book",
+     0.9073749780654907
+    ],
+    "ms": 1413
+   },
+   "model": {
+    "keypoint_frames": 30,
+    "top5": [
+     "book",
+     "tall",
+     "cousin",
+     "meet",
+     "family"
+    ],
+    "top1_hit": false,
+    "top5_hit": true
+   }
+  },
+  {
+   "video": "65506",
+   "gloss": "dog",
+   "frames": 30,
+   "before": {
+    "labels": [],
+    "top1": false,
+    "top5": false,
+    "tgcn": null,
+    "ms": 1466
+   },
+   "after": {
+    "labels": [
+     "book"
+    ],
+    "top1": false,
+    "top5": false,
+    "tgcn": [
+     "book",
+     0.9556459784507751
+    ],
+    "ms": 1462
+   },
+   "model": {
+    "keypoint_frames": 30,
+    "top5": [
+     "book",
+     "cousin",
+     "meet",
+     "tall",
+     "family"
+    ],
+    "top1_hit": false,
+    "top5_hit": false
+   }
+  },
+  {
+   "video": "65761",
+   "gloss": "forget",
+   "frames": 30,
+   "before": {
+    "labels": [
+     "ok"
+    ],
+    "top1": false,
+    "top5": false,
+    "tgcn": null,
+    "ms": 1538
+   },
+   "after": {
+    "labels": [
+     "book",
+     "ok"
+    ],
+    "top1": false,
+    "top5": false,
+    "tgcn": [
+     "book",
+     0.6335498690605164
+    ],
+    "ms": 1542
+   },
+   "model": {
+    "keypoint_frames": 30,
+    "top5": [
+     "book",
+     "tall",
+     "bed",
+     "meet",
+     "cousin"
+    ],
+    "top1_hit": false,
+    "top5_hit": false
+   }
+  },
+  {
+   "video": "65884",
+   "gloss": "hearing",
+   "frames": 30,
+   "before": {
+    "labels": [],
+    "top1": false,
+    "top5": false,
+    "tgcn": null,
+    "ms": 1433
+   },
+   "after": {
+    "labels": [
+     "book"
+    ],
+    "top1": false,
+    "top5": false,
+    "tgcn": [
+     "book",
+     0.855573832988739
+    ],
+    "ms": 1429
+   },
+   "model": {
+    "keypoint_frames": 30,
+    "top5": [
+     "book",
+     "meet",
+     "bed",
+     "cousin",
+     "family"
+    ],
+    "top1_hit": false,
+    "top5_hit": false
+   }
+  },
+  {
+   "video": "66111",
+   "gloss": "medicine",
+   "frames": 30,
+   "before": {
+    "labels": [],
+    "top1": false,
+    "top5": false,
+    "tgcn": null,
+    "ms": 1759
+   },
+   "after": {
+    "labels": [
+     "book"
+    ],
+    "top1": false,
+    "top5": false,
+    "tgcn": [
+     "book",
+     0.9363388419151306
+    ],
+    "ms": 1760
+   },
+   "model": {
+    "keypoint_frames": 30,
+    "top5": [
+     "book",
+     "meet",
+     "bed",
+     "cousin",
+     "cool"
+    ],
+    "top1_hit": false,
+    "top5_hit": false
+   }
+  },
+  {
+   "video": "69225",
+   "gloss": "basketball",
+   "frames": 30,
+   "before": {
+    "labels": [
+     "hello"
+    ],
+    "top1": false,
+    "top5": false,
+    "tgcn": null,
+    "ms": 1885
+   },
+   "after": {
+    "labels": [
+     "hello"
+    ],
+    "top1": false,
+    "top5": false,
+    "tgcn": null,
+    "ms": 1907
+   },
+   "model": {
+    "keypoint_frames": 30,
+    "top5": [
+     "no",
+     "book",
+     "short",
+     "tall",
+     "meet"
+    ],
+    "top1_hit": false,
+    "top5_hit": false
+   }
+  },
+  {
+   "video": "69252",
+   "gloss": "brown",
+   "frames": 30,
+   "before": {
+    "labels": [],
+    "top1": false,
+    "top5": false,
+    "tgcn": null,
+    "ms": 1679
+   },
+   "after": {
+    "labels": [
+     "book"
+    ],
+    "top1": false,
+    "top5": false,
+    "tgcn": [
+     "book",
+     0.9009074568748474
+    ],
+    "ms": 1677
+   },
+   "model": {
+    "keypoint_frames": 30,
+    "top5": [
+     "book",
+     "tall",
+     "cousin",
+     "meet",
+     "bed"
+    ],
+    "top1_hit": false,
+    "top5_hit": false
+   }
+  },
+  {
+   "video": "69257",
+   "gloss": "can",
+   "frames": 30,
+   "before": {
+    "labels": [
+     "yes",
+     "no"
+    ],
+    "top1": false,
+    "top5": false,
+    "tgcn": null,
+    "ms": 1939
+   },
+   "after": {
+    "labels": [
+     "yes",
+     "no",
+     "book"
+    ],
+    "top1": false,
+    "top5": false,
+    "tgcn": [
+     "book",
+     0.861732542514801
+    ],
+    "ms": 1950
+   },
+   "model": {
+    "keypoint_frames": 30,
+    "top5": [
+     "book",
+     "meet",
+     "bed",
+     "cousin",
+     "candy"
+    ],
+    "top1_hit": false,
+    "top5_hit": false
+   }
+  },
+  {
+   "video": "69269",
+   "gloss": "city",
+   "frames": 30,
+   "before": {
+    "labels": [
+     "hello"
+    ],
+    "top1": false,
+    "top5": false,
+    "tgcn": null,
+    "ms": 1990
+   },
+   "after": {
+    "labels": [
+     "book",
+     "hello"
+    ],
+    "top1": false,
+    "top5": false,
+    "tgcn": [
+     "book",
+     0.5397049188613892
+    ],
+    "ms": 1991
+   },
+   "model": {
+    "keypoint_frames": 30,
+    "top5": [
+     "book",
+     "meet",
+     "bed",
+     "kiss",
+     "family"
+    ],
+    "top1_hit": false,
+    "top5_hit": false
+   }
+  },
+  {
+   "video": "69370",
+   "gloss": "how",
+   "frames": 30,
+   "before": {
+    "labels": [
+     "ok"
+    ],
+    "top1": false,
+    "top5": false,
+    "tgcn": null,
+    "ms": 2106
+   },
+   "after": {
+    "labels": [
+     "ok",
+     "book"
+    ],
+    "top1": false,
+    "top5": false,
+    "tgcn": [
+     "book",
+     0.7142167687416077
+    ],
+    "ms": 2120
+   },
+   "model": {
+    "keypoint_frames": 30,
+    "top5": [
+     "book",
+     "bed",
+     "candy",
+     "meet",
+     "cousin"
+    ],
+    "top1_hit": false,
+    "top5_hit": false
+   }
+  },
+  {
+   "video": "69389",
+   "gloss": "like",
+   "frames": 30,
+   "before": {
+    "labels": [],
+    "top1": false,
+    "top5": false,
+    "tgcn": null,
+    "ms": 1618
+   },
+   "after": {
+    "labels": [
+     "book"
+    ],
+    "top1": false,
+    "top5": false,
+    "tgcn": [
+     "book",
+     0.9579064249992371
+    ],
+    "ms": 1616
+   },
+   "model": {
+    "keypoint_frames": 30,
+    "top5": [
+     "book",
+     "meet",
+     "cousin",
+     "tall",
+     "family"
+    ],
+    "top1_hit": false,
+    "top5_hit": false
+   }
+  },
+  {
+   "video": "69431",
+   "gloss": "pizza",
+   "frames": 30,
+   "before": {
+    "labels": [],
+    "top1": false,
+    "top5": false,
+    "tgcn": null,
+    "ms": 1546
+   },
+   "after": {
+    "labels": [
+     "book"
+    ],
+    "top1": false,
+    "top5": false,
+    "tgcn": [
+     "book",
+     0.9191356301307678
+    ],
+    "ms": 1551
+   },
+   "model": {
+    "keypoint_frames": 30,
+    "top5": [
+     "book",
+     "meet",
+     "cousin",
+     "bed",
+     "family"
+    ],
+    "top1_hit": false,
+    "top5_hit": false
+   }
+  },
+  {
+   "video": "69433",
+   "gloss": "play",
+   "frames": 30,
+   "before": {
+    "labels": [
+     "ok"
+    ],
+    "top1": false,
+    "top5": false,
+    "tgcn": null,
+    "ms": 1869
+   },
+   "after": {
+    "labels": [
+     "ok",
+     "book"
+    ],
+    "top1": false,
+    "top5": false,
+    "tgcn": [
+     "book",
+     0.7052885293960571
+    ],
+    "ms": 1874
+   },
+   "model": {
+    "keypoint_frames": 30,
+    "top5": [
+     "book",
+     "meet",
+     "bed",
+     "cousin",
+     "cool"
+    ],
+    "top1_hit": false,
+    "top5_hit": false
+   }
+  },
+  {
+   "video": "69439",
+   "gloss": "pull",
+   "frames": 30,
+   "before": {
+    "labels": [],
+    "top1": false,
+    "top5": false,
+    "tgcn": null,
+    "ms": 2054
+   },
+   "after": {
+    "labels": [
+     "tall"
+    ],
+    "top1": false,
+    "top5": false,
+    "tgcn": [
+     "tall",
+     0.6243327856063843
+    ],
+    "ms": 2059
+   },
+   "model": {
+    "keypoint_frames": 30,
+    "top5": [
+     "tall",
+     "book",
+     "cousin",
+     "all",
+     "later"
+    ],
+    "top1_hit": false,
+    "top5_hit": false
+   }
+  },
+  {
+   "video": "69440",
+   "gloss": "purple",
+   "frames": 30,
+   "before": {
+    "labels": [],
+    "top1": false,
+    "top5": false,
+    "tgcn": null,
+    "ms": 1536
+   },
+   "after": {
+    "labels": [
+     "book"
+    ],
+    "top1": false,
+    "top5": false,
+    "tgcn": [
+     "book",
+     0.9537544250488281
+    ],
+    "ms": 1537
+   },
+   "model": {
+    "keypoint_frames": 30,
+    "top5": [
+     "book",
+     "cousin",
+     "tall",
+     "meet",
+     "family"
+    ],
+    "top1_hit": false,
+    "top5_hit": false
+   }
+  }
+ ]
+}

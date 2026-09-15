@@ -1,0 +1,6760 @@
+{
+ "method": "[Final report: Section 5.4, Table 5.3]\n\nFusion on scripted scenes whose real events are known in advance.\n\nEach tick is built from ESC-50 clips and synthetic speech from macOS `say`;\nnothing is recorded. Sound and speech are mixed at equal loudness, cut to the\n2.8 s tick, encoded to WebM/Opus as the browser sends them, and posted with\nthree plain grey frames to the real /process handler with live captions off,\nso speech, generic sounds, the enrolled personal sound and name and keyword\nalerts all reach the fusion step. One personal sound (\"Kitchen alarm\") is\nenrolled from three clock-alarm clips; the test scenes use other clips.\n\nThe urgency of each real event is fixed here, before running, following the\npriority bands of Section 3.6:\n  3  siren, crying baby, glass breaking, speech with a safety word, the user's name\n  2  door knock, dog, the enrolled personal sound, ordinary speech\n  0  rain, keyboard typing\nMixed scenes pair events of different urgency, so the correct first headline\nis never a tie.\n\nEvery detection (before and after merge_events) and every headline is\nattributed to the real event it came from: speech-source events and speech-like\nAST labels to the speech, the personal label and other AST labels to the sound,\nanything else to nothing. Per tick this gives duplicate headline slots, whether\nthe first headline is the most urgent real event, missed events, and how many\nexcess detections of one event merge_events removed.\n\nProfiles and the diary go to a temporary directory; the language-model\nnotification is disabled because it runs after ranking. Model weights load\nfrom the local cache, and the script refuses to score unless AST is the loaded\nclassifier and the personal sound is embedded as the application embeds it\n(YamNet, then AST once personal sounds moved to AST embeddings): in a trial run\na failed network request during loading silently replaced AST with YamNet. The scene set runs\nthree times, because Whisper's temperature fallback makes its transcripts of\nnon-speech sounds vary from run to run. Writes eval_results/fusion_eval.json.\n",
+ "scene_set": "original",
+ "backends": {
+  "sound_classifier": "ast",
+  "personal_embedding": "ast"
+ },
+ "rules": {
+  "sentences": {
+   "plain_a": [
+    "Could you pass me the salt, please?",
+    2
+   ],
+   "plain_b": [
+    "The meeting has moved to three o'clock.",
+    2
+   ],
+   "safety": [
+    "Help, there is a fire in the kitchen!",
+    3
+   ],
+   "name": [
+    "Laura, can you come here for a moment?",
+    3
+   ]
+  },
+  "sounds": {
+   "siren": 3,
+   "crying_baby": 3,
+   "glass_breaking": 3,
+   "door_wood_knock": 2,
+   "dog": 2,
+   "clock_alarm": 2,
+   "rain": 0,
+   "keyboard_typing": 0
+  },
+  "self_name": "Laura",
+  "personal_sound": "Kitchen alarm"
+ },
+ "enrolment": {
+  "ok": true,
+  "label": "Kitchen alarm",
+  "n_examples": 3
+ },
+ "summary": {
+  "ticks": 105,
+  "headline_slots": 105,
+  "duplicate_slots": {
+   "n": 0,
+   "of": 105,
+   "rate": 0.0
+  },
+  "unwarranted_slots": {
+   "n": 12,
+   "of": 105,
+   "rate": 0.114
+  },
+  "ticks_with_duplicate_headline": {
+   "n": 0,
+   "of": 105,
+   "rate": 0.0
+  },
+  "correct_first": {
+   "n": 84,
+   "of": 93,
+   "rate": 0.903
+  },
+  "correct_first_by_kind": {
+   "sound only": {
+    "n": 48,
+    "of": 54,
+    "rate": 0.889
+   },
+   "speech and sound": {
+    "n": 24,
+    "of": 27,
+    "rate": 0.889
+   },
+   "speech only": {
+    "n": 12,
+    "of": 12,
+    "rate": 1.0
+   }
+  },
+  "missed_events": {
+   "n": 15,
+   "of": 108,
+   "rate": 0.139
+  },
+  "background_ticks_with_headline": {
+   "n": 0,
+   "of": 12,
+   "rate": 0.0
+  },
+  "excess_detections_before_merge": 168,
+  "removed_by_merge": 99,
+  "identical_label_repeats": 0,
+  "ticks_with_model_warnings": 0,
+  "unwarranted_slots_from_transcripts": 12,
+  "non_speech_ticks_with_transcript": {
+   "n": 45,
+   "of": 66,
+   "rate": 0.682
+  },
+  "ticks_all_slots_one_event": 0,
+  "first_wrong_outranked": 0,
+  "first_wrong_not_headlined": 9,
+  "missed_despite_urgent_detection": 0,
+  "personal_matches": 9,
+  "scenes": 35,
+  "repeats": 3,
+  "per_repeat": [
+   {
+    "correct_first": {
+     "n": 28,
+     "of": 31,
+     "rate": 0.903
+    },
+    "duplicate_slots": {
+     "n": 0,
+     "of": 35,
+     "rate": 0.0
+    },
+    "unwarranted_slots": {
+     "n": 4,
+     "of": 35,
+     "rate": 0.114
+    },
+    "missed_events": 5,
+    "removed_by_merge": 33
+   },
+   {
+    "correct_first": {
+     "n": 28,
+     "of": 31,
+     "rate": 0.903
+    },
+    "duplicate_slots": {
+     "n": 0,
+     "of": 35,
+     "rate": 0.0
+    },
+    "unwarranted_slots": {
+     "n": 4,
+     "of": 35,
+     "rate": 0.114
+    },
+    "missed_events": 5,
+    "removed_by_merge": 33
+   },
+   {
+    "correct_first": {
+     "n": 28,
+     "of": 31,
+     "rate": 0.903
+    },
+    "duplicate_slots": {
+     "n": 0,
+     "of": 35,
+     "rate": 0.0
+    },
+    "unwarranted_slots": {
+     "n": 4,
+     "of": 35,
+     "rate": 0.114
+    },
+    "missed_events": 5,
+    "removed_by_merge": 33
+   }
+  ],
+  "merge_hit_rate": 0.589
+ },
+ "ticks": [
+  {
+   "repeat": 0,
+   "scene": 0,
+   "kind": "sound only",
+   "speech": null,
+   "sound": "siren 1-31482-A-42.wav",
+   "real": {
+    "sound": 3
+   },
+   "transcript": "Beep, beep.",
+   "headlines": [
+    [
+     "sound",
+     "Siren",
+     "CRITICAL"
+    ],
+    [
+     "speech",
+     "Beep, beep.",
+     "IMPORTANT"
+    ]
+   ],
+   "headline_events": [
+    "sound",
+    "nothing"
+   ],
+   "duplicate_slots": 0,
+   "unwarranted_slots": 1,
+   "unwarranted_transcript_slots": 1,
+   "all_slots_one_event": false,
+   "correct_first": true,
+   "first_wrong_reason": null,
+   "missed": [],
+   "missed_with_urgent_detection": [],
+   "personal_matches": 0,
+   "before_merge": [
+    [
+     "speech",
+     "Beep, beep.",
+     2
+    ],
+    [
+     "sound",
+     "Siren",
+     3
+    ],
+    [
+     "sound",
+     "Emergency vehicle",
+     1
+    ],
+    [
+     "sound",
+     "Police car (siren)",
+     3
+    ]
+   ],
+   "after_merge": [
+    [
+     "sound",
+     "Siren",
+     3
+    ],
+    [
+     "sound",
+     "Emergency vehicle",
+     1
+    ],
+    [
+     "speech",
+     "Beep, beep.",
+     2
+    ]
+   ],
+   "excess_before": 2,
+   "excess_after": 1,
+   "identical_label_repeats": 0,
+   "warnings": [],
+   "latency_ms": 1310
+  },
+  {
+   "repeat": 0,
+   "scene": 1,
+   "kind": "sound only",
+   "speech": null,
+   "sound": "siren 1-31482-B-42.wav",
+   "real": {
+    "sound": 3
+   },
+   "transcript": "Oh yeah.",
+   "headlines": [
+    [
+     "sound",
+     "Police car (siren)",
+     "CRITICAL"
+    ],
+    [
+     "speech",
+     "Oh yeah.",
+     "IMPORTANT"
+    ]
+   ],
+   "headline_events": [
+    "sound",
+    "nothing"
+   ],
+   "duplicate_slots": 0,
+   "unwarranted_slots": 1,
+   "unwarranted_transcript_slots": 1,
+   "all_slots_one_event": false,
+   "correct_first": true,
+   "first_wrong_reason": null,
+   "missed": [],
+   "missed_with_urgent_detection": [],
+   "personal_matches": 0,
+   "before_merge": [
+    [
+     "speech",
+     "Oh yeah.",
+     2
+    ],
+    [
+     "sound",
+     "Emergency vehicle",
+     1
+    ],
+    [
+     "sound",
+     "Police car (siren)",
+     3
+    ],
+    [
+     "sound",
+     "Siren",
+     3
+    ]
+   ],
+   "after_merge": [
+    [
+     "sound",
+     "Police car (siren)",
+     3
+    ],
+    [
+     "speech",
+     "Oh yeah.",
+     2
+    ]
+   ],
+   "excess_before": 2,
+   "excess_after": 0,
+   "identical_label_repeats": 0,
+   "warnings": [],
+   "latency_ms": 2351
+  },
+  {
+   "repeat": 0,
+   "scene": 2,
+   "kind": "sound only",
+   "speech": null,
+   "sound": "siren 1-54084-A-42.wav",
+   "real": {
+    "sound": 3
+   },
+   "transcript": "the",
+   "headlines": [
+    [
+     "sound",
+     "Civil defense siren",
+     "CRITICAL"
+    ]
+   ],
+   "headline_events": [
+    "sound"
+   ],
+   "duplicate_slots": 0,
+   "unwarranted_slots": 0,
+   "unwarranted_transcript_slots": 0,
+   "all_slots_one_event": false,
+   "correct_first": true,
+   "first_wrong_reason": null,
+   "missed": [],
+   "missed_with_urgent_detection": [],
+   "personal_matches": 0,
+   "before_merge": [
+    [
+     "sound",
+     "Civil defense siren",
+     3
+    ],
+    [
+     "sound",
+     "Siren",
+     3
+    ]
+   ],
+   "after_merge": [
+    [
+     "sound",
+     "Civil defense siren",
+     3
+    ]
+   ],
+   "excess_before": 1,
+   "excess_after": 0,
+   "identical_label_repeats": 0,
+   "warnings": [],
+   "latency_ms": 2170
+  },
+  {
+   "repeat": 0,
+   "scene": 3,
+   "kind": "sound only",
+   "speech": null,
+   "sound": "crying_baby 1-187207-A-20.wav",
+   "real": {
+    "sound": 3
+   },
+   "transcript": "Oh!",
+   "headlines": [
+    [
+     "sound",
+     "Baby cry, infant cry",
+     "CRITICAL"
+    ],
+    [
+     "speech",
+     "Oh!",
+     "IMPORTANT"
+    ]
+   ],
+   "headline_events": [
+    "sound",
+    "nothing"
+   ],
+   "duplicate_slots": 0,
+   "unwarranted_slots": 1,
+   "unwarranted_transcript_slots": 1,
+   "all_slots_one_event": false,
+   "correct_first": true,
+   "first_wrong_reason": null,
+   "missed": [],
+   "missed_with_urgent_detection": [],
+   "personal_matches": 0,
+   "before_merge": [
+    [
+     "speech",
+     "Oh!",
+     2
+    ],
+    [
+     "sound",
+     "Baby cry, infant cry",
+     3
+    ],
+    [
+     "sound",
+     "Speech",
+     1
+    ]
+   ],
+   "after_merge": [
+    [
+     "sound",
+     "Baby cry, infant cry",
+     3
+    ],
+    [
+     "sound",
+     "Speech",
+     1
+    ],
+    [
+     "speech",
+     "Oh!",
+     2
+    ]
+   ],
+   "excess_before": 1,
+   "excess_after": 1,
+   "identical_label_repeats": 0,
+   "warnings": [],
+   "latency_ms": 1493
+  },
+  {
+   "repeat": 0,
+   "scene": 4,
+   "kind": "sound only",
+   "speech": null,
+   "sound": "crying_baby 1-211527-A-20.wav",
+   "real": {
+    "sound": 3
+   },
+   "transcript": "Please!",
+   "headlines": [
+    [
+     "sound",
+     "Baby cry, infant cry",
+     "CRITICAL"
+    ],
+    [
+     "speech",
+     "Please!",
+     "IMPORTANT"
+    ]
+   ],
+   "headline_events": [
+    "sound",
+    "nothing"
+   ],
+   "duplicate_slots": 0,
+   "unwarranted_slots": 1,
+   "unwarranted_transcript_slots": 1,
+   "all_slots_one_event": false,
+   "correct_first": true,
+   "first_wrong_reason": null,
+   "missed": [],
+   "missed_with_urgent_detection": [],
+   "personal_matches": 0,
+   "before_merge": [
+    [
+     "speech",
+     "Please!",
+     2
+    ],
+    [
+     "sound",
+     "Baby cry, infant cry",
+     3
+    ],
+    [
+     "sound",
+     "Speech",
+     1
+    ]
+   ],
+   "after_merge": [
+    [
+     "sound",
+     "Baby cry, infant cry",
+     3
+    ],
+    [
+     "sound",
+     "Speech",
+     1
+    ],
+    [
+     "speech",
+     "Please!",
+     2
+    ]
+   ],
+   "excess_before": 1,
+   "excess_after": 1,
+   "identical_label_repeats": 0,
+   "warnings": [],
+   "latency_ms": 1185
+  },
+  {
+   "repeat": 0,
+   "scene": 5,
+   "kind": "sound only",
+   "speech": null,
+   "sound": "crying_baby 1-211527-B-20.wav",
+   "real": {
+    "sound": 3
+   },
+   "transcript": "Oh!",
+   "headlines": [],
+   "headline_events": [],
+   "duplicate_slots": 0,
+   "unwarranted_slots": 0,
+   "unwarranted_transcript_slots": 0,
+   "all_slots_one_event": false,
+   "correct_first": false,
+   "first_wrong_reason": "not headlined",
+   "missed": [
+    "sound"
+   ],
+   "missed_with_urgent_detection": [],
+   "personal_matches": 0,
+   "before_merge": [],
+   "after_merge": [],
+   "excess_before": 0,
+   "excess_after": 0,
+   "identical_label_repeats": 0,
+   "warnings": [],
+   "latency_ms": 1036
+  },
+  {
+   "repeat": 0,
+   "scene": 6,
+   "kind": "sound only",
+   "speech": null,
+   "sound": "glass_breaking 1-20133-A-39.wav",
+   "real": {
+    "sound": 3
+   },
+   "transcript": "Don't know. Do you?",
+   "headlines": [],
+   "headline_events": [],
+   "duplicate_slots": 0,
+   "unwarranted_slots": 0,
+   "unwarranted_transcript_slots": 0,
+   "all_slots_one_event": false,
+   "correct_first": false,
+   "first_wrong_reason": "not headlined",
+   "missed": [
+    "sound"
+   ],
+   "missed_with_urgent_detection": [],
+   "personal_matches": 0,
+   "before_merge": [
+    [
+     "sound",
+     "Breaking",
+     0
+    ]
+   ],
+   "after_merge": [
+    [
+     "sound",
+     "Breaking",
+     0
+    ]
+   ],
+   "excess_before": 0,
+   "excess_after": 0,
+   "identical_label_repeats": 0,
+   "warnings": [],
+   "latency_ms": 2108
+  },
+  {
+   "repeat": 0,
+   "scene": 7,
+   "kind": "sound only",
+   "speech": null,
+   "sound": "glass_breaking 1-84536-A-39.wav",
+   "real": {
+    "sound": 3
+   },
+   "transcript": "",
+   "headlines": [
+    [
+     "sound",
+     "Glass",
+     "CRITICAL"
+    ]
+   ],
+   "headline_events": [
+    "sound"
+   ],
+   "duplicate_slots": 0,
+   "unwarranted_slots": 0,
+   "unwarranted_transcript_slots": 0,
+   "all_slots_one_event": false,
+   "correct_first": true,
+   "first_wrong_reason": null,
+   "missed": [],
+   "missed_with_urgent_detection": [],
+   "personal_matches": 0,
+   "before_merge": [
+    [
+     "sound",
+     "Breaking",
+     0
+    ],
+    [
+     "sound",
+     "Glass",
+     3
+    ]
+   ],
+   "after_merge": [
+    [
+     "sound",
+     "Breaking",
+     0
+    ],
+    [
+     "sound",
+     "Glass",
+     3
+    ]
+   ],
+   "excess_before": 1,
+   "excess_after": 1,
+   "identical_label_repeats": 0,
+   "warnings": [],
+   "latency_ms": 1959
+  },
+  {
+   "repeat": 0,
+   "scene": 8,
+   "kind": "sound only",
+   "speech": null,
+   "sound": "glass_breaking 1-84704-A-39.wav",
+   "real": {
+    "sound": 3
+   },
+   "transcript": "",
+   "headlines": [
+    [
+     "sound",
+     "Glass",
+     "CRITICAL"
+    ]
+   ],
+   "headline_events": [
+    "sound"
+   ],
+   "duplicate_slots": 0,
+   "unwarranted_slots": 0,
+   "unwarranted_transcript_slots": 0,
+   "all_slots_one_event": false,
+   "correct_first": true,
+   "first_wrong_reason": null,
+   "missed": [],
+   "missed_with_urgent_detection": [],
+   "personal_matches": 0,
+   "before_merge": [
+    [
+     "sound",
+     "Breaking",
+     0
+    ],
+    [
+     "sound",
+     "Chink, clink",
+     0
+    ],
+    [
+     "sound",
+     "Glass",
+     3
+    ]
+   ],
+   "after_merge": [
+    [
+     "sound",
+     "Breaking",
+     0
+    ],
+    [
+     "sound",
+     "Glass",
+     3
+    ]
+   ],
+   "excess_before": 2,
+   "excess_after": 1,
+   "identical_label_repeats": 0,
+   "warnings": [],
+   "latency_ms": 2141
+  },
+  {
+   "repeat": 0,
+   "scene": 9,
+   "kind": "sound only",
+   "speech": null,
+   "sound": "door_wood_knock 1-101336-A-30.wav",
+   "real": {
+    "sound": 2
+   },
+   "transcript": "and",
+   "headlines": [
+    [
+     "sound",
+     "Knock",
+     "IMPORTANT"
+    ]
+   ],
+   "headline_events": [
+    "sound"
+   ],
+   "duplicate_slots": 0,
+   "unwarranted_slots": 0,
+   "unwarranted_transcript_slots": 0,
+   "all_slots_one_event": false,
+   "correct_first": true,
+   "first_wrong_reason": null,
+   "missed": [],
+   "missed_with_urgent_detection": [],
+   "personal_matches": 0,
+   "before_merge": [
+    [
+     "sound",
+     "Knock",
+     2
+    ]
+   ],
+   "after_merge": [
+    [
+     "sound",
+     "Knock",
+     2
+    ]
+   ],
+   "excess_before": 0,
+   "excess_after": 0,
+   "identical_label_repeats": 0,
+   "warnings": [],
+   "latency_ms": 1931
+  },
+  {
+   "repeat": 0,
+   "scene": 10,
+   "kind": "sound only",
+   "speech": null,
+   "sound": "door_wood_knock 1-103995-A-30.wav",
+   "real": {
+    "sound": 2
+   },
+   "transcript": "You know.",
+   "headlines": [
+    [
+     "sound",
+     "Knock",
+     "IMPORTANT"
+    ]
+   ],
+   "headline_events": [
+    "sound"
+   ],
+   "duplicate_slots": 0,
+   "unwarranted_slots": 0,
+   "unwarranted_transcript_slots": 0,
+   "all_slots_one_event": false,
+   "correct_first": true,
+   "first_wrong_reason": null,
+   "missed": [],
+   "missed_with_urgent_detection": [],
+   "personal_matches": 0,
+   "before_merge": [
+    [
+     "sound",
+     "Knock",
+     2
+    ]
+   ],
+   "after_merge": [
+    [
+     "sound",
+     "Knock",
+     2
+    ]
+   ],
+   "excess_before": 0,
+   "excess_after": 0,
+   "identical_label_repeats": 0,
+   "warnings": [],
+   "latency_ms": 1902
+  },
+  {
+   "repeat": 0,
+   "scene": 11,
+   "kind": "sound only",
+   "speech": null,
+   "sound": "door_wood_knock 1-103999-A-30.wav",
+   "real": {
+    "sound": 2
+   },
+   "transcript": "You know.",
+   "headlines": [
+    [
+     "sound",
+     "Knock",
+     "IMPORTANT"
+    ]
+   ],
+   "headline_events": [
+    "sound"
+   ],
+   "duplicate_slots": 0,
+   "unwarranted_slots": 0,
+   "unwarranted_transcript_slots": 0,
+   "all_slots_one_event": false,
+   "correct_first": true,
+   "first_wrong_reason": null,
+   "missed": [],
+   "missed_with_urgent_detection": [],
+   "personal_matches": 0,
+   "before_merge": [
+    [
+     "sound",
+     "Knock",
+     2
+    ]
+   ],
+   "after_merge": [
+    [
+     "sound",
+     "Knock",
+     2
+    ]
+   ],
+   "excess_before": 0,
+   "excess_after": 0,
+   "identical_label_repeats": 0,
+   "warnings": [],
+   "latency_ms": 2365
+  },
+  {
+   "repeat": 0,
+   "scene": 12,
+   "kind": "sound only",
+   "speech": null,
+   "sound": "dog 1-100032-A-0.wav",
+   "real": {
+    "sound": 2
+   },
+   "transcript": "",
+   "headlines": [
+    [
+     "sound",
+     "Dog",
+     "IMPORTANT"
+    ]
+   ],
+   "headline_events": [
+    "sound"
+   ],
+   "duplicate_slots": 0,
+   "unwarranted_slots": 0,
+   "unwarranted_transcript_slots": 0,
+   "all_slots_one_event": false,
+   "correct_first": true,
+   "first_wrong_reason": null,
+   "missed": [],
+   "missed_with_urgent_detection": [],
+   "personal_matches": 0,
+   "before_merge": [
+    [
+     "sound",
+     "Dog",
+     2
+    ],
+    [
+     "sound",
+     "Bark",
+     2
+    ],
+    [
+     "sound",
+     "Bow-wow",
+     0
+    ]
+   ],
+   "after_merge": [
+    [
+     "sound",
+     "Dog",
+     2
+    ]
+   ],
+   "excess_before": 2,
+   "excess_after": 0,
+   "identical_label_repeats": 0,
+   "warnings": [],
+   "latency_ms": 5212
+  },
+  {
+   "repeat": 0,
+   "scene": 13,
+   "kind": "sound only",
+   "speech": null,
+   "sound": "dog 1-110389-A-0.wav",
+   "real": {
+    "sound": 2
+   },
+   "transcript": "Rup.",
+   "headlines": [
+    [
+     "sound",
+     "Dog",
+     "IMPORTANT"
+    ]
+   ],
+   "headline_events": [
+    "sound"
+   ],
+   "duplicate_slots": 0,
+   "unwarranted_slots": 0,
+   "unwarranted_transcript_slots": 0,
+   "all_slots_one_event": false,
+   "correct_first": true,
+   "first_wrong_reason": null,
+   "missed": [],
+   "missed_with_urgent_detection": [],
+   "personal_matches": 0,
+   "before_merge": [
+    [
+     "sound",
+     "Bow-wow",
+     0
+    ],
+    [
+     "sound",
+     "Dog",
+     2
+    ],
+    [
+     "sound",
+     "Bark",
+     2
+    ]
+   ],
+   "after_merge": [
+    [
+     "sound",
+     "Dog",
+     2
+    ]
+   ],
+   "excess_before": 2,
+   "excess_after": 0,
+   "identical_label_repeats": 0,
+   "warnings": [],
+   "latency_ms": 2054
+  },
+  {
+   "repeat": 0,
+   "scene": 14,
+   "kind": "sound only",
+   "speech": null,
+   "sound": "dog 1-30226-A-0.wav",
+   "real": {
+    "sound": 2
+   },
+   "transcript": "",
+   "headlines": [
+    [
+     "sound",
+     "Dog",
+     "IMPORTANT"
+    ]
+   ],
+   "headline_events": [
+    "sound"
+   ],
+   "duplicate_slots": 0,
+   "unwarranted_slots": 0,
+   "unwarranted_transcript_slots": 0,
+   "all_slots_one_event": false,
+   "correct_first": true,
+   "first_wrong_reason": null,
+   "missed": [],
+   "missed_with_urgent_detection": [],
+   "personal_matches": 0,
+   "before_merge": [
+    [
+     "sound",
+     "Animal",
+     0
+    ],
+    [
+     "sound",
+     "Domestic animals, pets",
+     0
+    ],
+    [
+     "sound",
+     "Dog",
+     2
+    ]
+   ],
+   "after_merge": [
+    [
+     "sound",
+     "Dog",
+     2
+    ]
+   ],
+   "excess_before": 2,
+   "excess_after": 0,
+   "identical_label_repeats": 0,
+   "warnings": [],
+   "latency_ms": 2203
+  },
+  {
+   "repeat": 0,
+   "scene": 15,
+   "kind": "sound only",
+   "speech": null,
+   "sound": "clock_alarm 1-67033-A-37.wav",
+   "real": {
+    "sound": 2
+   },
+   "transcript": "Beak, Beak, Beak,",
+   "headlines": [
+    [
+     "sound",
+     "Kitchen alarm (personal)",
+     "CRITICAL"
+    ]
+   ],
+   "headline_events": [
+    "sound"
+   ],
+   "duplicate_slots": 0,
+   "unwarranted_slots": 0,
+   "unwarranted_transcript_slots": 0,
+   "all_slots_one_event": false,
+   "correct_first": true,
+   "first_wrong_reason": null,
+   "missed": [],
+   "missed_with_urgent_detection": [],
+   "personal_matches": 1,
+   "before_merge": [
+    [
+     "sound",
+     "Kitchen alarm (personal)",
+     2
+    ],
+    [
+     "sound",
+     "Alarm clock",
+     3
+    ],
+    [
+     "sound",
+     "Sound effect",
+     0
+    ]
+   ],
+   "after_merge": [
+    [
+     "sound",
+     "Kitchen alarm (personal)",
+     3
+    ],
+    [
+     "sound",
+     "Sound effect",
+     0
+    ]
+   ],
+   "excess_before": 2,
+   "excess_after": 1,
+   "identical_label_repeats": 0,
+   "warnings": [],
+   "latency_ms": 1583
+  },
+  {
+   "repeat": 0,
+   "scene": 16,
+   "kind": "sound only",
+   "speech": null,
+   "sound": "clock_alarm 1-72195-A-37.wav",
+   "real": {
+    "sound": 2
+   },
+   "transcript": "Beep. Beep.",
+   "headlines": [
+    [
+     "sound",
+     "Kitchen alarm (personal)",
+     "CRITICAL"
+    ]
+   ],
+   "headline_events": [
+    "sound"
+   ],
+   "duplicate_slots": 0,
+   "unwarranted_slots": 0,
+   "unwarranted_transcript_slots": 0,
+   "all_slots_one_event": false,
+   "correct_first": true,
+   "first_wrong_reason": null,
+   "missed": [],
+   "missed_with_urgent_detection": [],
+   "personal_matches": 1,
+   "before_merge": [
+    [
+     "sound",
+     "Kitchen alarm (personal)",
+     2
+    ],
+    [
+     "sound",
+     "Beep, bleep",
+     1
+    ],
+    [
+     "sound",
+     "Alarm",
+     3
+    ],
+    [
+     "sound",
+     "Smoke detector, smoke alarm",
+     3
+    ]
+   ],
+   "after_merge": [
+    [
+     "sound",
+     "Beep, bleep",
+     1
+    ],
+    [
+     "sound",
+     "Kitchen alarm (personal)",
+     3
+    ]
+   ],
+   "excess_before": 3,
+   "excess_after": 1,
+   "identical_label_repeats": 0,
+   "warnings": [],
+   "latency_ms": 1364
+  },
+  {
+   "repeat": 0,
+   "scene": 17,
+   "kind": "sound only",
+   "speech": null,
+   "sound": "clock_alarm 1-72195-B-37.wav",
+   "real": {
+    "sound": 2
+   },
+   "transcript": "Beek. Beek.",
+   "headlines": [
+    [
+     "sound",
+     "Kitchen alarm (personal)",
+     "CRITICAL"
+    ]
+   ],
+   "headline_events": [
+    "sound"
+   ],
+   "duplicate_slots": 0,
+   "unwarranted_slots": 0,
+   "unwarranted_transcript_slots": 0,
+   "all_slots_one_event": false,
+   "correct_first": true,
+   "first_wrong_reason": null,
+   "missed": [],
+   "missed_with_urgent_detection": [],
+   "personal_matches": 1,
+   "before_merge": [
+    [
+     "sound",
+     "Kitchen alarm (personal)",
+     2
+    ],
+    [
+     "sound",
+     "Alarm clock",
+     3
+    ],
+    [
+     "sound",
+     "Alarm",
+     3
+    ],
+    [
+     "sound",
+     "Beep, bleep",
+     1
+    ]
+   ],
+   "after_merge": [
+    [
+     "sound",
+     "Kitchen alarm (personal)",
+     3
+    ],
+    [
+     "sound",
+     "Beep, bleep",
+     1
+    ]
+   ],
+   "excess_before": 3,
+   "excess_after": 1,
+   "identical_label_repeats": 0,
+   "warnings": [],
+   "latency_ms": 1264
+  },
+  {
+   "repeat": 0,
+   "scene": 18,
+   "kind": "background only",
+   "speech": null,
+   "sound": "rain 1-17367-A-10.wav",
+   "real": {
+    "sound": 0
+   },
+   "transcript": "",
+   "headlines": [],
+   "headline_events": [],
+   "duplicate_slots": 0,
+   "unwarranted_slots": 0,
+   "unwarranted_transcript_slots": 0,
+   "all_slots_one_event": false,
+   "correct_first": null,
+   "first_wrong_reason": null,
+   "missed": [],
+   "missed_with_urgent_detection": [],
+   "personal_matches": 0,
+   "before_merge": [
+    [
+     "sound",
+     "Rain",
+     0
+    ],
+    [
+     "sound",
+     "Rain on surface",
+     0
+    ],
+    [
+     "sound",
+     "Raindrop",
+     0
+    ]
+   ],
+   "after_merge": [
+    [
+     "sound",
+     "Rain",
+     0
+    ]
+   ],
+   "excess_before": 2,
+   "excess_after": 0,
+   "identical_label_repeats": 0,
+   "warnings": [],
+   "latency_ms": 1418
+  },
+  {
+   "repeat": 0,
+   "scene": 19,
+   "kind": "background only",
+   "speech": null,
+   "sound": "rain 1-21189-A-10.wav",
+   "real": {
+    "sound": 0
+   },
+   "transcript": "",
+   "headlines": [],
+   "headline_events": [],
+   "duplicate_slots": 0,
+   "unwarranted_slots": 0,
+   "unwarranted_transcript_slots": 0,
+   "all_slots_one_event": false,
+   "correct_first": null,
+   "first_wrong_reason": null,
+   "missed": [],
+   "missed_with_urgent_detection": [],
+   "personal_matches": 0,
+   "before_merge": [
+    [
+     "sound",
+     "Rain on surface",
+     0
+    ],
+    [
+     "sound",
+     "Raindrop",
+     0
+    ],
+    [
+     "sound",
+     "Rain",
+     0
+    ]
+   ],
+   "after_merge": [
+    [
+     "sound",
+     "Rain on surface",
+     0
+    ],
+    [
+     "sound",
+     "Raindrop",
+     0
+    ]
+   ],
+   "excess_before": 2,
+   "excess_after": 1,
+   "identical_label_repeats": 0,
+   "warnings": [],
+   "latency_ms": 1978
+  },
+  {
+   "repeat": 0,
+   "scene": 20,
+   "kind": "background only",
+   "speech": null,
+   "sound": "keyboard_typing 1-137-A-32.wav",
+   "real": {
+    "sound": 0
+   },
+   "transcript": "Okay.",
+   "headlines": [],
+   "headline_events": [],
+   "duplicate_slots": 0,
+   "unwarranted_slots": 0,
+   "unwarranted_transcript_slots": 0,
+   "all_slots_one_event": false,
+   "correct_first": null,
+   "first_wrong_reason": null,
+   "missed": [],
+   "missed_with_urgent_detection": [],
+   "personal_matches": 0,
+   "before_merge": [
+    [
+     "sound",
+     "Computer keyboard",
+     0
+    ],
+    [
+     "sound",
+     "Typing",
+     0
+    ]
+   ],
+   "after_merge": [
+    [
+     "sound",
+     "Computer keyboard",
+     0
+    ]
+   ],
+   "excess_before": 1,
+   "excess_after": 0,
+   "identical_label_repeats": 0,
+   "warnings": [],
+   "latency_ms": 1907
+  },
+  {
+   "repeat": 0,
+   "scene": 21,
+   "kind": "background only",
+   "speech": null,
+   "sound": "keyboard_typing 1-53501-A-32.wav",
+   "real": {
+    "sound": 0
+   },
+   "transcript": "",
+   "headlines": [],
+   "headline_events": [],
+   "duplicate_slots": 0,
+   "unwarranted_slots": 0,
+   "unwarranted_transcript_slots": 0,
+   "all_slots_one_event": false,
+   "correct_first": null,
+   "first_wrong_reason": null,
+   "missed": [],
+   "missed_with_urgent_detection": [],
+   "personal_matches": 0,
+   "before_merge": [
+    [
+     "sound",
+     "Computer keyboard",
+     0
+    ],
+    [
+     "sound",
+     "Typing",
+     0
+    ]
+   ],
+   "after_merge": [
+    [
+     "sound",
+     "Computer keyboard",
+     0
+    ]
+   ],
+   "excess_before": 1,
+   "excess_after": 0,
+   "identical_label_repeats": 0,
+   "warnings": [],
+   "latency_ms": 2133
+  },
+  {
+   "repeat": 0,
+   "scene": 22,
+   "kind": "speech only",
+   "speech": "Could you pass me the salt, please?",
+   "sound": null,
+   "real": {
+    "speech": 2
+   },
+   "transcript": "Could you pass me the salt, please?",
+   "headlines": [
+    [
+     "speech",
+     "Could you pass me the salt, please?",
+     "IMPORTANT"
+    ]
+   ],
+   "headline_events": [
+    "speech"
+   ],
+   "duplicate_slots": 0,
+   "unwarranted_slots": 0,
+   "unwarranted_transcript_slots": 0,
+   "all_slots_one_event": false,
+   "correct_first": true,
+   "first_wrong_reason": null,
+   "missed": [],
+   "missed_with_urgent_detection": [],
+   "personal_matches": 0,
+   "before_merge": [
+    [
+     "speech",
+     "Could you pass me the salt, please?",
+     2
+    ],
+    [
+     "sound",
+     "Speech",
+     1
+    ]
+   ],
+   "after_merge": [
+    [
+     "sound",
+     "Speech",
+     1
+    ],
+    [
+     "speech",
+     "Could you pass me the salt, please?",
+     2
+    ]
+   ],
+   "excess_before": 1,
+   "excess_after": 1,
+   "identical_label_repeats": 0,
+   "warnings": [],
+   "latency_ms": 1172
+  },
+  {
+   "repeat": 0,
+   "scene": 23,
+   "kind": "speech only",
+   "speech": "The meeting has moved to three o'clock.",
+   "sound": null,
+   "real": {
+    "speech": 2
+   },
+   "transcript": "The meeting has moved to 3 o'clock.",
+   "headlines": [
+    [
+     "speech",
+     "The meeting has moved to 3 o'clock.",
+     "IMPORTANT"
+    ]
+   ],
+   "headline_events": [
+    "speech"
+   ],
+   "duplicate_slots": 0,
+   "unwarranted_slots": 0,
+   "unwarranted_transcript_slots": 0,
+   "all_slots_one_event": false,
+   "correct_first": true,
+   "first_wrong_reason": null,
+   "missed": [],
+   "missed_with_urgent_detection": [],
+   "personal_matches": 0,
+   "before_merge": [
+    [
+     "speech",
+     "The meeting has moved to 3 o'clock.",
+     2
+    ],
+    [
+     "sound",
+     "Speech",
+     1
+    ]
+   ],
+   "after_merge": [
+    [
+     "sound",
+     "Speech",
+     1
+    ],
+    [
+     "speech",
+     "The meeting has moved to 3 o'clock.",
+     2
+    ]
+   ],
+   "excess_before": 1,
+   "excess_after": 1,
+   "identical_label_repeats": 0,
+   "warnings": [],
+   "latency_ms": 1406
+  },
+  {
+   "repeat": 0,
+   "scene": 24,
+   "kind": "speech only",
+   "speech": "Help, there is a fire in the kitchen!",
+   "sound": null,
+   "real": {
+    "speech": 3
+   },
+   "transcript": "Help, there is a fire in the kitchen.",
+   "headlines": [
+    [
+     "speech",
+     "Keyword: \"fire\": Help, there is a fire in the kitchen.",
+     "CRITICAL"
+    ]
+   ],
+   "headline_events": [
+    "speech"
+   ],
+   "duplicate_slots": 0,
+   "unwarranted_slots": 0,
+   "unwarranted_transcript_slots": 0,
+   "all_slots_one_event": false,
+   "correct_first": true,
+   "first_wrong_reason": null,
+   "missed": [],
+   "missed_with_urgent_detection": [],
+   "personal_matches": 0,
+   "before_merge": [
+    [
+     "speech",
+     "Help, there is a fire in the kitchen.",
+     3
+    ],
+    [
+     "sound",
+     "Speech",
+     1
+    ],
+    [
+     "speech",
+     "Keyword: \"fire\"",
+     3
+    ],
+    [
+     "speech",
+     "Keyword: \"help\"",
+     3
+    ]
+   ],
+   "after_merge": [
+    [
+     "sound",
+     "Speech",
+     1
+    ],
+    [
+     "speech",
+     "Keyword: \"fire\": Help, there is a fire in the kitchen.",
+     3
+    ]
+   ],
+   "excess_before": 3,
+   "excess_after": 1,
+   "identical_label_repeats": 0,
+   "warnings": [],
+   "latency_ms": 1176
+  },
+  {
+   "repeat": 0,
+   "scene": 25,
+   "kind": "speech only",
+   "speech": "Laura, can you come here for a moment?",
+   "sound": null,
+   "real": {
+    "speech": 3
+   },
+   "transcript": "Laura, can you come here for a moment?",
+   "headlines": [
+    [
+     "speech",
+     "Your name was called: Laura, can you come here for a moment?",
+     "CRITICAL"
+    ]
+   ],
+   "headline_events": [
+    "speech"
+   ],
+   "duplicate_slots": 0,
+   "unwarranted_slots": 0,
+   "unwarranted_transcript_slots": 0,
+   "all_slots_one_event": false,
+   "correct_first": true,
+   "first_wrong_reason": null,
+   "missed": [],
+   "missed_with_urgent_detection": [],
+   "personal_matches": 0,
+   "before_merge": [
+    [
+     "speech",
+     "Laura, can you come here for a moment?",
+     2
+    ],
+    [
+     "sound",
+     "Speech",
+     1
+    ],
+    [
+     "speech",
+     "Your name was called",
+     3
+    ]
+   ],
+   "after_merge": [
+    [
+     "sound",
+     "Speech",
+     1
+    ],
+    [
+     "speech",
+     "Your name was called: Laura, can you come here for a moment?",
+     3
+    ]
+   ],
+   "excess_before": 2,
+   "excess_after": 1,
+   "identical_label_repeats": 0,
+   "warnings": [],
+   "latency_ms": 1150
+  },
+  {
+   "repeat": 0,
+   "scene": 26,
+   "kind": "speech and sound",
+   "speech": "Could you pass me the salt, please?",
+   "sound": "siren 1-76831-A-42.wav",
+   "real": {
+    "speech": 2,
+    "sound": 3
+   },
+   "transcript": "Could you pass me the salt, please?",
+   "headlines": [
+    [
+     "sound",
+     "Police car (siren)",
+     "CRITICAL"
+    ],
+    [
+     "speech",
+     "Could you pass me the salt, please?",
+     "IMPORTANT"
+    ]
+   ],
+   "headline_events": [
+    "sound",
+    "speech"
+   ],
+   "duplicate_slots": 0,
+   "unwarranted_slots": 0,
+   "unwarranted_transcript_slots": 0,
+   "all_slots_one_event": false,
+   "correct_first": true,
+   "first_wrong_reason": null,
+   "missed": [],
+   "missed_with_urgent_detection": [],
+   "personal_matches": 0,
+   "before_merge": [
+    [
+     "speech",
+     "Could you pass me the salt, please?",
+     2
+    ],
+    [
+     "sound",
+     "Speech",
+     1
+    ],
+    [
+     "sound",
+     "Police car (siren)",
+     3
+    ],
+    [
+     "sound",
+     "Siren",
+     3
+    ]
+   ],
+   "after_merge": [
+    [
+     "sound",
+     "Speech",
+     1
+    ],
+    [
+     "sound",
+     "Police car (siren)",
+     3
+    ],
+    [
+     "speech",
+     "Could you pass me the salt, please?",
+     2
+    ]
+   ],
+   "excess_before": 2,
+   "excess_after": 1,
+   "identical_label_repeats": 0,
+   "warnings": [],
+   "latency_ms": 1128
+  },
+  {
+   "repeat": 0,
+   "scene": 27,
+   "kind": "speech and sound",
+   "speech": "Could you pass me the salt, please?",
+   "sound": "crying_baby 1-211527-C-20.wav",
+   "real": {
+    "speech": 2,
+    "sound": 3
+   },
+   "transcript": "Could you pass me the salt, please?",
+   "headlines": [
+    [
+     "sound",
+     "Baby cry, infant cry",
+     "CRITICAL"
+    ],
+    [
+     "speech",
+     "Could you pass me the salt, please?",
+     "IMPORTANT"
+    ]
+   ],
+   "headline_events": [
+    "sound",
+    "speech"
+   ],
+   "duplicate_slots": 0,
+   "unwarranted_slots": 0,
+   "unwarranted_transcript_slots": 0,
+   "all_slots_one_event": false,
+   "correct_first": true,
+   "first_wrong_reason": null,
+   "missed": [],
+   "missed_with_urgent_detection": [],
+   "personal_matches": 0,
+   "before_merge": [
+    [
+     "speech",
+     "Could you pass me the salt, please?",
+     2
+    ],
+    [
+     "sound",
+     "Baby cry, infant cry",
+     3
+    ],
+    [
+     "sound",
+     "Speech",
+     1
+    ],
+    [
+     "sound",
+     "Whimper",
+     0
+    ]
+   ],
+   "after_merge": [
+    [
+     "sound",
+     "Baby cry, infant cry",
+     3
+    ],
+    [
+     "sound",
+     "Speech",
+     1
+    ],
+    [
+     "sound",
+     "Whimper",
+     0
+    ],
+    [
+     "speech",
+     "Could you pass me the salt, please?",
+     2
+    ]
+   ],
+   "excess_before": 2,
+   "excess_after": 2,
+   "identical_label_repeats": 0,
+   "warnings": [],
+   "latency_ms": 1281
+  },
+  {
+   "repeat": 0,
+   "scene": 28,
+   "kind": "speech and sound",
+   "speech": "The meeting has moved to three o'clock.",
+   "sound": "glass_breaking 1-84705-A-39.wav",
+   "real": {
+    "speech": 2,
+    "sound": 3
+   },
+   "transcript": "The meeting has moved to 3 o'clock.",
+   "headlines": [
+    [
+     "speech",
+     "The meeting has moved to 3 o'clock.",
+     "IMPORTANT"
+    ]
+   ],
+   "headline_events": [
+    "speech"
+   ],
+   "duplicate_slots": 0,
+   "unwarranted_slots": 0,
+   "unwarranted_transcript_slots": 0,
+   "all_slots_one_event": false,
+   "correct_first": false,
+   "first_wrong_reason": "not headlined",
+   "missed": [
+    "sound"
+   ],
+   "missed_with_urgent_detection": [],
+   "personal_matches": 0,
+   "before_merge": [
+    [
+     "speech",
+     "The meeting has moved to 3 o'clock.",
+     2
+    ],
+    [
+     "sound",
+     "Speech",
+     1
+    ]
+   ],
+   "after_merge": [
+    [
+     "sound",
+     "Speech",
+     1
+    ],
+    [
+     "speech",
+     "The meeting has moved to 3 o'clock.",
+     2
+    ]
+   ],
+   "excess_before": 1,
+   "excess_after": 1,
+   "identical_label_repeats": 0,
+   "warnings": [],
+   "latency_ms": 1256
+  },
+  {
+   "repeat": 0,
+   "scene": 29,
+   "kind": "speech and sound",
+   "speech": "The meeting has moved to three o'clock.",
+   "sound": "rain 1-26222-A-10.wav",
+   "real": {
+    "speech": 2,
+    "sound": 0
+   },
+   "transcript": "The meeting has moved to 3-5.",
+   "headlines": [
+    [
+     "speech",
+     "The meeting has moved to 3-5.",
+     "IMPORTANT"
+    ]
+   ],
+   "headline_events": [
+    "speech"
+   ],
+   "duplicate_slots": 0,
+   "unwarranted_slots": 0,
+   "unwarranted_transcript_slots": 0,
+   "all_slots_one_event": false,
+   "correct_first": true,
+   "first_wrong_reason": null,
+   "missed": [],
+   "missed_with_urgent_detection": [],
+   "personal_matches": 0,
+   "before_merge": [
+    [
+     "speech",
+     "The meeting has moved to 3-5.",
+     2
+    ],
+    [
+     "sound",
+     "Speech",
+     1
+    ]
+   ],
+   "after_merge": [
+    [
+     "sound",
+     "Speech",
+     1
+    ],
+    [
+     "speech",
+     "The meeting has moved to 3-5.",
+     2
+    ]
+   ],
+   "excess_before": 1,
+   "excess_after": 1,
+   "identical_label_repeats": 0,
+   "warnings": [],
+   "latency_ms": 1131
+  },
+  {
+   "repeat": 0,
+   "scene": 30,
+   "kind": "speech and sound",
+   "speech": "Could you pass me the salt, please?",
+   "sound": "keyboard_typing 1-61212-A-32.wav",
+   "real": {
+    "speech": 2,
+    "sound": 0
+   },
+   "transcript": "Could you pass me the salt, please?",
+   "headlines": [
+    [
+     "speech",
+     "Could you pass me the salt, please?",
+     "IMPORTANT"
+    ]
+   ],
+   "headline_events": [
+    "speech"
+   ],
+   "duplicate_slots": 0,
+   "unwarranted_slots": 0,
+   "unwarranted_transcript_slots": 0,
+   "all_slots_one_event": false,
+   "correct_first": true,
+   "first_wrong_reason": null,
+   "missed": [],
+   "missed_with_urgent_detection": [],
+   "personal_matches": 0,
+   "before_merge": [
+    [
+     "speech",
+     "Could you pass me the salt, please?",
+     2
+    ],
+    [
+     "sound",
+     "Speech",
+     1
+    ],
+    [
+     "sound",
+     "Computer keyboard",
+     0
+    ],
+    [
+     "sound",
+     "Typing",
+     0
+    ]
+   ],
+   "after_merge": [
+    [
+     "sound",
+     "Speech",
+     1
+    ],
+    [
+     "sound",
+     "Computer keyboard",
+     0
+    ],
+    [
+     "speech",
+     "Could you pass me the salt, please?",
+     2
+    ]
+   ],
+   "excess_before": 2,
+   "excess_after": 1,
+   "identical_label_repeats": 0,
+   "warnings": [],
+   "latency_ms": 1150
+  },
+  {
+   "repeat": 0,
+   "scene": 31,
+   "kind": "speech and sound",
+   "speech": "Help, there is a fire in the kitchen!",
+   "sound": "dog 1-30344-A-0.wav",
+   "real": {
+    "speech": 3,
+    "sound": 2
+   },
+   "transcript": "Help! There is a fire in the kitchen.",
+   "headlines": [
+    [
+     "speech",
+     "Keyword: \"fire\": Help! There is a fire in the kitchen.",
+     "CRITICAL"
+    ]
+   ],
+   "headline_events": [
+    "speech"
+   ],
+   "duplicate_slots": 0,
+   "unwarranted_slots": 0,
+   "unwarranted_transcript_slots": 0,
+   "all_slots_one_event": false,
+   "correct_first": true,
+   "first_wrong_reason": null,
+   "missed": [
+    "sound"
+   ],
+   "missed_with_urgent_detection": [],
+   "personal_matches": 0,
+   "before_merge": [
+    [
+     "speech",
+     "Help! There is a fire in the kitchen.",
+     3
+    ],
+    [
+     "sound",
+     "Speech",
+     1
+    ],
+    [
+     "sound",
+     "Bow-wow",
+     0
+    ],
+    [
+     "sound",
+     "Animal",
+     0
+    ],
+    [
+     "speech",
+     "Keyword: \"fire\"",
+     3
+    ],
+    [
+     "speech",
+     "Keyword: \"help\"",
+     3
+    ]
+   ],
+   "after_merge": [
+    [
+     "sound",
+     "Speech",
+     1
+    ],
+    [
+     "sound",
+     "Bow-wow",
+     0
+    ],
+    [
+     "speech",
+     "Keyword: \"fire\": Help! There is a fire in the kitchen.",
+     3
+    ]
+   ],
+   "excess_before": 4,
+   "excess_after": 1,
+   "identical_label_repeats": 0,
+   "warnings": [],
+   "latency_ms": 1392
+  },
+  {
+   "repeat": 0,
+   "scene": 32,
+   "kind": "speech and sound",
+   "speech": "Help, there is a fire in the kitchen!",
+   "sound": "rain 1-29561-A-10.wav",
+   "real": {
+    "speech": 3,
+    "sound": 0
+   },
+   "transcript": "help, there is a fire in the kitchen.",
+   "headlines": [
+    [
+     "speech",
+     "Keyword: \"fire\": help, there is a fire in the kitchen.",
+     "CRITICAL"
+    ]
+   ],
+   "headline_events": [
+    "speech"
+   ],
+   "duplicate_slots": 0,
+   "unwarranted_slots": 0,
+   "unwarranted_transcript_slots": 0,
+   "all_slots_one_event": false,
+   "correct_first": true,
+   "first_wrong_reason": null,
+   "missed": [],
+   "missed_with_urgent_detection": [],
+   "personal_matches": 0,
+   "before_merge": [
+    [
+     "speech",
+     "help, there is a fire in the kitchen.",
+     3
+    ],
+    [
+     "sound",
+     "Speech",
+     1
+    ],
+    [
+     "speech",
+     "Keyword: \"fire\"",
+     3
+    ],
+    [
+     "speech",
+     "Keyword: \"help\"",
+     3
+    ]
+   ],
+   "after_merge": [
+    [
+     "sound",
+     "Speech",
+     1
+    ],
+    [
+     "speech",
+     "Keyword: \"fire\": help, there is a fire in the kitchen.",
+     3
+    ]
+   ],
+   "excess_before": 3,
+   "excess_after": 1,
+   "identical_label_repeats": 0,
+   "warnings": [],
+   "latency_ms": 1351
+  },
+  {
+   "repeat": 0,
+   "scene": 33,
+   "kind": "speech and sound",
+   "speech": "Laura, can you come here for a moment?",
+   "sound": "door_wood_knock 1-26188-A-30.wav",
+   "real": {
+    "speech": 3,
+    "sound": 2
+   },
+   "transcript": "Laura, can you come here for a moment?",
+   "headlines": [
+    [
+     "speech",
+     "Your name was called: Laura, can you come here for a moment?",
+     "CRITICAL"
+    ]
+   ],
+   "headline_events": [
+    "speech"
+   ],
+   "duplicate_slots": 0,
+   "unwarranted_slots": 0,
+   "unwarranted_transcript_slots": 0,
+   "all_slots_one_event": false,
+   "correct_first": true,
+   "first_wrong_reason": null,
+   "missed": [
+    "sound"
+   ],
+   "missed_with_urgent_detection": [],
+   "personal_matches": 0,
+   "before_merge": [
+    [
+     "speech",
+     "Laura, can you come here for a moment?",
+     2
+    ],
+    [
+     "sound",
+     "Speech",
+     1
+    ],
+    [
+     "speech",
+     "Your name was called",
+     3
+    ]
+   ],
+   "after_merge": [
+    [
+     "sound",
+     "Speech",
+     1
+    ],
+    [
+     "speech",
+     "Your name was called: Laura, can you come here for a moment?",
+     3
+    ]
+   ],
+   "excess_before": 2,
+   "excess_after": 1,
+   "identical_label_repeats": 0,
+   "warnings": [],
+   "latency_ms": 1525
+  },
+  {
+   "repeat": 0,
+   "scene": 34,
+   "kind": "speech and sound",
+   "speech": "Laura, can you come here for a moment?",
+   "sound": "keyboard_typing 1-62594-A-32.wav",
+   "real": {
+    "speech": 3,
+    "sound": 0
+   },
+   "transcript": "Laura, can you come here for a moment?",
+   "headlines": [
+    [
+     "speech",
+     "Your name was called: Laura, can you come here for a moment?",
+     "CRITICAL"
+    ]
+   ],
+   "headline_events": [
+    "speech"
+   ],
+   "duplicate_slots": 0,
+   "unwarranted_slots": 0,
+   "unwarranted_transcript_slots": 0,
+   "all_slots_one_event": false,
+   "correct_first": true,
+   "first_wrong_reason": null,
+   "missed": [],
+   "missed_with_urgent_detection": [],
+   "personal_matches": 0,
+   "before_merge": [
+    [
+     "speech",
+     "Laura, can you come here for a moment?",
+     2
+    ],
+    [
+     "sound",
+     "Speech",
+     1
+    ],
+    [
+     "sound",
+     "Computer keyboard",
+     0
+    ],
+    [
+     "speech",
+     "Your name was called",
+     3
+    ]
+   ],
+   "after_merge": [
+    [
+     "sound",
+     "Speech",
+     1
+    ],
+    [
+     "sound",
+     "Computer keyboard",
+     0
+    ],
+    [
+     "speech",
+     "Your name was called: Laura, can you come here for a moment?",
+     3
+    ]
+   ],
+   "excess_before": 2,
+   "excess_after": 1,
+   "identical_label_repeats": 0,
+   "warnings": [],
+   "latency_ms": 1475
+  },
+  {
+   "repeat": 1,
+   "scene": 0,
+   "kind": "sound only",
+   "speech": null,
+   "sound": "siren 1-31482-A-42.wav",
+   "real": {
+    "sound": 3
+   },
+   "transcript": "Beep, beep.",
+   "headlines": [
+    [
+     "sound",
+     "Siren",
+     "CRITICAL"
+    ],
+    [
+     "speech",
+     "Beep, beep.",
+     "IMPORTANT"
+    ]
+   ],
+   "headline_events": [
+    "sound",
+    "nothing"
+   ],
+   "duplicate_slots": 0,
+   "unwarranted_slots": 1,
+   "unwarranted_transcript_slots": 1,
+   "all_slots_one_event": false,
+   "correct_first": true,
+   "first_wrong_reason": null,
+   "missed": [],
+   "missed_with_urgent_detection": [],
+   "personal_matches": 0,
+   "before_merge": [
+    [
+     "speech",
+     "Beep, beep.",
+     2
+    ],
+    [
+     "sound",
+     "Siren",
+     3
+    ],
+    [
+     "sound",
+     "Emergency vehicle",
+     1
+    ],
+    [
+     "sound",
+     "Police car (siren)",
+     3
+    ]
+   ],
+   "after_merge": [
+    [
+     "sound",
+     "Siren",
+     3
+    ],
+    [
+     "sound",
+     "Emergency vehicle",
+     1
+    ],
+    [
+     "speech",
+     "Beep, beep.",
+     2
+    ]
+   ],
+   "excess_before": 2,
+   "excess_after": 1,
+   "identical_label_repeats": 0,
+   "warnings": [],
+   "latency_ms": 1564
+  },
+  {
+   "repeat": 1,
+   "scene": 1,
+   "kind": "sound only",
+   "speech": null,
+   "sound": "siren 1-31482-B-42.wav",
+   "real": {
+    "sound": 3
+   },
+   "transcript": "the",
+   "headlines": [
+    [
+     "sound",
+     "Police car (siren)",
+     "CRITICAL"
+    ],
+    [
+     "speech",
+     "the",
+     "IMPORTANT"
+    ]
+   ],
+   "headline_events": [
+    "sound",
+    "nothing"
+   ],
+   "duplicate_slots": 0,
+   "unwarranted_slots": 1,
+   "unwarranted_transcript_slots": 1,
+   "all_slots_one_event": false,
+   "correct_first": true,
+   "first_wrong_reason": null,
+   "missed": [],
+   "missed_with_urgent_detection": [],
+   "personal_matches": 0,
+   "before_merge": [
+    [
+     "speech",
+     "the",
+     2
+    ],
+    [
+     "sound",
+     "Emergency vehicle",
+     1
+    ],
+    [
+     "sound",
+     "Police car (siren)",
+     3
+    ],
+    [
+     "sound",
+     "Siren",
+     3
+    ]
+   ],
+   "after_merge": [
+    [
+     "sound",
+     "Police car (siren)",
+     3
+    ],
+    [
+     "speech",
+     "the",
+     2
+    ]
+   ],
+   "excess_before": 2,
+   "excess_after": 0,
+   "identical_label_repeats": 0,
+   "warnings": [],
+   "latency_ms": 2044
+  },
+  {
+   "repeat": 1,
+   "scene": 2,
+   "kind": "sound only",
+   "speech": null,
+   "sound": "siren 1-54084-A-42.wav",
+   "real": {
+    "sound": 3
+   },
+   "transcript": "the",
+   "headlines": [
+    [
+     "sound",
+     "Civil defense siren",
+     "CRITICAL"
+    ]
+   ],
+   "headline_events": [
+    "sound"
+   ],
+   "duplicate_slots": 0,
+   "unwarranted_slots": 0,
+   "unwarranted_transcript_slots": 0,
+   "all_slots_one_event": false,
+   "correct_first": true,
+   "first_wrong_reason": null,
+   "missed": [],
+   "missed_with_urgent_detection": [],
+   "personal_matches": 0,
+   "before_merge": [
+    [
+     "sound",
+     "Civil defense siren",
+     3
+    ],
+    [
+     "sound",
+     "Siren",
+     3
+    ]
+   ],
+   "after_merge": [
+    [
+     "sound",
+     "Civil defense siren",
+     3
+    ]
+   ],
+   "excess_before": 1,
+   "excess_after": 0,
+   "identical_label_repeats": 0,
+   "warnings": [],
+   "latency_ms": 2148
+  },
+  {
+   "repeat": 1,
+   "scene": 3,
+   "kind": "sound only",
+   "speech": null,
+   "sound": "crying_baby 1-187207-A-20.wav",
+   "real": {
+    "sound": 3
+   },
+   "transcript": "Oh!",
+   "headlines": [
+    [
+     "sound",
+     "Baby cry, infant cry",
+     "CRITICAL"
+    ],
+    [
+     "speech",
+     "Oh!",
+     "IMPORTANT"
+    ]
+   ],
+   "headline_events": [
+    "sound",
+    "nothing"
+   ],
+   "duplicate_slots": 0,
+   "unwarranted_slots": 1,
+   "unwarranted_transcript_slots": 1,
+   "all_slots_one_event": false,
+   "correct_first": true,
+   "first_wrong_reason": null,
+   "missed": [],
+   "missed_with_urgent_detection": [],
+   "personal_matches": 0,
+   "before_merge": [
+    [
+     "speech",
+     "Oh!",
+     2
+    ],
+    [
+     "sound",
+     "Baby cry, infant cry",
+     3
+    ],
+    [
+     "sound",
+     "Speech",
+     1
+    ]
+   ],
+   "after_merge": [
+    [
+     "sound",
+     "Baby cry, infant cry",
+     3
+    ],
+    [
+     "sound",
+     "Speech",
+     1
+    ],
+    [
+     "speech",
+     "Oh!",
+     2
+    ]
+   ],
+   "excess_before": 1,
+   "excess_after": 1,
+   "identical_label_repeats": 0,
+   "warnings": [],
+   "latency_ms": 1094
+  },
+  {
+   "repeat": 1,
+   "scene": 4,
+   "kind": "sound only",
+   "speech": null,
+   "sound": "crying_baby 1-211527-A-20.wav",
+   "real": {
+    "sound": 3
+   },
+   "transcript": "Please!",
+   "headlines": [
+    [
+     "sound",
+     "Baby cry, infant cry",
+     "CRITICAL"
+    ],
+    [
+     "speech",
+     "Please!",
+     "IMPORTANT"
+    ]
+   ],
+   "headline_events": [
+    "sound",
+    "nothing"
+   ],
+   "duplicate_slots": 0,
+   "unwarranted_slots": 1,
+   "unwarranted_transcript_slots": 1,
+   "all_slots_one_event": false,
+   "correct_first": true,
+   "first_wrong_reason": null,
+   "missed": [],
+   "missed_with_urgent_detection": [],
+   "personal_matches": 0,
+   "before_merge": [
+    [
+     "speech",
+     "Please!",
+     2
+    ],
+    [
+     "sound",
+     "Baby cry, infant cry",
+     3
+    ],
+    [
+     "sound",
+     "Speech",
+     1
+    ]
+   ],
+   "after_merge": [
+    [
+     "sound",
+     "Baby cry, infant cry",
+     3
+    ],
+    [
+     "sound",
+     "Speech",
+     1
+    ],
+    [
+     "speech",
+     "Please!",
+     2
+    ]
+   ],
+   "excess_before": 1,
+   "excess_after": 1,
+   "identical_label_repeats": 0,
+   "warnings": [],
+   "latency_ms": 1397
+  },
+  {
+   "repeat": 1,
+   "scene": 5,
+   "kind": "sound only",
+   "speech": null,
+   "sound": "crying_baby 1-211527-B-20.wav",
+   "real": {
+    "sound": 3
+   },
+   "transcript": "Oh!",
+   "headlines": [],
+   "headline_events": [],
+   "duplicate_slots": 0,
+   "unwarranted_slots": 0,
+   "unwarranted_transcript_slots": 0,
+   "all_slots_one_event": false,
+   "correct_first": false,
+   "first_wrong_reason": "not headlined",
+   "missed": [
+    "sound"
+   ],
+   "missed_with_urgent_detection": [],
+   "personal_matches": 0,
+   "before_merge": [],
+   "after_merge": [],
+   "excess_before": 0,
+   "excess_after": 0,
+   "identical_label_repeats": 0,
+   "warnings": [],
+   "latency_ms": 1106
+  },
+  {
+   "repeat": 1,
+   "scene": 6,
+   "kind": "sound only",
+   "speech": null,
+   "sound": "glass_breaking 1-20133-A-39.wav",
+   "real": {
+    "sound": 3
+   },
+   "transcript": "the",
+   "headlines": [],
+   "headline_events": [],
+   "duplicate_slots": 0,
+   "unwarranted_slots": 0,
+   "unwarranted_transcript_slots": 0,
+   "all_slots_one_event": false,
+   "correct_first": false,
+   "first_wrong_reason": "not headlined",
+   "missed": [
+    "sound"
+   ],
+   "missed_with_urgent_detection": [],
+   "personal_matches": 0,
+   "before_merge": [
+    [
+     "sound",
+     "Breaking",
+     0
+    ]
+   ],
+   "after_merge": [
+    [
+     "sound",
+     "Breaking",
+     0
+    ]
+   ],
+   "excess_before": 0,
+   "excess_after": 0,
+   "identical_label_repeats": 0,
+   "warnings": [],
+   "latency_ms": 2486
+  },
+  {
+   "repeat": 1,
+   "scene": 7,
+   "kind": "sound only",
+   "speech": null,
+   "sound": "glass_breaking 1-84536-A-39.wav",
+   "real": {
+    "sound": 3
+   },
+   "transcript": "",
+   "headlines": [
+    [
+     "sound",
+     "Glass",
+     "CRITICAL"
+    ]
+   ],
+   "headline_events": [
+    "sound"
+   ],
+   "duplicate_slots": 0,
+   "unwarranted_slots": 0,
+   "unwarranted_transcript_slots": 0,
+   "all_slots_one_event": false,
+   "correct_first": true,
+   "first_wrong_reason": null,
+   "missed": [],
+   "missed_with_urgent_detection": [],
+   "personal_matches": 0,
+   "before_merge": [
+    [
+     "sound",
+     "Breaking",
+     0
+    ],
+    [
+     "sound",
+     "Glass",
+     3
+    ]
+   ],
+   "after_merge": [
+    [
+     "sound",
+     "Breaking",
+     0
+    ],
+    [
+     "sound",
+     "Glass",
+     3
+    ]
+   ],
+   "excess_before": 1,
+   "excess_after": 1,
+   "identical_label_repeats": 0,
+   "warnings": [],
+   "latency_ms": 1843
+  },
+  {
+   "repeat": 1,
+   "scene": 8,
+   "kind": "sound only",
+   "speech": null,
+   "sound": "glass_breaking 1-84704-A-39.wav",
+   "real": {
+    "sound": 3
+   },
+   "transcript": "",
+   "headlines": [
+    [
+     "sound",
+     "Glass",
+     "CRITICAL"
+    ]
+   ],
+   "headline_events": [
+    "sound"
+   ],
+   "duplicate_slots": 0,
+   "unwarranted_slots": 0,
+   "unwarranted_transcript_slots": 0,
+   "all_slots_one_event": false,
+   "correct_first": true,
+   "first_wrong_reason": null,
+   "missed": [],
+   "missed_with_urgent_detection": [],
+   "personal_matches": 0,
+   "before_merge": [
+    [
+     "sound",
+     "Breaking",
+     0
+    ],
+    [
+     "sound",
+     "Chink, clink",
+     0
+    ],
+    [
+     "sound",
+     "Glass",
+     3
+    ]
+   ],
+   "after_merge": [
+    [
+     "sound",
+     "Breaking",
+     0
+    ],
+    [
+     "sound",
+     "Glass",
+     3
+    ]
+   ],
+   "excess_before": 2,
+   "excess_after": 1,
+   "identical_label_repeats": 0,
+   "warnings": [],
+   "latency_ms": 1960
+  },
+  {
+   "repeat": 1,
+   "scene": 9,
+   "kind": "sound only",
+   "speech": null,
+   "sound": "door_wood_knock 1-101336-A-30.wav",
+   "real": {
+    "sound": 2
+   },
+   "transcript": "and",
+   "headlines": [
+    [
+     "sound",
+     "Knock",
+     "IMPORTANT"
+    ]
+   ],
+   "headline_events": [
+    "sound"
+   ],
+   "duplicate_slots": 0,
+   "unwarranted_slots": 0,
+   "unwarranted_transcript_slots": 0,
+   "all_slots_one_event": false,
+   "correct_first": true,
+   "first_wrong_reason": null,
+   "missed": [],
+   "missed_with_urgent_detection": [],
+   "personal_matches": 0,
+   "before_merge": [
+    [
+     "sound",
+     "Knock",
+     2
+    ]
+   ],
+   "after_merge": [
+    [
+     "sound",
+     "Knock",
+     2
+    ]
+   ],
+   "excess_before": 0,
+   "excess_after": 0,
+   "identical_label_repeats": 0,
+   "warnings": [],
+   "latency_ms": 2016
+  },
+  {
+   "repeat": 1,
+   "scene": 10,
+   "kind": "sound only",
+   "speech": null,
+   "sound": "door_wood_knock 1-103995-A-30.wav",
+   "real": {
+    "sound": 2
+   },
+   "transcript": "",
+   "headlines": [
+    [
+     "sound",
+     "Knock",
+     "IMPORTANT"
+    ]
+   ],
+   "headline_events": [
+    "sound"
+   ],
+   "duplicate_slots": 0,
+   "unwarranted_slots": 0,
+   "unwarranted_transcript_slots": 0,
+   "all_slots_one_event": false,
+   "correct_first": true,
+   "first_wrong_reason": null,
+   "missed": [],
+   "missed_with_urgent_detection": [],
+   "personal_matches": 0,
+   "before_merge": [
+    [
+     "sound",
+     "Knock",
+     2
+    ]
+   ],
+   "after_merge": [
+    [
+     "sound",
+     "Knock",
+     2
+    ]
+   ],
+   "excess_before": 0,
+   "excess_after": 0,
+   "identical_label_repeats": 0,
+   "warnings": [],
+   "latency_ms": 1621
+  },
+  {
+   "repeat": 1,
+   "scene": 11,
+   "kind": "sound only",
+   "speech": null,
+   "sound": "door_wood_knock 1-103999-A-30.wav",
+   "real": {
+    "sound": 2
+   },
+   "transcript": "",
+   "headlines": [
+    [
+     "sound",
+     "Knock",
+     "IMPORTANT"
+    ]
+   ],
+   "headline_events": [
+    "sound"
+   ],
+   "duplicate_slots": 0,
+   "unwarranted_slots": 0,
+   "unwarranted_transcript_slots": 0,
+   "all_slots_one_event": false,
+   "correct_first": true,
+   "first_wrong_reason": null,
+   "missed": [],
+   "missed_with_urgent_detection": [],
+   "personal_matches": 0,
+   "before_merge": [
+    [
+     "sound",
+     "Knock",
+     2
+    ]
+   ],
+   "after_merge": [
+    [
+     "sound",
+     "Knock",
+     2
+    ]
+   ],
+   "excess_before": 0,
+   "excess_after": 0,
+   "identical_label_repeats": 0,
+   "warnings": [],
+   "latency_ms": 2085
+  },
+  {
+   "repeat": 1,
+   "scene": 12,
+   "kind": "sound only",
+   "speech": null,
+   "sound": "dog 1-100032-A-0.wav",
+   "real": {
+    "sound": 2
+   },
+   "transcript": "Yeah.",
+   "headlines": [
+    [
+     "sound",
+     "Dog",
+     "IMPORTANT"
+    ]
+   ],
+   "headline_events": [
+    "sound"
+   ],
+   "duplicate_slots": 0,
+   "unwarranted_slots": 0,
+   "unwarranted_transcript_slots": 0,
+   "all_slots_one_event": false,
+   "correct_first": true,
+   "first_wrong_reason": null,
+   "missed": [],
+   "missed_with_urgent_detection": [],
+   "personal_matches": 0,
+   "before_merge": [
+    [
+     "sound",
+     "Dog",
+     2
+    ],
+    [
+     "sound",
+     "Bark",
+     2
+    ],
+    [
+     "sound",
+     "Bow-wow",
+     0
+    ]
+   ],
+   "after_merge": [
+    [
+     "sound",
+     "Dog",
+     2
+    ]
+   ],
+   "excess_before": 2,
+   "excess_after": 0,
+   "identical_label_repeats": 0,
+   "warnings": [],
+   "latency_ms": 4323
+  },
+  {
+   "repeat": 1,
+   "scene": 13,
+   "kind": "sound only",
+   "speech": null,
+   "sound": "dog 1-110389-A-0.wav",
+   "real": {
+    "sound": 2
+   },
+   "transcript": "What?",
+   "headlines": [
+    [
+     "sound",
+     "Dog",
+     "IMPORTANT"
+    ]
+   ],
+   "headline_events": [
+    "sound"
+   ],
+   "duplicate_slots": 0,
+   "unwarranted_slots": 0,
+   "unwarranted_transcript_slots": 0,
+   "all_slots_one_event": false,
+   "correct_first": true,
+   "first_wrong_reason": null,
+   "missed": [],
+   "missed_with_urgent_detection": [],
+   "personal_matches": 0,
+   "before_merge": [
+    [
+     "sound",
+     "Bow-wow",
+     0
+    ],
+    [
+     "sound",
+     "Dog",
+     2
+    ],
+    [
+     "sound",
+     "Bark",
+     2
+    ]
+   ],
+   "after_merge": [
+    [
+     "sound",
+     "Dog",
+     2
+    ]
+   ],
+   "excess_before": 2,
+   "excess_after": 0,
+   "identical_label_repeats": 0,
+   "warnings": [],
+   "latency_ms": 2005
+  },
+  {
+   "repeat": 1,
+   "scene": 14,
+   "kind": "sound only",
+   "speech": null,
+   "sound": "dog 1-30226-A-0.wav",
+   "real": {
+    "sound": 2
+   },
+   "transcript": "A-F-S-C-R-C-S-S-R-E-R-S-V-R-S-T-R-S-S-S-E-S-W-S-T-S-L-D-S-A-S-T-S-S-S-S-S-S-T-S-L-S-S-I-S-L-S-T-S-S-S-S-S-A-",
+   "headlines": [
+    [
+     "sound",
+     "Dog",
+     "IMPORTANT"
+    ]
+   ],
+   "headline_events": [
+    "sound"
+   ],
+   "duplicate_slots": 0,
+   "unwarranted_slots": 0,
+   "unwarranted_transcript_slots": 0,
+   "all_slots_one_event": false,
+   "correct_first": true,
+   "first_wrong_reason": null,
+   "missed": [],
+   "missed_with_urgent_detection": [],
+   "personal_matches": 0,
+   "before_merge": [
+    [
+     "sound",
+     "Animal",
+     0
+    ],
+    [
+     "sound",
+     "Domestic animals, pets",
+     0
+    ],
+    [
+     "sound",
+     "Dog",
+     2
+    ]
+   ],
+   "after_merge": [
+    [
+     "sound",
+     "Dog",
+     2
+    ]
+   ],
+   "excess_before": 2,
+   "excess_after": 0,
+   "identical_label_repeats": 0,
+   "warnings": [],
+   "latency_ms": 4075
+  },
+  {
+   "repeat": 1,
+   "scene": 15,
+   "kind": "sound only",
+   "speech": null,
+   "sound": "clock_alarm 1-67033-A-37.wav",
+   "real": {
+    "sound": 2
+   },
+   "transcript": "Beak, Beak, Beak,",
+   "headlines": [
+    [
+     "sound",
+     "Kitchen alarm (personal)",
+     "CRITICAL"
+    ]
+   ],
+   "headline_events": [
+    "sound"
+   ],
+   "duplicate_slots": 0,
+   "unwarranted_slots": 0,
+   "unwarranted_transcript_slots": 0,
+   "all_slots_one_event": false,
+   "correct_first": true,
+   "first_wrong_reason": null,
+   "missed": [],
+   "missed_with_urgent_detection": [],
+   "personal_matches": 1,
+   "before_merge": [
+    [
+     "sound",
+     "Kitchen alarm (personal)",
+     2
+    ],
+    [
+     "sound",
+     "Alarm clock",
+     3
+    ],
+    [
+     "sound",
+     "Sound effect",
+     0
+    ]
+   ],
+   "after_merge": [
+    [
+     "sound",
+     "Kitchen alarm (personal)",
+     3
+    ],
+    [
+     "sound",
+     "Sound effect",
+     0
+    ]
+   ],
+   "excess_before": 2,
+   "excess_after": 1,
+   "identical_label_repeats": 0,
+   "warnings": [],
+   "latency_ms": 1551
+  },
+  {
+   "repeat": 1,
+   "scene": 16,
+   "kind": "sound only",
+   "speech": null,
+   "sound": "clock_alarm 1-72195-A-37.wav",
+   "real": {
+    "sound": 2
+   },
+   "transcript": "Beep. Beep.",
+   "headlines": [
+    [
+     "sound",
+     "Kitchen alarm (personal)",
+     "CRITICAL"
+    ]
+   ],
+   "headline_events": [
+    "sound"
+   ],
+   "duplicate_slots": 0,
+   "unwarranted_slots": 0,
+   "unwarranted_transcript_slots": 0,
+   "all_slots_one_event": false,
+   "correct_first": true,
+   "first_wrong_reason": null,
+   "missed": [],
+   "missed_with_urgent_detection": [],
+   "personal_matches": 1,
+   "before_merge": [
+    [
+     "sound",
+     "Kitchen alarm (personal)",
+     2
+    ],
+    [
+     "sound",
+     "Beep, bleep",
+     1
+    ],
+    [
+     "sound",
+     "Alarm",
+     3
+    ],
+    [
+     "sound",
+     "Smoke detector, smoke alarm",
+     3
+    ]
+   ],
+   "after_merge": [
+    [
+     "sound",
+     "Beep, bleep",
+     1
+    ],
+    [
+     "sound",
+     "Kitchen alarm (personal)",
+     3
+    ]
+   ],
+   "excess_before": 3,
+   "excess_after": 1,
+   "identical_label_repeats": 0,
+   "warnings": [],
+   "latency_ms": 1465
+  },
+  {
+   "repeat": 1,
+   "scene": 17,
+   "kind": "sound only",
+   "speech": null,
+   "sound": "clock_alarm 1-72195-B-37.wav",
+   "real": {
+    "sound": 2
+   },
+   "transcript": "Beek. Beek.",
+   "headlines": [
+    [
+     "sound",
+     "Kitchen alarm (personal)",
+     "CRITICAL"
+    ]
+   ],
+   "headline_events": [
+    "sound"
+   ],
+   "duplicate_slots": 0,
+   "unwarranted_slots": 0,
+   "unwarranted_transcript_slots": 0,
+   "all_slots_one_event": false,
+   "correct_first": true,
+   "first_wrong_reason": null,
+   "missed": [],
+   "missed_with_urgent_detection": [],
+   "personal_matches": 1,
+   "before_merge": [
+    [
+     "sound",
+     "Kitchen alarm (personal)",
+     2
+    ],
+    [
+     "sound",
+     "Alarm clock",
+     3
+    ],
+    [
+     "sound",
+     "Alarm",
+     3
+    ],
+    [
+     "sound",
+     "Beep, bleep",
+     1
+    ]
+   ],
+   "after_merge": [
+    [
+     "sound",
+     "Kitchen alarm (personal)",
+     3
+    ],
+    [
+     "sound",
+     "Beep, bleep",
+     1
+    ]
+   ],
+   "excess_before": 3,
+   "excess_after": 1,
+   "identical_label_repeats": 0,
+   "warnings": [],
+   "latency_ms": 1300
+  },
+  {
+   "repeat": 1,
+   "scene": 18,
+   "kind": "background only",
+   "speech": null,
+   "sound": "rain 1-17367-A-10.wav",
+   "real": {
+    "sound": 0
+   },
+   "transcript": "",
+   "headlines": [],
+   "headline_events": [],
+   "duplicate_slots": 0,
+   "unwarranted_slots": 0,
+   "unwarranted_transcript_slots": 0,
+   "all_slots_one_event": false,
+   "correct_first": null,
+   "first_wrong_reason": null,
+   "missed": [],
+   "missed_with_urgent_detection": [],
+   "personal_matches": 0,
+   "before_merge": [
+    [
+     "sound",
+     "Rain",
+     0
+    ],
+    [
+     "sound",
+     "Rain on surface",
+     0
+    ],
+    [
+     "sound",
+     "Raindrop",
+     0
+    ]
+   ],
+   "after_merge": [
+    [
+     "sound",
+     "Rain",
+     0
+    ]
+   ],
+   "excess_before": 2,
+   "excess_after": 0,
+   "identical_label_repeats": 0,
+   "warnings": [],
+   "latency_ms": 1955
+  },
+  {
+   "repeat": 1,
+   "scene": 19,
+   "kind": "background only",
+   "speech": null,
+   "sound": "rain 1-21189-A-10.wav",
+   "real": {
+    "sound": 0
+   },
+   "transcript": "",
+   "headlines": [],
+   "headline_events": [],
+   "duplicate_slots": 0,
+   "unwarranted_slots": 0,
+   "unwarranted_transcript_slots": 0,
+   "all_slots_one_event": false,
+   "correct_first": null,
+   "first_wrong_reason": null,
+   "missed": [],
+   "missed_with_urgent_detection": [],
+   "personal_matches": 0,
+   "before_merge": [
+    [
+     "sound",
+     "Rain on surface",
+     0
+    ],
+    [
+     "sound",
+     "Raindrop",
+     0
+    ],
+    [
+     "sound",
+     "Rain",
+     0
+    ]
+   ],
+   "after_merge": [
+    [
+     "sound",
+     "Rain on surface",
+     0
+    ],
+    [
+     "sound",
+     "Raindrop",
+     0
+    ]
+   ],
+   "excess_before": 2,
+   "excess_after": 1,
+   "identical_label_repeats": 0,
+   "warnings": [],
+   "latency_ms": 1994
+  },
+  {
+   "repeat": 1,
+   "scene": 20,
+   "kind": "background only",
+   "speech": null,
+   "sound": "keyboard_typing 1-137-A-32.wav",
+   "real": {
+    "sound": 0
+   },
+   "transcript": "the",
+   "headlines": [],
+   "headline_events": [],
+   "duplicate_slots": 0,
+   "unwarranted_slots": 0,
+   "unwarranted_transcript_slots": 0,
+   "all_slots_one_event": false,
+   "correct_first": null,
+   "first_wrong_reason": null,
+   "missed": [],
+   "missed_with_urgent_detection": [],
+   "personal_matches": 0,
+   "before_merge": [
+    [
+     "sound",
+     "Computer keyboard",
+     0
+    ],
+    [
+     "sound",
+     "Typing",
+     0
+    ]
+   ],
+   "after_merge": [
+    [
+     "sound",
+     "Computer keyboard",
+     0
+    ]
+   ],
+   "excess_before": 1,
+   "excess_after": 0,
+   "identical_label_repeats": 0,
+   "warnings": [],
+   "latency_ms": 2895
+  },
+  {
+   "repeat": 1,
+   "scene": 21,
+   "kind": "background only",
+   "speech": null,
+   "sound": "keyboard_typing 1-53501-A-32.wav",
+   "real": {
+    "sound": 0
+   },
+   "transcript": "I don't know.",
+   "headlines": [],
+   "headline_events": [],
+   "duplicate_slots": 0,
+   "unwarranted_slots": 0,
+   "unwarranted_transcript_slots": 0,
+   "all_slots_one_event": false,
+   "correct_first": null,
+   "first_wrong_reason": null,
+   "missed": [],
+   "missed_with_urgent_detection": [],
+   "personal_matches": 0,
+   "before_merge": [
+    [
+     "sound",
+     "Computer keyboard",
+     0
+    ],
+    [
+     "sound",
+     "Typing",
+     0
+    ]
+   ],
+   "after_merge": [
+    [
+     "sound",
+     "Computer keyboard",
+     0
+    ]
+   ],
+   "excess_before": 1,
+   "excess_after": 0,
+   "identical_label_repeats": 0,
+   "warnings": [],
+   "latency_ms": 2343
+  },
+  {
+   "repeat": 1,
+   "scene": 22,
+   "kind": "speech only",
+   "speech": "Could you pass me the salt, please?",
+   "sound": null,
+   "real": {
+    "speech": 2
+   },
+   "transcript": "Could you pass me the salt, please?",
+   "headlines": [
+    [
+     "speech",
+     "Could you pass me the salt, please?",
+     "IMPORTANT"
+    ]
+   ],
+   "headline_events": [
+    "speech"
+   ],
+   "duplicate_slots": 0,
+   "unwarranted_slots": 0,
+   "unwarranted_transcript_slots": 0,
+   "all_slots_one_event": false,
+   "correct_first": true,
+   "first_wrong_reason": null,
+   "missed": [],
+   "missed_with_urgent_detection": [],
+   "personal_matches": 0,
+   "before_merge": [
+    [
+     "speech",
+     "Could you pass me the salt, please?",
+     2
+    ],
+    [
+     "sound",
+     "Speech",
+     1
+    ]
+   ],
+   "after_merge": [
+    [
+     "sound",
+     "Speech",
+     1
+    ],
+    [
+     "speech",
+     "Could you pass me the salt, please?",
+     2
+    ]
+   ],
+   "excess_before": 1,
+   "excess_after": 1,
+   "identical_label_repeats": 0,
+   "warnings": [],
+   "latency_ms": 1150
+  },
+  {
+   "repeat": 1,
+   "scene": 23,
+   "kind": "speech only",
+   "speech": "The meeting has moved to three o'clock.",
+   "sound": null,
+   "real": {
+    "speech": 2
+   },
+   "transcript": "The meeting has moved to 3 o'clock.",
+   "headlines": [
+    [
+     "speech",
+     "The meeting has moved to 3 o'clock.",
+     "IMPORTANT"
+    ]
+   ],
+   "headline_events": [
+    "speech"
+   ],
+   "duplicate_slots": 0,
+   "unwarranted_slots": 0,
+   "unwarranted_transcript_slots": 0,
+   "all_slots_one_event": false,
+   "correct_first": true,
+   "first_wrong_reason": null,
+   "missed": [],
+   "missed_with_urgent_detection": [],
+   "personal_matches": 0,
+   "before_merge": [
+    [
+     "speech",
+     "The meeting has moved to 3 o'clock.",
+     2
+    ],
+    [
+     "sound",
+     "Speech",
+     1
+    ]
+   ],
+   "after_merge": [
+    [
+     "sound",
+     "Speech",
+     1
+    ],
+    [
+     "speech",
+     "The meeting has moved to 3 o'clock.",
+     2
+    ]
+   ],
+   "excess_before": 1,
+   "excess_after": 1,
+   "identical_label_repeats": 0,
+   "warnings": [],
+   "latency_ms": 1188
+  },
+  {
+   "repeat": 1,
+   "scene": 24,
+   "kind": "speech only",
+   "speech": "Help, there is a fire in the kitchen!",
+   "sound": null,
+   "real": {
+    "speech": 3
+   },
+   "transcript": "Help, there is a fire in the kitchen.",
+   "headlines": [
+    [
+     "speech",
+     "Keyword: \"fire\": Help, there is a fire in the kitchen.",
+     "CRITICAL"
+    ]
+   ],
+   "headline_events": [
+    "speech"
+   ],
+   "duplicate_slots": 0,
+   "unwarranted_slots": 0,
+   "unwarranted_transcript_slots": 0,
+   "all_slots_one_event": false,
+   "correct_first": true,
+   "first_wrong_reason": null,
+   "missed": [],
+   "missed_with_urgent_detection": [],
+   "personal_matches": 0,
+   "before_merge": [
+    [
+     "speech",
+     "Help, there is a fire in the kitchen.",
+     3
+    ],
+    [
+     "sound",
+     "Speech",
+     1
+    ],
+    [
+     "speech",
+     "Keyword: \"fire\"",
+     3
+    ],
+    [
+     "speech",
+     "Keyword: \"help\"",
+     3
+    ]
+   ],
+   "after_merge": [
+    [
+     "sound",
+     "Speech",
+     1
+    ],
+    [
+     "speech",
+     "Keyword: \"fire\": Help, there is a fire in the kitchen.",
+     3
+    ]
+   ],
+   "excess_before": 3,
+   "excess_after": 1,
+   "identical_label_repeats": 0,
+   "warnings": [],
+   "latency_ms": 1439
+  },
+  {
+   "repeat": 1,
+   "scene": 25,
+   "kind": "speech only",
+   "speech": "Laura, can you come here for a moment?",
+   "sound": null,
+   "real": {
+    "speech": 3
+   },
+   "transcript": "Laura, can you come here for a moment?",
+   "headlines": [
+    [
+     "speech",
+     "Your name was called: Laura, can you come here for a moment?",
+     "CRITICAL"
+    ]
+   ],
+   "headline_events": [
+    "speech"
+   ],
+   "duplicate_slots": 0,
+   "unwarranted_slots": 0,
+   "unwarranted_transcript_slots": 0,
+   "all_slots_one_event": false,
+   "correct_first": true,
+   "first_wrong_reason": null,
+   "missed": [],
+   "missed_with_urgent_detection": [],
+   "personal_matches": 0,
+   "before_merge": [
+    [
+     "speech",
+     "Laura, can you come here for a moment?",
+     2
+    ],
+    [
+     "sound",
+     "Speech",
+     1
+    ],
+    [
+     "speech",
+     "Your name was called",
+     3
+    ]
+   ],
+   "after_merge": [
+    [
+     "sound",
+     "Speech",
+     1
+    ],
+    [
+     "speech",
+     "Your name was called: Laura, can you come here for a moment?",
+     3
+    ]
+   ],
+   "excess_before": 2,
+   "excess_after": 1,
+   "identical_label_repeats": 0,
+   "warnings": [],
+   "latency_ms": 1192
+  },
+  {
+   "repeat": 1,
+   "scene": 26,
+   "kind": "speech and sound",
+   "speech": "Could you pass me the salt, please?",
+   "sound": "siren 1-76831-A-42.wav",
+   "real": {
+    "speech": 2,
+    "sound": 3
+   },
+   "transcript": "Could you pass me the salt, please?",
+   "headlines": [
+    [
+     "sound",
+     "Police car (siren)",
+     "CRITICAL"
+    ],
+    [
+     "speech",
+     "Could you pass me the salt, please?",
+     "IMPORTANT"
+    ]
+   ],
+   "headline_events": [
+    "sound",
+    "speech"
+   ],
+   "duplicate_slots": 0,
+   "unwarranted_slots": 0,
+   "unwarranted_transcript_slots": 0,
+   "all_slots_one_event": false,
+   "correct_first": true,
+   "first_wrong_reason": null,
+   "missed": [],
+   "missed_with_urgent_detection": [],
+   "personal_matches": 0,
+   "before_merge": [
+    [
+     "speech",
+     "Could you pass me the salt, please?",
+     2
+    ],
+    [
+     "sound",
+     "Speech",
+     1
+    ],
+    [
+     "sound",
+     "Police car (siren)",
+     3
+    ],
+    [
+     "sound",
+     "Siren",
+     3
+    ]
+   ],
+   "after_merge": [
+    [
+     "sound",
+     "Speech",
+     1
+    ],
+    [
+     "sound",
+     "Police car (siren)",
+     3
+    ],
+    [
+     "speech",
+     "Could you pass me the salt, please?",
+     2
+    ]
+   ],
+   "excess_before": 2,
+   "excess_after": 1,
+   "identical_label_repeats": 0,
+   "warnings": [],
+   "latency_ms": 1161
+  },
+  {
+   "repeat": 1,
+   "scene": 27,
+   "kind": "speech and sound",
+   "speech": "Could you pass me the salt, please?",
+   "sound": "crying_baby 1-211527-C-20.wav",
+   "real": {
+    "speech": 2,
+    "sound": 3
+   },
+   "transcript": "Could you pass me the salt, please?",
+   "headlines": [
+    [
+     "sound",
+     "Baby cry, infant cry",
+     "CRITICAL"
+    ],
+    [
+     "speech",
+     "Could you pass me the salt, please?",
+     "IMPORTANT"
+    ]
+   ],
+   "headline_events": [
+    "sound",
+    "speech"
+   ],
+   "duplicate_slots": 0,
+   "unwarranted_slots": 0,
+   "unwarranted_transcript_slots": 0,
+   "all_slots_one_event": false,
+   "correct_first": true,
+   "first_wrong_reason": null,
+   "missed": [],
+   "missed_with_urgent_detection": [],
+   "personal_matches": 0,
+   "before_merge": [
+    [
+     "speech",
+     "Could you pass me the salt, please?",
+     2
+    ],
+    [
+     "sound",
+     "Baby cry, infant cry",
+     3
+    ],
+    [
+     "sound",
+     "Speech",
+     1
+    ],
+    [
+     "sound",
+     "Whimper",
+     0
+    ]
+   ],
+   "after_merge": [
+    [
+     "sound",
+     "Baby cry, infant cry",
+     3
+    ],
+    [
+     "sound",
+     "Speech",
+     1
+    ],
+    [
+     "sound",
+     "Whimper",
+     0
+    ],
+    [
+     "speech",
+     "Could you pass me the salt, please?",
+     2
+    ]
+   ],
+   "excess_before": 2,
+   "excess_after": 2,
+   "identical_label_repeats": 0,
+   "warnings": [],
+   "latency_ms": 1614
+  },
+  {
+   "repeat": 1,
+   "scene": 28,
+   "kind": "speech and sound",
+   "speech": "The meeting has moved to three o'clock.",
+   "sound": "glass_breaking 1-84705-A-39.wav",
+   "real": {
+    "speech": 2,
+    "sound": 3
+   },
+   "transcript": "The meeting has moved to 3 o'clock.",
+   "headlines": [
+    [
+     "speech",
+     "The meeting has moved to 3 o'clock.",
+     "IMPORTANT"
+    ]
+   ],
+   "headline_events": [
+    "speech"
+   ],
+   "duplicate_slots": 0,
+   "unwarranted_slots": 0,
+   "unwarranted_transcript_slots": 0,
+   "all_slots_one_event": false,
+   "correct_first": false,
+   "first_wrong_reason": "not headlined",
+   "missed": [
+    "sound"
+   ],
+   "missed_with_urgent_detection": [],
+   "personal_matches": 0,
+   "before_merge": [
+    [
+     "speech",
+     "The meeting has moved to 3 o'clock.",
+     2
+    ],
+    [
+     "sound",
+     "Speech",
+     1
+    ]
+   ],
+   "after_merge": [
+    [
+     "sound",
+     "Speech",
+     1
+    ],
+    [
+     "speech",
+     "The meeting has moved to 3 o'clock.",
+     2
+    ]
+   ],
+   "excess_before": 1,
+   "excess_after": 1,
+   "identical_label_repeats": 0,
+   "warnings": [],
+   "latency_ms": 1406
+  },
+  {
+   "repeat": 1,
+   "scene": 29,
+   "kind": "speech and sound",
+   "speech": "The meeting has moved to three o'clock.",
+   "sound": "rain 1-26222-A-10.wav",
+   "real": {
+    "speech": 2,
+    "sound": 0
+   },
+   "transcript": "The meeting has moved to 3-5.",
+   "headlines": [
+    [
+     "speech",
+     "The meeting has moved to 3-5.",
+     "IMPORTANT"
+    ]
+   ],
+   "headline_events": [
+    "speech"
+   ],
+   "duplicate_slots": 0,
+   "unwarranted_slots": 0,
+   "unwarranted_transcript_slots": 0,
+   "all_slots_one_event": false,
+   "correct_first": true,
+   "first_wrong_reason": null,
+   "missed": [],
+   "missed_with_urgent_detection": [],
+   "personal_matches": 0,
+   "before_merge": [
+    [
+     "speech",
+     "The meeting has moved to 3-5.",
+     2
+    ],
+    [
+     "sound",
+     "Speech",
+     1
+    ]
+   ],
+   "after_merge": [
+    [
+     "sound",
+     "Speech",
+     1
+    ],
+    [
+     "speech",
+     "The meeting has moved to 3-5.",
+     2
+    ]
+   ],
+   "excess_before": 1,
+   "excess_after": 1,
+   "identical_label_repeats": 0,
+   "warnings": [],
+   "latency_ms": 1128
+  },
+  {
+   "repeat": 1,
+   "scene": 30,
+   "kind": "speech and sound",
+   "speech": "Could you pass me the salt, please?",
+   "sound": "keyboard_typing 1-61212-A-32.wav",
+   "real": {
+    "speech": 2,
+    "sound": 0
+   },
+   "transcript": "Could you pass me the salt, please?",
+   "headlines": [
+    [
+     "speech",
+     "Could you pass me the salt, please?",
+     "IMPORTANT"
+    ]
+   ],
+   "headline_events": [
+    "speech"
+   ],
+   "duplicate_slots": 0,
+   "unwarranted_slots": 0,
+   "unwarranted_transcript_slots": 0,
+   "all_slots_one_event": false,
+   "correct_first": true,
+   "first_wrong_reason": null,
+   "missed": [],
+   "missed_with_urgent_detection": [],
+   "personal_matches": 0,
+   "before_merge": [
+    [
+     "speech",
+     "Could you pass me the salt, please?",
+     2
+    ],
+    [
+     "sound",
+     "Speech",
+     1
+    ],
+    [
+     "sound",
+     "Computer keyboard",
+     0
+    ],
+    [
+     "sound",
+     "Typing",
+     0
+    ]
+   ],
+   "after_merge": [
+    [
+     "sound",
+     "Speech",
+     1
+    ],
+    [
+     "sound",
+     "Computer keyboard",
+     0
+    ],
+    [
+     "speech",
+     "Could you pass me the salt, please?",
+     2
+    ]
+   ],
+   "excess_before": 2,
+   "excess_after": 1,
+   "identical_label_repeats": 0,
+   "warnings": [],
+   "latency_ms": 1173
+  },
+  {
+   "repeat": 1,
+   "scene": 31,
+   "kind": "speech and sound",
+   "speech": "Help, there is a fire in the kitchen!",
+   "sound": "dog 1-30344-A-0.wav",
+   "real": {
+    "speech": 3,
+    "sound": 2
+   },
+   "transcript": "Help! There is a fire in the kitchen.",
+   "headlines": [
+    [
+     "speech",
+     "Keyword: \"fire\": Help! There is a fire in the kitchen.",
+     "CRITICAL"
+    ]
+   ],
+   "headline_events": [
+    "speech"
+   ],
+   "duplicate_slots": 0,
+   "unwarranted_slots": 0,
+   "unwarranted_transcript_slots": 0,
+   "all_slots_one_event": false,
+   "correct_first": true,
+   "first_wrong_reason": null,
+   "missed": [
+    "sound"
+   ],
+   "missed_with_urgent_detection": [],
+   "personal_matches": 0,
+   "before_merge": [
+    [
+     "speech",
+     "Help! There is a fire in the kitchen.",
+     3
+    ],
+    [
+     "sound",
+     "Speech",
+     1
+    ],
+    [
+     "sound",
+     "Bow-wow",
+     0
+    ],
+    [
+     "sound",
+     "Animal",
+     0
+    ],
+    [
+     "speech",
+     "Keyword: \"fire\"",
+     3
+    ],
+    [
+     "speech",
+     "Keyword: \"help\"",
+     3
+    ]
+   ],
+   "after_merge": [
+    [
+     "sound",
+     "Speech",
+     1
+    ],
+    [
+     "sound",
+     "Bow-wow",
+     0
+    ],
+    [
+     "speech",
+     "Keyword: \"fire\": Help! There is a fire in the kitchen.",
+     3
+    ]
+   ],
+   "excess_before": 4,
+   "excess_after": 1,
+   "identical_label_repeats": 0,
+   "warnings": [],
+   "latency_ms": 1144
+  },
+  {
+   "repeat": 1,
+   "scene": 32,
+   "kind": "speech and sound",
+   "speech": "Help, there is a fire in the kitchen!",
+   "sound": "rain 1-29561-A-10.wav",
+   "real": {
+    "speech": 3,
+    "sound": 0
+   },
+   "transcript": "help, there is a fire in the kitchen.",
+   "headlines": [
+    [
+     "speech",
+     "Keyword: \"fire\": help, there is a fire in the kitchen.",
+     "CRITICAL"
+    ]
+   ],
+   "headline_events": [
+    "speech"
+   ],
+   "duplicate_slots": 0,
+   "unwarranted_slots": 0,
+   "unwarranted_transcript_slots": 0,
+   "all_slots_one_event": false,
+   "correct_first": true,
+   "first_wrong_reason": null,
+   "missed": [],
+   "missed_with_urgent_detection": [],
+   "personal_matches": 0,
+   "before_merge": [
+    [
+     "speech",
+     "help, there is a fire in the kitchen.",
+     3
+    ],
+    [
+     "sound",
+     "Speech",
+     1
+    ],
+    [
+     "speech",
+     "Keyword: \"fire\"",
+     3
+    ],
+    [
+     "speech",
+     "Keyword: \"help\"",
+     3
+    ]
+   ],
+   "after_merge": [
+    [
+     "sound",
+     "Speech",
+     1
+    ],
+    [
+     "speech",
+     "Keyword: \"fire\": help, there is a fire in the kitchen.",
+     3
+    ]
+   ],
+   "excess_before": 3,
+   "excess_after": 1,
+   "identical_label_repeats": 0,
+   "warnings": [],
+   "latency_ms": 1553
+  },
+  {
+   "repeat": 1,
+   "scene": 33,
+   "kind": "speech and sound",
+   "speech": "Laura, can you come here for a moment?",
+   "sound": "door_wood_knock 1-26188-A-30.wav",
+   "real": {
+    "speech": 3,
+    "sound": 2
+   },
+   "transcript": "Laura, can you come here for a moment?",
+   "headlines": [
+    [
+     "speech",
+     "Your name was called: Laura, can you come here for a moment?",
+     "CRITICAL"
+    ]
+   ],
+   "headline_events": [
+    "speech"
+   ],
+   "duplicate_slots": 0,
+   "unwarranted_slots": 0,
+   "unwarranted_transcript_slots": 0,
+   "all_slots_one_event": false,
+   "correct_first": true,
+   "first_wrong_reason": null,
+   "missed": [
+    "sound"
+   ],
+   "missed_with_urgent_detection": [],
+   "personal_matches": 0,
+   "before_merge": [
+    [
+     "speech",
+     "Laura, can you come here for a moment?",
+     2
+    ],
+    [
+     "sound",
+     "Speech",
+     1
+    ],
+    [
+     "speech",
+     "Your name was called",
+     3
+    ]
+   ],
+   "after_merge": [
+    [
+     "sound",
+     "Speech",
+     1
+    ],
+    [
+     "speech",
+     "Your name was called: Laura, can you come here for a moment?",
+     3
+    ]
+   ],
+   "excess_before": 2,
+   "excess_after": 1,
+   "identical_label_repeats": 0,
+   "warnings": [],
+   "latency_ms": 1139
+  },
+  {
+   "repeat": 1,
+   "scene": 34,
+   "kind": "speech and sound",
+   "speech": "Laura, can you come here for a moment?",
+   "sound": "keyboard_typing 1-62594-A-32.wav",
+   "real": {
+    "speech": 3,
+    "sound": 0
+   },
+   "transcript": "Laura, can you come here for a moment?",
+   "headlines": [
+    [
+     "speech",
+     "Your name was called: Laura, can you come here for a moment?",
+     "CRITICAL"
+    ]
+   ],
+   "headline_events": [
+    "speech"
+   ],
+   "duplicate_slots": 0,
+   "unwarranted_slots": 0,
+   "unwarranted_transcript_slots": 0,
+   "all_slots_one_event": false,
+   "correct_first": true,
+   "first_wrong_reason": null,
+   "missed": [],
+   "missed_with_urgent_detection": [],
+   "personal_matches": 0,
+   "before_merge": [
+    [
+     "speech",
+     "Laura, can you come here for a moment?",
+     2
+    ],
+    [
+     "sound",
+     "Speech",
+     1
+    ],
+    [
+     "sound",
+     "Computer keyboard",
+     0
+    ],
+    [
+     "speech",
+     "Your name was called",
+     3
+    ]
+   ],
+   "after_merge": [
+    [
+     "sound",
+     "Speech",
+     1
+    ],
+    [
+     "sound",
+     "Computer keyboard",
+     0
+    ],
+    [
+     "speech",
+     "Your name was called: Laura, can you come here for a moment?",
+     3
+    ]
+   ],
+   "excess_before": 2,
+   "excess_after": 1,
+   "identical_label_repeats": 0,
+   "warnings": [],
+   "latency_ms": 1249
+  },
+  {
+   "repeat": 2,
+   "scene": 0,
+   "kind": "sound only",
+   "speech": null,
+   "sound": "siren 1-31482-A-42.wav",
+   "real": {
+    "sound": 3
+   },
+   "transcript": "Beep, beep.",
+   "headlines": [
+    [
+     "sound",
+     "Siren",
+     "CRITICAL"
+    ],
+    [
+     "speech",
+     "Beep, beep.",
+     "IMPORTANT"
+    ]
+   ],
+   "headline_events": [
+    "sound",
+    "nothing"
+   ],
+   "duplicate_slots": 0,
+   "unwarranted_slots": 1,
+   "unwarranted_transcript_slots": 1,
+   "all_slots_one_event": false,
+   "correct_first": true,
+   "first_wrong_reason": null,
+   "missed": [],
+   "missed_with_urgent_detection": [],
+   "personal_matches": 0,
+   "before_merge": [
+    [
+     "speech",
+     "Beep, beep.",
+     2
+    ],
+    [
+     "sound",
+     "Siren",
+     3
+    ],
+    [
+     "sound",
+     "Emergency vehicle",
+     1
+    ],
+    [
+     "sound",
+     "Police car (siren)",
+     3
+    ]
+   ],
+   "after_merge": [
+    [
+     "sound",
+     "Siren",
+     3
+    ],
+    [
+     "sound",
+     "Emergency vehicle",
+     1
+    ],
+    [
+     "speech",
+     "Beep, beep.",
+     2
+    ]
+   ],
+   "excess_before": 2,
+   "excess_after": 1,
+   "identical_label_repeats": 0,
+   "warnings": [],
+   "latency_ms": 1321
+  },
+  {
+   "repeat": 2,
+   "scene": 1,
+   "kind": "sound only",
+   "speech": null,
+   "sound": "siren 1-31482-B-42.wav",
+   "real": {
+    "sound": 3
+   },
+   "transcript": "the",
+   "headlines": [
+    [
+     "sound",
+     "Police car (siren)",
+     "CRITICAL"
+    ],
+    [
+     "speech",
+     "the",
+     "IMPORTANT"
+    ]
+   ],
+   "headline_events": [
+    "sound",
+    "nothing"
+   ],
+   "duplicate_slots": 0,
+   "unwarranted_slots": 1,
+   "unwarranted_transcript_slots": 1,
+   "all_slots_one_event": false,
+   "correct_first": true,
+   "first_wrong_reason": null,
+   "missed": [],
+   "missed_with_urgent_detection": [],
+   "personal_matches": 0,
+   "before_merge": [
+    [
+     "speech",
+     "the",
+     2
+    ],
+    [
+     "sound",
+     "Emergency vehicle",
+     1
+    ],
+    [
+     "sound",
+     "Police car (siren)",
+     3
+    ],
+    [
+     "sound",
+     "Siren",
+     3
+    ]
+   ],
+   "after_merge": [
+    [
+     "sound",
+     "Police car (siren)",
+     3
+    ],
+    [
+     "speech",
+     "the",
+     2
+    ]
+   ],
+   "excess_before": 2,
+   "excess_after": 0,
+   "identical_label_repeats": 0,
+   "warnings": [],
+   "latency_ms": 2677
+  },
+  {
+   "repeat": 2,
+   "scene": 2,
+   "kind": "sound only",
+   "speech": null,
+   "sound": "siren 1-54084-A-42.wav",
+   "real": {
+    "sound": 3
+   },
+   "transcript": "the",
+   "headlines": [
+    [
+     "sound",
+     "Civil defense siren",
+     "CRITICAL"
+    ]
+   ],
+   "headline_events": [
+    "sound"
+   ],
+   "duplicate_slots": 0,
+   "unwarranted_slots": 0,
+   "unwarranted_transcript_slots": 0,
+   "all_slots_one_event": false,
+   "correct_first": true,
+   "first_wrong_reason": null,
+   "missed": [],
+   "missed_with_urgent_detection": [],
+   "personal_matches": 0,
+   "before_merge": [
+    [
+     "sound",
+     "Civil defense siren",
+     3
+    ],
+    [
+     "sound",
+     "Siren",
+     3
+    ]
+   ],
+   "after_merge": [
+    [
+     "sound",
+     "Civil defense siren",
+     3
+    ]
+   ],
+   "excess_before": 1,
+   "excess_after": 0,
+   "identical_label_repeats": 0,
+   "warnings": [],
+   "latency_ms": 2112
+  },
+  {
+   "repeat": 2,
+   "scene": 3,
+   "kind": "sound only",
+   "speech": null,
+   "sound": "crying_baby 1-187207-A-20.wav",
+   "real": {
+    "sound": 3
+   },
+   "transcript": "Oh!",
+   "headlines": [
+    [
+     "sound",
+     "Baby cry, infant cry",
+     "CRITICAL"
+    ],
+    [
+     "speech",
+     "Oh!",
+     "IMPORTANT"
+    ]
+   ],
+   "headline_events": [
+    "sound",
+    "nothing"
+   ],
+   "duplicate_slots": 0,
+   "unwarranted_slots": 1,
+   "unwarranted_transcript_slots": 1,
+   "all_slots_one_event": false,
+   "correct_first": true,
+   "first_wrong_reason": null,
+   "missed": [],
+   "missed_with_urgent_detection": [],
+   "personal_matches": 0,
+   "before_merge": [
+    [
+     "speech",
+     "Oh!",
+     2
+    ],
+    [
+     "sound",
+     "Baby cry, infant cry",
+     3
+    ],
+    [
+     "sound",
+     "Speech",
+     1
+    ]
+   ],
+   "after_merge": [
+    [
+     "sound",
+     "Baby cry, infant cry",
+     3
+    ],
+    [
+     "sound",
+     "Speech",
+     1
+    ],
+    [
+     "speech",
+     "Oh!",
+     2
+    ]
+   ],
+   "excess_before": 1,
+   "excess_after": 1,
+   "identical_label_repeats": 0,
+   "warnings": [],
+   "latency_ms": 1053
+  },
+  {
+   "repeat": 2,
+   "scene": 4,
+   "kind": "sound only",
+   "speech": null,
+   "sound": "crying_baby 1-211527-A-20.wav",
+   "real": {
+    "sound": 3
+   },
+   "transcript": "Please!",
+   "headlines": [
+    [
+     "sound",
+     "Baby cry, infant cry",
+     "CRITICAL"
+    ],
+    [
+     "speech",
+     "Please!",
+     "IMPORTANT"
+    ]
+   ],
+   "headline_events": [
+    "sound",
+    "nothing"
+   ],
+   "duplicate_slots": 0,
+   "unwarranted_slots": 1,
+   "unwarranted_transcript_slots": 1,
+   "all_slots_one_event": false,
+   "correct_first": true,
+   "first_wrong_reason": null,
+   "missed": [],
+   "missed_with_urgent_detection": [],
+   "personal_matches": 0,
+   "before_merge": [
+    [
+     "speech",
+     "Please!",
+     2
+    ],
+    [
+     "sound",
+     "Baby cry, infant cry",
+     3
+    ],
+    [
+     "sound",
+     "Speech",
+     1
+    ]
+   ],
+   "after_merge": [
+    [
+     "sound",
+     "Baby cry, infant cry",
+     3
+    ],
+    [
+     "sound",
+     "Speech",
+     1
+    ],
+    [
+     "speech",
+     "Please!",
+     2
+    ]
+   ],
+   "excess_before": 1,
+   "excess_after": 1,
+   "identical_label_repeats": 0,
+   "warnings": [],
+   "latency_ms": 1161
+  },
+  {
+   "repeat": 2,
+   "scene": 5,
+   "kind": "sound only",
+   "speech": null,
+   "sound": "crying_baby 1-211527-B-20.wav",
+   "real": {
+    "sound": 3
+   },
+   "transcript": "Oh!",
+   "headlines": [],
+   "headline_events": [],
+   "duplicate_slots": 0,
+   "unwarranted_slots": 0,
+   "unwarranted_transcript_slots": 0,
+   "all_slots_one_event": false,
+   "correct_first": false,
+   "first_wrong_reason": "not headlined",
+   "missed": [
+    "sound"
+   ],
+   "missed_with_urgent_detection": [],
+   "personal_matches": 0,
+   "before_merge": [],
+   "after_merge": [],
+   "excess_before": 0,
+   "excess_after": 0,
+   "identical_label_repeats": 0,
+   "warnings": [],
+   "latency_ms": 1241
+  },
+  {
+   "repeat": 2,
+   "scene": 6,
+   "kind": "sound only",
+   "speech": null,
+   "sound": "glass_breaking 1-20133-A-39.wav",
+   "real": {
+    "sound": 3
+   },
+   "transcript": "Okay.",
+   "headlines": [],
+   "headline_events": [],
+   "duplicate_slots": 0,
+   "unwarranted_slots": 0,
+   "unwarranted_transcript_slots": 0,
+   "all_slots_one_event": false,
+   "correct_first": false,
+   "first_wrong_reason": "not headlined",
+   "missed": [
+    "sound"
+   ],
+   "missed_with_urgent_detection": [],
+   "personal_matches": 0,
+   "before_merge": [
+    [
+     "sound",
+     "Breaking",
+     0
+    ]
+   ],
+   "after_merge": [
+    [
+     "sound",
+     "Breaking",
+     0
+    ]
+   ],
+   "excess_before": 0,
+   "excess_after": 0,
+   "identical_label_repeats": 0,
+   "warnings": [],
+   "latency_ms": 4030
+  },
+  {
+   "repeat": 2,
+   "scene": 7,
+   "kind": "sound only",
+   "speech": null,
+   "sound": "glass_breaking 1-84536-A-39.wav",
+   "real": {
+    "sound": 3
+   },
+   "transcript": "",
+   "headlines": [
+    [
+     "sound",
+     "Glass",
+     "CRITICAL"
+    ]
+   ],
+   "headline_events": [
+    "sound"
+   ],
+   "duplicate_slots": 0,
+   "unwarranted_slots": 0,
+   "unwarranted_transcript_slots": 0,
+   "all_slots_one_event": false,
+   "correct_first": true,
+   "first_wrong_reason": null,
+   "missed": [],
+   "missed_with_urgent_detection": [],
+   "personal_matches": 0,
+   "before_merge": [
+    [
+     "sound",
+     "Breaking",
+     0
+    ],
+    [
+     "sound",
+     "Glass",
+     3
+    ]
+   ],
+   "after_merge": [
+    [
+     "sound",
+     "Breaking",
+     0
+    ],
+    [
+     "sound",
+     "Glass",
+     3
+    ]
+   ],
+   "excess_before": 1,
+   "excess_after": 1,
+   "identical_label_repeats": 0,
+   "warnings": [],
+   "latency_ms": 1560
+  },
+  {
+   "repeat": 2,
+   "scene": 8,
+   "kind": "sound only",
+   "speech": null,
+   "sound": "glass_breaking 1-84704-A-39.wav",
+   "real": {
+    "sound": 3
+   },
+   "transcript": "",
+   "headlines": [
+    [
+     "sound",
+     "Glass",
+     "CRITICAL"
+    ]
+   ],
+   "headline_events": [
+    "sound"
+   ],
+   "duplicate_slots": 0,
+   "unwarranted_slots": 0,
+   "unwarranted_transcript_slots": 0,
+   "all_slots_one_event": false,
+   "correct_first": true,
+   "first_wrong_reason": null,
+   "missed": [],
+   "missed_with_urgent_detection": [],
+   "personal_matches": 0,
+   "before_merge": [
+    [
+     "sound",
+     "Breaking",
+     0
+    ],
+    [
+     "sound",
+     "Chink, clink",
+     0
+    ],
+    [
+     "sound",
+     "Glass",
+     3
+    ]
+   ],
+   "after_merge": [
+    [
+     "sound",
+     "Breaking",
+     0
+    ],
+    [
+     "sound",
+     "Glass",
+     3
+    ]
+   ],
+   "excess_before": 2,
+   "excess_after": 1,
+   "identical_label_repeats": 0,
+   "warnings": [],
+   "latency_ms": 1867
+  },
+  {
+   "repeat": 2,
+   "scene": 9,
+   "kind": "sound only",
+   "speech": null,
+   "sound": "door_wood_knock 1-101336-A-30.wav",
+   "real": {
+    "sound": 2
+   },
+   "transcript": "That's it.",
+   "headlines": [
+    [
+     "sound",
+     "Knock",
+     "IMPORTANT"
+    ]
+   ],
+   "headline_events": [
+    "sound"
+   ],
+   "duplicate_slots": 0,
+   "unwarranted_slots": 0,
+   "unwarranted_transcript_slots": 0,
+   "all_slots_one_event": false,
+   "correct_first": true,
+   "first_wrong_reason": null,
+   "missed": [],
+   "missed_with_urgent_detection": [],
+   "personal_matches": 0,
+   "before_merge": [
+    [
+     "sound",
+     "Knock",
+     2
+    ]
+   ],
+   "after_merge": [
+    [
+     "sound",
+     "Knock",
+     2
+    ]
+   ],
+   "excess_before": 0,
+   "excess_after": 0,
+   "identical_label_repeats": 0,
+   "warnings": [],
+   "latency_ms": 2585
+  },
+  {
+   "repeat": 2,
+   "scene": 10,
+   "kind": "sound only",
+   "speech": null,
+   "sound": "door_wood_knock 1-103995-A-30.wav",
+   "real": {
+    "sound": 2
+   },
+   "transcript": "You know.",
+   "headlines": [
+    [
+     "sound",
+     "Knock",
+     "IMPORTANT"
+    ]
+   ],
+   "headline_events": [
+    "sound"
+   ],
+   "duplicate_slots": 0,
+   "unwarranted_slots": 0,
+   "unwarranted_transcript_slots": 0,
+   "all_slots_one_event": false,
+   "correct_first": true,
+   "first_wrong_reason": null,
+   "missed": [],
+   "missed_with_urgent_detection": [],
+   "personal_matches": 0,
+   "before_merge": [
+    [
+     "sound",
+     "Knock",
+     2
+    ]
+   ],
+   "after_merge": [
+    [
+     "sound",
+     "Knock",
+     2
+    ]
+   ],
+   "excess_before": 0,
+   "excess_after": 0,
+   "identical_label_repeats": 0,
+   "warnings": [],
+   "latency_ms": 2955
+  },
+  {
+   "repeat": 2,
+   "scene": 11,
+   "kind": "sound only",
+   "speech": null,
+   "sound": "door_wood_knock 1-103999-A-30.wav",
+   "real": {
+    "sound": 2
+   },
+   "transcript": "",
+   "headlines": [
+    [
+     "sound",
+     "Knock",
+     "IMPORTANT"
+    ]
+   ],
+   "headline_events": [
+    "sound"
+   ],
+   "duplicate_slots": 0,
+   "unwarranted_slots": 0,
+   "unwarranted_transcript_slots": 0,
+   "all_slots_one_event": false,
+   "correct_first": true,
+   "first_wrong_reason": null,
+   "missed": [],
+   "missed_with_urgent_detection": [],
+   "personal_matches": 0,
+   "before_merge": [
+    [
+     "sound",
+     "Knock",
+     2
+    ]
+   ],
+   "after_merge": [
+    [
+     "sound",
+     "Knock",
+     2
+    ]
+   ],
+   "excess_before": 0,
+   "excess_after": 0,
+   "identical_label_repeats": 0,
+   "warnings": [],
+   "latency_ms": 2244
+  },
+  {
+   "repeat": 2,
+   "scene": 12,
+   "kind": "sound only",
+   "speech": null,
+   "sound": "dog 1-100032-A-0.wav",
+   "real": {
+    "sound": 2
+   },
+   "transcript": "",
+   "headlines": [
+    [
+     "sound",
+     "Dog",
+     "IMPORTANT"
+    ]
+   ],
+   "headline_events": [
+    "sound"
+   ],
+   "duplicate_slots": 0,
+   "unwarranted_slots": 0,
+   "unwarranted_transcript_slots": 0,
+   "all_slots_one_event": false,
+   "correct_first": true,
+   "first_wrong_reason": null,
+   "missed": [],
+   "missed_with_urgent_detection": [],
+   "personal_matches": 0,
+   "before_merge": [
+    [
+     "sound",
+     "Dog",
+     2
+    ],
+    [
+     "sound",
+     "Bark",
+     2
+    ],
+    [
+     "sound",
+     "Bow-wow",
+     0
+    ]
+   ],
+   "after_merge": [
+    [
+     "sound",
+     "Dog",
+     2
+    ]
+   ],
+   "excess_before": 2,
+   "excess_after": 0,
+   "identical_label_repeats": 0,
+   "warnings": [],
+   "latency_ms": 3278
+  },
+  {
+   "repeat": 2,
+   "scene": 13,
+   "kind": "sound only",
+   "speech": null,
+   "sound": "dog 1-110389-A-0.wav",
+   "real": {
+    "sound": 2
+   },
+   "transcript": "What?",
+   "headlines": [
+    [
+     "sound",
+     "Dog",
+     "IMPORTANT"
+    ]
+   ],
+   "headline_events": [
+    "sound"
+   ],
+   "duplicate_slots": 0,
+   "unwarranted_slots": 0,
+   "unwarranted_transcript_slots": 0,
+   "all_slots_one_event": false,
+   "correct_first": true,
+   "first_wrong_reason": null,
+   "missed": [],
+   "missed_with_urgent_detection": [],
+   "personal_matches": 0,
+   "before_merge": [
+    [
+     "sound",
+     "Bow-wow",
+     0
+    ],
+    [
+     "sound",
+     "Dog",
+     2
+    ],
+    [
+     "sound",
+     "Bark",
+     2
+    ]
+   ],
+   "after_merge": [
+    [
+     "sound",
+     "Dog",
+     2
+    ]
+   ],
+   "excess_before": 2,
+   "excess_after": 0,
+   "identical_label_repeats": 0,
+   "warnings": [],
+   "latency_ms": 2228
+  },
+  {
+   "repeat": 2,
+   "scene": 14,
+   "kind": "sound only",
+   "speech": null,
+   "sound": "dog 1-30226-A-0.wav",
+   "real": {
+    "sound": 2
+   },
+   "transcript": "",
+   "headlines": [
+    [
+     "sound",
+     "Dog",
+     "IMPORTANT"
+    ]
+   ],
+   "headline_events": [
+    "sound"
+   ],
+   "duplicate_slots": 0,
+   "unwarranted_slots": 0,
+   "unwarranted_transcript_slots": 0,
+   "all_slots_one_event": false,
+   "correct_first": true,
+   "first_wrong_reason": null,
+   "missed": [],
+   "missed_with_urgent_detection": [],
+   "personal_matches": 0,
+   "before_merge": [
+    [
+     "sound",
+     "Animal",
+     0
+    ],
+    [
+     "sound",
+     "Domestic animals, pets",
+     0
+    ],
+    [
+     "sound",
+     "Dog",
+     2
+    ]
+   ],
+   "after_merge": [
+    [
+     "sound",
+     "Dog",
+     2
+    ]
+   ],
+   "excess_before": 2,
+   "excess_after": 0,
+   "identical_label_repeats": 0,
+   "warnings": [],
+   "latency_ms": 2479
+  },
+  {
+   "repeat": 2,
+   "scene": 15,
+   "kind": "sound only",
+   "speech": null,
+   "sound": "clock_alarm 1-67033-A-37.wav",
+   "real": {
+    "sound": 2
+   },
+   "transcript": "Beek. Beek. Beek.",
+   "headlines": [
+    [
+     "sound",
+     "Kitchen alarm (personal)",
+     "CRITICAL"
+    ]
+   ],
+   "headline_events": [
+    "sound"
+   ],
+   "duplicate_slots": 0,
+   "unwarranted_slots": 0,
+   "unwarranted_transcript_slots": 0,
+   "all_slots_one_event": false,
+   "correct_first": true,
+   "first_wrong_reason": null,
+   "missed": [],
+   "missed_with_urgent_detection": [],
+   "personal_matches": 1,
+   "before_merge": [
+    [
+     "sound",
+     "Kitchen alarm (personal)",
+     2
+    ],
+    [
+     "sound",
+     "Alarm clock",
+     3
+    ],
+    [
+     "sound",
+     "Sound effect",
+     0
+    ]
+   ],
+   "after_merge": [
+    [
+     "sound",
+     "Kitchen alarm (personal)",
+     3
+    ],
+    [
+     "sound",
+     "Sound effect",
+     0
+    ]
+   ],
+   "excess_before": 2,
+   "excess_after": 1,
+   "identical_label_repeats": 0,
+   "warnings": [],
+   "latency_ms": 1546
+  },
+  {
+   "repeat": 2,
+   "scene": 16,
+   "kind": "sound only",
+   "speech": null,
+   "sound": "clock_alarm 1-72195-A-37.wav",
+   "real": {
+    "sound": 2
+   },
+   "transcript": "Beep. Beep.",
+   "headlines": [
+    [
+     "sound",
+     "Kitchen alarm (personal)",
+     "CRITICAL"
+    ]
+   ],
+   "headline_events": [
+    "sound"
+   ],
+   "duplicate_slots": 0,
+   "unwarranted_slots": 0,
+   "unwarranted_transcript_slots": 0,
+   "all_slots_one_event": false,
+   "correct_first": true,
+   "first_wrong_reason": null,
+   "missed": [],
+   "missed_with_urgent_detection": [],
+   "personal_matches": 1,
+   "before_merge": [
+    [
+     "sound",
+     "Kitchen alarm (personal)",
+     2
+    ],
+    [
+     "sound",
+     "Beep, bleep",
+     1
+    ],
+    [
+     "sound",
+     "Alarm",
+     3
+    ],
+    [
+     "sound",
+     "Smoke detector, smoke alarm",
+     3
+    ]
+   ],
+   "after_merge": [
+    [
+     "sound",
+     "Beep, bleep",
+     1
+    ],
+    [
+     "sound",
+     "Kitchen alarm (personal)",
+     3
+    ]
+   ],
+   "excess_before": 3,
+   "excess_after": 1,
+   "identical_label_repeats": 0,
+   "warnings": [],
+   "latency_ms": 1249
+  },
+  {
+   "repeat": 2,
+   "scene": 17,
+   "kind": "sound only",
+   "speech": null,
+   "sound": "clock_alarm 1-72195-B-37.wav",
+   "real": {
+    "sound": 2
+   },
+   "transcript": "Beek. Beek.",
+   "headlines": [
+    [
+     "sound",
+     "Kitchen alarm (personal)",
+     "CRITICAL"
+    ]
+   ],
+   "headline_events": [
+    "sound"
+   ],
+   "duplicate_slots": 0,
+   "unwarranted_slots": 0,
+   "unwarranted_transcript_slots": 0,
+   "all_slots_one_event": false,
+   "correct_first": true,
+   "first_wrong_reason": null,
+   "missed": [],
+   "missed_with_urgent_detection": [],
+   "personal_matches": 1,
+   "before_merge": [
+    [
+     "sound",
+     "Kitchen alarm (personal)",
+     2
+    ],
+    [
+     "sound",
+     "Alarm clock",
+     3
+    ],
+    [
+     "sound",
+     "Alarm",
+     3
+    ],
+    [
+     "sound",
+     "Beep, bleep",
+     1
+    ]
+   ],
+   "after_merge": [
+    [
+     "sound",
+     "Kitchen alarm (personal)",
+     3
+    ],
+    [
+     "sound",
+     "Beep, bleep",
+     1
+    ]
+   ],
+   "excess_before": 3,
+   "excess_after": 1,
+   "identical_label_repeats": 0,
+   "warnings": [],
+   "latency_ms": 1512
+  },
+  {
+   "repeat": 2,
+   "scene": 18,
+   "kind": "background only",
+   "speech": null,
+   "sound": "rain 1-17367-A-10.wav",
+   "real": {
+    "sound": 0
+   },
+   "transcript": "",
+   "headlines": [],
+   "headline_events": [],
+   "duplicate_slots": 0,
+   "unwarranted_slots": 0,
+   "unwarranted_transcript_slots": 0,
+   "all_slots_one_event": false,
+   "correct_first": null,
+   "first_wrong_reason": null,
+   "missed": [],
+   "missed_with_urgent_detection": [],
+   "personal_matches": 0,
+   "before_merge": [
+    [
+     "sound",
+     "Rain",
+     0
+    ],
+    [
+     "sound",
+     "Rain on surface",
+     0
+    ],
+    [
+     "sound",
+     "Raindrop",
+     0
+    ]
+   ],
+   "after_merge": [
+    [
+     "sound",
+     "Rain",
+     0
+    ]
+   ],
+   "excess_before": 2,
+   "excess_after": 0,
+   "identical_label_repeats": 0,
+   "warnings": [],
+   "latency_ms": 2098
+  },
+  {
+   "repeat": 2,
+   "scene": 19,
+   "kind": "background only",
+   "speech": null,
+   "sound": "rain 1-21189-A-10.wav",
+   "real": {
+    "sound": 0
+   },
+   "transcript": "",
+   "headlines": [],
+   "headline_events": [],
+   "duplicate_slots": 0,
+   "unwarranted_slots": 0,
+   "unwarranted_transcript_slots": 0,
+   "all_slots_one_event": false,
+   "correct_first": null,
+   "first_wrong_reason": null,
+   "missed": [],
+   "missed_with_urgent_detection": [],
+   "personal_matches": 0,
+   "before_merge": [
+    [
+     "sound",
+     "Rain on surface",
+     0
+    ],
+    [
+     "sound",
+     "Raindrop",
+     0
+    ],
+    [
+     "sound",
+     "Rain",
+     0
+    ]
+   ],
+   "after_merge": [
+    [
+     "sound",
+     "Rain on surface",
+     0
+    ],
+    [
+     "sound",
+     "Raindrop",
+     0
+    ]
+   ],
+   "excess_before": 2,
+   "excess_after": 1,
+   "identical_label_repeats": 0,
+   "warnings": [],
+   "latency_ms": 2972
+  },
+  {
+   "repeat": 2,
+   "scene": 20,
+   "kind": "background only",
+   "speech": null,
+   "sound": "keyboard_typing 1-137-A-32.wav",
+   "real": {
+    "sound": 0
+   },
+   "transcript": "the",
+   "headlines": [],
+   "headline_events": [],
+   "duplicate_slots": 0,
+   "unwarranted_slots": 0,
+   "unwarranted_transcript_slots": 0,
+   "all_slots_one_event": false,
+   "correct_first": null,
+   "first_wrong_reason": null,
+   "missed": [],
+   "missed_with_urgent_detection": [],
+   "personal_matches": 0,
+   "before_merge": [
+    [
+     "sound",
+     "Computer keyboard",
+     0
+    ],
+    [
+     "sound",
+     "Typing",
+     0
+    ]
+   ],
+   "after_merge": [
+    [
+     "sound",
+     "Computer keyboard",
+     0
+    ]
+   ],
+   "excess_before": 1,
+   "excess_after": 0,
+   "identical_label_repeats": 0,
+   "warnings": [],
+   "latency_ms": 2542
+  },
+  {
+   "repeat": 2,
+   "scene": 21,
+   "kind": "background only",
+   "speech": null,
+   "sound": "keyboard_typing 1-53501-A-32.wav",
+   "real": {
+    "sound": 0
+   },
+   "transcript": "",
+   "headlines": [],
+   "headline_events": [],
+   "duplicate_slots": 0,
+   "unwarranted_slots": 0,
+   "unwarranted_transcript_slots": 0,
+   "all_slots_one_event": false,
+   "correct_first": null,
+   "first_wrong_reason": null,
+   "missed": [],
+   "missed_with_urgent_detection": [],
+   "personal_matches": 0,
+   "before_merge": [
+    [
+     "sound",
+     "Computer keyboard",
+     0
+    ],
+    [
+     "sound",
+     "Typing",
+     0
+    ]
+   ],
+   "after_merge": [
+    [
+     "sound",
+     "Computer keyboard",
+     0
+    ]
+   ],
+   "excess_before": 1,
+   "excess_after": 0,
+   "identical_label_repeats": 0,
+   "warnings": [],
+   "latency_ms": 2094
+  },
+  {
+   "repeat": 2,
+   "scene": 22,
+   "kind": "speech only",
+   "speech": "Could you pass me the salt, please?",
+   "sound": null,
+   "real": {
+    "speech": 2
+   },
+   "transcript": "Could you pass me the salt, please?",
+   "headlines": [
+    [
+     "speech",
+     "Could you pass me the salt, please?",
+     "IMPORTANT"
+    ]
+   ],
+   "headline_events": [
+    "speech"
+   ],
+   "duplicate_slots": 0,
+   "unwarranted_slots": 0,
+   "unwarranted_transcript_slots": 0,
+   "all_slots_one_event": false,
+   "correct_first": true,
+   "first_wrong_reason": null,
+   "missed": [],
+   "missed_with_urgent_detection": [],
+   "personal_matches": 0,
+   "before_merge": [
+    [
+     "speech",
+     "Could you pass me the salt, please?",
+     2
+    ],
+    [
+     "sound",
+     "Speech",
+     1
+    ]
+   ],
+   "after_merge": [
+    [
+     "sound",
+     "Speech",
+     1
+    ],
+    [
+     "speech",
+     "Could you pass me the salt, please?",
+     2
+    ]
+   ],
+   "excess_before": 1,
+   "excess_after": 1,
+   "identical_label_repeats": 0,
+   "warnings": [],
+   "latency_ms": 1132
+  },
+  {
+   "repeat": 2,
+   "scene": 23,
+   "kind": "speech only",
+   "speech": "The meeting has moved to three o'clock.",
+   "sound": null,
+   "real": {
+    "speech": 2
+   },
+   "transcript": "The meeting has moved to 3 o'clock.",
+   "headlines": [
+    [
+     "speech",
+     "The meeting has moved to 3 o'clock.",
+     "IMPORTANT"
+    ]
+   ],
+   "headline_events": [
+    "speech"
+   ],
+   "duplicate_slots": 0,
+   "unwarranted_slots": 0,
+   "unwarranted_transcript_slots": 0,
+   "all_slots_one_event": false,
+   "correct_first": true,
+   "first_wrong_reason": null,
+   "missed": [],
+   "missed_with_urgent_detection": [],
+   "personal_matches": 0,
+   "before_merge": [
+    [
+     "speech",
+     "The meeting has moved to 3 o'clock.",
+     2
+    ],
+    [
+     "sound",
+     "Speech",
+     1
+    ]
+   ],
+   "after_merge": [
+    [
+     "sound",
+     "Speech",
+     1
+    ],
+    [
+     "speech",
+     "The meeting has moved to 3 o'clock.",
+     2
+    ]
+   ],
+   "excess_before": 1,
+   "excess_after": 1,
+   "identical_label_repeats": 0,
+   "warnings": [],
+   "latency_ms": 1139
+  },
+  {
+   "repeat": 2,
+   "scene": 24,
+   "kind": "speech only",
+   "speech": "Help, there is a fire in the kitchen!",
+   "sound": null,
+   "real": {
+    "speech": 3
+   },
+   "transcript": "Help, there is a fire in the kitchen.",
+   "headlines": [
+    [
+     "speech",
+     "Keyword: \"fire\": Help, there is a fire in the kitchen.",
+     "CRITICAL"
+    ]
+   ],
+   "headline_events": [
+    "speech"
+   ],
+   "duplicate_slots": 0,
+   "unwarranted_slots": 0,
+   "unwarranted_transcript_slots": 0,
+   "all_slots_one_event": false,
+   "correct_first": true,
+   "first_wrong_reason": null,
+   "missed": [],
+   "missed_with_urgent_detection": [],
+   "personal_matches": 0,
+   "before_merge": [
+    [
+     "speech",
+     "Help, there is a fire in the kitchen.",
+     3
+    ],
+    [
+     "sound",
+     "Speech",
+     1
+    ],
+    [
+     "speech",
+     "Keyword: \"fire\"",
+     3
+    ],
+    [
+     "speech",
+     "Keyword: \"help\"",
+     3
+    ]
+   ],
+   "after_merge": [
+    [
+     "sound",
+     "Speech",
+     1
+    ],
+    [
+     "speech",
+     "Keyword: \"fire\": Help, there is a fire in the kitchen.",
+     3
+    ]
+   ],
+   "excess_before": 3,
+   "excess_after": 1,
+   "identical_label_repeats": 0,
+   "warnings": [],
+   "latency_ms": 1121
+  },
+  {
+   "repeat": 2,
+   "scene": 25,
+   "kind": "speech only",
+   "speech": "Laura, can you come here for a moment?",
+   "sound": null,
+   "real": {
+    "speech": 3
+   },
+   "transcript": "Laura, can you come here for a moment?",
+   "headlines": [
+    [
+     "speech",
+     "Your name was called: Laura, can you come here for a moment?",
+     "CRITICAL"
+    ]
+   ],
+   "headline_events": [
+    "speech"
+   ],
+   "duplicate_slots": 0,
+   "unwarranted_slots": 0,
+   "unwarranted_transcript_slots": 0,
+   "all_slots_one_event": false,
+   "correct_first": true,
+   "first_wrong_reason": null,
+   "missed": [],
+   "missed_with_urgent_detection": [],
+   "personal_matches": 0,
+   "before_merge": [
+    [
+     "speech",
+     "Laura, can you come here for a moment?",
+     2
+    ],
+    [
+     "sound",
+     "Speech",
+     1
+    ],
+    [
+     "speech",
+     "Your name was called",
+     3
+    ]
+   ],
+   "after_merge": [
+    [
+     "sound",
+     "Speech",
+     1
+    ],
+    [
+     "speech",
+     "Your name was called: Laura, can you come here for a moment?",
+     3
+    ]
+   ],
+   "excess_before": 2,
+   "excess_after": 1,
+   "identical_label_repeats": 0,
+   "warnings": [],
+   "latency_ms": 1281
+  },
+  {
+   "repeat": 2,
+   "scene": 26,
+   "kind": "speech and sound",
+   "speech": "Could you pass me the salt, please?",
+   "sound": "siren 1-76831-A-42.wav",
+   "real": {
+    "speech": 2,
+    "sound": 3
+   },
+   "transcript": "Could you pass me the salt, please?",
+   "headlines": [
+    [
+     "sound",
+     "Police car (siren)",
+     "CRITICAL"
+    ],
+    [
+     "speech",
+     "Could you pass me the salt, please?",
+     "IMPORTANT"
+    ]
+   ],
+   "headline_events": [
+    "sound",
+    "speech"
+   ],
+   "duplicate_slots": 0,
+   "unwarranted_slots": 0,
+   "unwarranted_transcript_slots": 0,
+   "all_slots_one_event": false,
+   "correct_first": true,
+   "first_wrong_reason": null,
+   "missed": [],
+   "missed_with_urgent_detection": [],
+   "personal_matches": 0,
+   "before_merge": [
+    [
+     "speech",
+     "Could you pass me the salt, please?",
+     2
+    ],
+    [
+     "sound",
+     "Speech",
+     1
+    ],
+    [
+     "sound",
+     "Police car (siren)",
+     3
+    ],
+    [
+     "sound",
+     "Siren",
+     3
+    ]
+   ],
+   "after_merge": [
+    [
+     "sound",
+     "Speech",
+     1
+    ],
+    [
+     "sound",
+     "Police car (siren)",
+     3
+    ],
+    [
+     "speech",
+     "Could you pass me the salt, please?",
+     2
+    ]
+   ],
+   "excess_before": 2,
+   "excess_after": 1,
+   "identical_label_repeats": 0,
+   "warnings": [],
+   "latency_ms": 1309
+  },
+  {
+   "repeat": 2,
+   "scene": 27,
+   "kind": "speech and sound",
+   "speech": "Could you pass me the salt, please?",
+   "sound": "crying_baby 1-211527-C-20.wav",
+   "real": {
+    "speech": 2,
+    "sound": 3
+   },
+   "transcript": "Could you pass me the salt, please?",
+   "headlines": [
+    [
+     "sound",
+     "Baby cry, infant cry",
+     "CRITICAL"
+    ],
+    [
+     "speech",
+     "Could you pass me the salt, please?",
+     "IMPORTANT"
+    ]
+   ],
+   "headline_events": [
+    "sound",
+    "speech"
+   ],
+   "duplicate_slots": 0,
+   "unwarranted_slots": 0,
+   "unwarranted_transcript_slots": 0,
+   "all_slots_one_event": false,
+   "correct_first": true,
+   "first_wrong_reason": null,
+   "missed": [],
+   "missed_with_urgent_detection": [],
+   "personal_matches": 0,
+   "before_merge": [
+    [
+     "speech",
+     "Could you pass me the salt, please?",
+     2
+    ],
+    [
+     "sound",
+     "Baby cry, infant cry",
+     3
+    ],
+    [
+     "sound",
+     "Speech",
+     1
+    ],
+    [
+     "sound",
+     "Whimper",
+     0
+    ]
+   ],
+   "after_merge": [
+    [
+     "sound",
+     "Baby cry, infant cry",
+     3
+    ],
+    [
+     "sound",
+     "Speech",
+     1
+    ],
+    [
+     "sound",
+     "Whimper",
+     0
+    ],
+    [
+     "speech",
+     "Could you pass me the salt, please?",
+     2
+    ]
+   ],
+   "excess_before": 2,
+   "excess_after": 2,
+   "identical_label_repeats": 0,
+   "warnings": [],
+   "latency_ms": 1158
+  },
+  {
+   "repeat": 2,
+   "scene": 28,
+   "kind": "speech and sound",
+   "speech": "The meeting has moved to three o'clock.",
+   "sound": "glass_breaking 1-84705-A-39.wav",
+   "real": {
+    "speech": 2,
+    "sound": 3
+   },
+   "transcript": "The meeting has moved to 3 o'clock.",
+   "headlines": [
+    [
+     "speech",
+     "The meeting has moved to 3 o'clock.",
+     "IMPORTANT"
+    ]
+   ],
+   "headline_events": [
+    "speech"
+   ],
+   "duplicate_slots": 0,
+   "unwarranted_slots": 0,
+   "unwarranted_transcript_slots": 0,
+   "all_slots_one_event": false,
+   "correct_first": false,
+   "first_wrong_reason": "not headlined",
+   "missed": [
+    "sound"
+   ],
+   "missed_with_urgent_detection": [],
+   "personal_matches": 0,
+   "before_merge": [
+    [
+     "speech",
+     "The meeting has moved to 3 o'clock.",
+     2
+    ],
+    [
+     "sound",
+     "Speech",
+     1
+    ]
+   ],
+   "after_merge": [
+    [
+     "sound",
+     "Speech",
+     1
+    ],
+    [
+     "speech",
+     "The meeting has moved to 3 o'clock.",
+     2
+    ]
+   ],
+   "excess_before": 1,
+   "excess_after": 1,
+   "identical_label_repeats": 0,
+   "warnings": [],
+   "latency_ms": 1125
+  },
+  {
+   "repeat": 2,
+   "scene": 29,
+   "kind": "speech and sound",
+   "speech": "The meeting has moved to three o'clock.",
+   "sound": "rain 1-26222-A-10.wav",
+   "real": {
+    "speech": 2,
+    "sound": 0
+   },
+   "transcript": "The meeting has moved to 3-5.",
+   "headlines": [
+    [
+     "speech",
+     "The meeting has moved to 3-5.",
+     "IMPORTANT"
+    ]
+   ],
+   "headline_events": [
+    "speech"
+   ],
+   "duplicate_slots": 0,
+   "unwarranted_slots": 0,
+   "unwarranted_transcript_slots": 0,
+   "all_slots_one_event": false,
+   "correct_first": true,
+   "first_wrong_reason": null,
+   "missed": [],
+   "missed_with_urgent_detection": [],
+   "personal_matches": 0,
+   "before_merge": [
+    [
+     "speech",
+     "The meeting has moved to 3-5.",
+     2
+    ],
+    [
+     "sound",
+     "Speech",
+     1
+    ]
+   ],
+   "after_merge": [
+    [
+     "sound",
+     "Speech",
+     1
+    ],
+    [
+     "speech",
+     "The meeting has moved to 3-5.",
+     2
+    ]
+   ],
+   "excess_before": 1,
+   "excess_after": 1,
+   "identical_label_repeats": 0,
+   "warnings": [],
+   "latency_ms": 1298
+  },
+  {
+   "repeat": 2,
+   "scene": 30,
+   "kind": "speech and sound",
+   "speech": "Could you pass me the salt, please?",
+   "sound": "keyboard_typing 1-61212-A-32.wav",
+   "real": {
+    "speech": 2,
+    "sound": 0
+   },
+   "transcript": "Could you pass me the salt, please?",
+   "headlines": [
+    [
+     "speech",
+     "Could you pass me the salt, please?",
+     "IMPORTANT"
+    ]
+   ],
+   "headline_events": [
+    "speech"
+   ],
+   "duplicate_slots": 0,
+   "unwarranted_slots": 0,
+   "unwarranted_transcript_slots": 0,
+   "all_slots_one_event": false,
+   "correct_first": true,
+   "first_wrong_reason": null,
+   "missed": [],
+   "missed_with_urgent_detection": [],
+   "personal_matches": 0,
+   "before_merge": [
+    [
+     "speech",
+     "Could you pass me the salt, please?",
+     2
+    ],
+    [
+     "sound",
+     "Speech",
+     1
+    ],
+    [
+     "sound",
+     "Computer keyboard",
+     0
+    ],
+    [
+     "sound",
+     "Typing",
+     0
+    ]
+   ],
+   "after_merge": [
+    [
+     "sound",
+     "Speech",
+     1
+    ],
+    [
+     "sound",
+     "Computer keyboard",
+     0
+    ],
+    [
+     "speech",
+     "Could you pass me the salt, please?",
+     2
+    ]
+   ],
+   "excess_before": 2,
+   "excess_after": 1,
+   "identical_label_repeats": 0,
+   "warnings": [],
+   "latency_ms": 1127
+  },
+  {
+   "repeat": 2,
+   "scene": 31,
+   "kind": "speech and sound",
+   "speech": "Help, there is a fire in the kitchen!",
+   "sound": "dog 1-30344-A-0.wav",
+   "real": {
+    "speech": 3,
+    "sound": 2
+   },
+   "transcript": "Help! There is a fire in the kitchen.",
+   "headlines": [
+    [
+     "speech",
+     "Keyword: \"fire\": Help! There is a fire in the kitchen.",
+     "CRITICAL"
+    ]
+   ],
+   "headline_events": [
+    "speech"
+   ],
+   "duplicate_slots": 0,
+   "unwarranted_slots": 0,
+   "unwarranted_transcript_slots": 0,
+   "all_slots_one_event": false,
+   "correct_first": true,
+   "first_wrong_reason": null,
+   "missed": [
+    "sound"
+   ],
+   "missed_with_urgent_detection": [],
+   "personal_matches": 0,
+   "before_merge": [
+    [
+     "speech",
+     "Help! There is a fire in the kitchen.",
+     3
+    ],
+    [
+     "sound",
+     "Speech",
+     1
+    ],
+    [
+     "sound",
+     "Bow-wow",
+     0
+    ],
+    [
+     "sound",
+     "Animal",
+     0
+    ],
+    [
+     "speech",
+     "Keyword: \"fire\"",
+     3
+    ],
+    [
+     "speech",
+     "Keyword: \"help\"",
+     3
+    ]
+   ],
+   "after_merge": [
+    [
+     "sound",
+     "Speech",
+     1
+    ],
+    [
+     "sound",
+     "Bow-wow",
+     0
+    ],
+    [
+     "speech",
+     "Keyword: \"fire\": Help! There is a fire in the kitchen.",
+     3
+    ]
+   ],
+   "excess_before": 4,
+   "excess_after": 1,
+   "identical_label_repeats": 0,
+   "warnings": [],
+   "latency_ms": 1112
+  },
+  {
+   "repeat": 2,
+   "scene": 32,
+   "kind": "speech and sound",
+   "speech": "Help, there is a fire in the kitchen!",
+   "sound": "rain 1-29561-A-10.wav",
+   "real": {
+    "speech": 3,
+    "sound": 0
+   },
+   "transcript": "help, there is a fire in the kitchen.",
+   "headlines": [
+    [
+     "speech",
+     "Keyword: \"fire\": help, there is a fire in the kitchen.",
+     "CRITICAL"
+    ]
+   ],
+   "headline_events": [
+    "speech"
+   ],
+   "duplicate_slots": 0,
+   "unwarranted_slots": 0,
+   "unwarranted_transcript_slots": 0,
+   "all_slots_one_event": false,
+   "correct_first": true,
+   "first_wrong_reason": null,
+   "missed": [],
+   "missed_with_urgent_detection": [],
+   "personal_matches": 0,
+   "before_merge": [
+    [
+     "speech",
+     "help, there is a fire in the kitchen.",
+     3
+    ],
+    [
+     "sound",
+     "Speech",
+     1
+    ],
+    [
+     "speech",
+     "Keyword: \"fire\"",
+     3
+    ],
+    [
+     "speech",
+     "Keyword: \"help\"",
+     3
+    ]
+   ],
+   "after_merge": [
+    [
+     "sound",
+     "Speech",
+     1
+    ],
+    [
+     "speech",
+     "Keyword: \"fire\": help, there is a fire in the kitchen.",
+     3
+    ]
+   ],
+   "excess_before": 3,
+   "excess_after": 1,
+   "identical_label_repeats": 0,
+   "warnings": [],
+   "latency_ms": 1120
+  },
+  {
+   "repeat": 2,
+   "scene": 33,
+   "kind": "speech and sound",
+   "speech": "Laura, can you come here for a moment?",
+   "sound": "door_wood_knock 1-26188-A-30.wav",
+   "real": {
+    "speech": 3,
+    "sound": 2
+   },
+   "transcript": "Laura, can you come here for a moment?",
+   "headlines": [
+    [
+     "speech",
+     "Your name was called: Laura, can you come here for a moment?",
+     "CRITICAL"
+    ]
+   ],
+   "headline_events": [
+    "speech"
+   ],
+   "duplicate_slots": 0,
+   "unwarranted_slots": 0,
+   "unwarranted_transcript_slots": 0,
+   "all_slots_one_event": false,
+   "correct_first": true,
+   "first_wrong_reason": null,
+   "missed": [
+    "sound"
+   ],
+   "missed_with_urgent_detection": [],
+   "personal_matches": 0,
+   "before_merge": [
+    [
+     "speech",
+     "Laura, can you come here for a moment?",
+     2
+    ],
+    [
+     "sound",
+     "Speech",
+     1
+    ],
+    [
+     "speech",
+     "Your name was called",
+     3
+    ]
+   ],
+   "after_merge": [
+    [
+     "sound",
+     "Speech",
+     1
+    ],
+    [
+     "speech",
+     "Your name was called: Laura, can you come here for a moment?",
+     3
+    ]
+   ],
+   "excess_before": 2,
+   "excess_after": 1,
+   "identical_label_repeats": 0,
+   "warnings": [],
+   "latency_ms": 1307
+  },
+  {
+   "repeat": 2,
+   "scene": 34,
+   "kind": "speech and sound",
+   "speech": "Laura, can you come here for a moment?",
+   "sound": "keyboard_typing 1-62594-A-32.wav",
+   "real": {
+    "speech": 3,
+    "sound": 0
+   },
+   "transcript": "Laura, can you come here for a moment?",
+   "headlines": [
+    [
+     "speech",
+     "Your name was called: Laura, can you come here for a moment?",
+     "CRITICAL"
+    ]
+   ],
+   "headline_events": [
+    "speech"
+   ],
+   "duplicate_slots": 0,
+   "unwarranted_slots": 0,
+   "unwarranted_transcript_slots": 0,
+   "all_slots_one_event": false,
+   "correct_first": true,
+   "first_wrong_reason": null,
+   "missed": [],
+   "missed_with_urgent_detection": [],
+   "personal_matches": 0,
+   "before_merge": [
+    [
+     "speech",
+     "Laura, can you come here for a moment?",
+     2
+    ],
+    [
+     "sound",
+     "Speech",
+     1
+    ],
+    [
+     "sound",
+     "Computer keyboard",
+     0
+    ],
+    [
+     "speech",
+     "Your name was called",
+     3
+    ]
+   ],
+   "after_merge": [
+    [
+     "sound",
+     "Speech",
+     1
+    ],
+    [
+     "sound",
+     "Computer keyboard",
+     0
+    ],
+    [
+     "speech",
+     "Your name was called: Laura, can you come here for a moment?",
+     3
+    ]
+   ],
+   "excess_before": 2,
+   "excess_after": 1,
+   "identical_label_repeats": 0,
+   "warnings": [],
+   "latency_ms": 1345
+  }
+ ]
+}

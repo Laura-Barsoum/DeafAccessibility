@@ -227,6 +227,71 @@ class AudioSceneClassifier:
             log.warning("AST inference failed: %s", e)
             return []
 
+    _SPEECH_LABEL_WORDS = ("speech", "conversation", "narration", "babbling", "whispering")
+
+    def embed_and_speech(self, audio_bytes: bytes) -> Tuple[Optional[np.ndarray], float]:
+        """AST's pooled embedding and its speech probability from one forward pass.
+
+        The embedding is what the classifier head reads, so it can serve the
+        personaliser without a second model; the speech probability (the
+        highest score over speech-family AudioSet labels) lets fusion ignore a
+        transcript when AST hears no speech. Returns (None, 0.0) unless AST is
+        the loaded backend.
+        """
+        self._ensure_loaded()
+        if getattr(self, "_backend", None) != "ast":
+            return None, 0.0
+        probs, pooled = self._ast_forward(audio_bytes)
+        if probs is None:
+            return None, 0.0
+        return pooled, self._speech_probability(probs)
+
+    def analyse(self, audio_bytes: bytes, top_k: int = 3, min_conf: float = 0.15) -> Dict[str, Any]:
+        """Sound events, AST's speech probability and the pooled embedding
+        from a single forward pass, for the per-tick handler. With a fallback
+        backend only the events are available."""
+        self._ensure_loaded()
+        if getattr(self, "_backend", None) != "ast":
+            return {"events": self.classify_to_events(audio_bytes, top_k=top_k, min_conf=min_conf),
+                    "speech_probability": None, "embedding": None}
+        probs, pooled = self._ast_forward(audio_bytes)
+        if probs is None:
+            return {"events": [], "speech_probability": None, "embedding": None}
+        top_idx = np.argsort(probs)[-top_k:][::-1]
+        preds = [(self._labels[i], float(probs[i])) for i in top_idx]
+        return {"events": self._events_from(preds, min_conf),
+                "speech_probability": self._speech_probability(probs), "embedding": pooled}
+
+    def _ast_forward(self, audio_bytes: bytes):
+        """One AST pass: (sigmoid probabilities over the labels, pooled
+        embedding), or (None, None) if the audio is unusable."""
+        try:
+            import librosa
+            import torch
+            with tempfile.NamedTemporaryFile(suffix=".wav", delete=False) as tmp:
+                tmp.write(audio_bytes); path = tmp.name
+            try:
+                y, _ = librosa.load(path, sr=16000, mono=True)
+            finally:
+                try: os.unlink(path)
+                except Exception: pass
+            if len(y) < 1600:
+                return None, None
+            inputs = self._extractor(y, sampling_rate=16000, return_tensors="pt")
+            with torch.no_grad():
+                pooled = self._model.audio_spectrogram_transformer(**inputs).pooler_output
+                probs = torch.sigmoid(self._model.classifier(pooled)).numpy().squeeze()
+            return probs, pooled.numpy().squeeze().astype(np.float32)
+        except Exception as e:
+            log.warning("AST forward pass failed: %s", e)
+            return None, None
+
+    def _speech_probability(self, probs) -> float:
+        if not hasattr(self, "_speech_idx"):
+            self._speech_idx = [i for i, lab in enumerate(self._labels)
+                                if any(w in lab.lower() for w in self._SPEECH_LABEL_WORDS)]
+        return float(max(probs[i] for i in self._speech_idx)) if self._speech_idx else 0.0
+
     def _classify_yamnet(self, audio_bytes: bytes, top_k: int) -> List[Tuple[str, float]]:
         """YamNet inference path (used only if AST cannot be loaded)."""
         try:
@@ -310,8 +375,12 @@ class AudioSceneClassifier:
         pass through — without them the sounds panel could go entirely
         empty in quiet rooms.
         """
+        return self._events_from(self.classify(audio_bytes, sample_rate, top_k), min_conf)
+
+    def _events_from(self, preds: List[Tuple[str, float]], min_conf: float) -> List[Event]:
+        """Thresholded, noise-filtered Events from (label, confidence) predictions."""
         out: List[Event] = []
-        for label, conf in self.classify(audio_bytes, sample_rate, top_k):
+        for label, conf in preds:
             if conf < min_conf:
                 continue
             if label.strip().lower() in self._SUPPRESSED_LABELS:

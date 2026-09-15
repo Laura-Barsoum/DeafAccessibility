@@ -640,6 +640,14 @@ class SignLanguageRecognizer:
         """Lazy-load the WLASL TGCN. Silently disables itself if unavailable."""
         if self._tgcn is not None:
             return
+        # Off unless asked for (ACCESSIBILITY_ENABLE_TGCN=1). With the published
+        # asl100 weights on MediaPipe keypoints the tier scored at chance on 100
+        # WLASL100 test clips (model top-5 6 of 100; sign_wlasl100.py), and a
+        # confident wrong gloss is worse than none.
+        if os.environ.get("ACCESSIBILITY_ENABLE_TGCN", "").lower() not in ("1", "true", "yes"):
+            self._tgcn = TGCNSignRecognizer(variant="asl100")
+            self._tgcn._load_failed = True
+            return
         variant = os.environ.get("ACCESSIBILITY_TGCN_VARIANT", "asl100")
         try:
             self._tgcn = TGCNSignRecognizer(variant=variant)

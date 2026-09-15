@@ -1,0 +1,85 @@
+{
+ "dev_clips": [
+  "65225",
+  "65539",
+  "69206",
+  "69236",
+  "69241",
+  "69281",
+  "69302",
+  "69345",
+  "69364",
+  "69368",
+  "69396",
+  "69411",
+  "69534",
+  "69546"
+ ],
+ "checkpoint_load": {
+  "missing": 0,
+  "unexpected": 0
+ },
+ "scores": {
+  "legacy/unit/manifest": {
+   "top1": 0,
+   "top5": 0,
+   "n": 14
+  },
+  "legacy/unit/alphabetical": {
+   "top1": 0,
+   "top5": 0,
+   "n": 14
+  },
+  "legacy/signed/manifest": {
+   "top1": 0,
+   "top5": 0,
+   "n": 14
+  },
+  "legacy/signed/alphabetical": {
+   "top1": 1,
+   "top5": 1,
+   "n": 14
+  },
+  "openpose/unit/manifest": {
+   "top1": 0,
+   "top5": 1,
+   "n": 14
+  },
+  "openpose/unit/alphabetical": {
+   "top1": 0,
+   "top5": 2,
+   "n": 14
+  },
+  "openpose/signed/manifest": {
+   "top1": 0,
+   "top5": 1,
+   "n": 14
+  },
+  "openpose/signed/alphabetical": {
+   "top1": 2,
+   "top5": 3,
+   "n": 14
+  },
+  "openpose_swapped/unit/manifest": {
+   "top1": 0,
+   "top5": 1,
+   "n": 14
+  },
+  "openpose_swapped/unit/alphabetical": {
+   "top1": 0,
+   "top5": 2,
+   "n": 14
+  },
+  "openpose_swapped/signed/manifest": {
+   "top1": 0,
+   "top5": 1,
+   "n": 14
+  },
+  "openpose_swapped/signed/alphabetical": {
+   "top1": 2,
+   "top5": 3,
+   "n": 14
+  }
+ },
+ "chosen": "openpose/signed/alphabetical"
+}

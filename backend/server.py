@@ -146,7 +146,8 @@ def get_llm():
 def get_personal():
     global _personal
     if _personal is None:
-        _personal = personalizer.Personalizer()
+        # Personal sounds are embedded with AST when AST is the loaded classifier.
+        _personal = personalizer.Personalizer(embedder=lambda b: get_audio_scene().embed_and_speech(b)[0])
     return _personal
 
 
@@ -360,8 +361,7 @@ def process():
             f_stt = _executor.submit(get_stt().transcribe, audio_bytes)
     else:
         f_stt = None
-    f_sound = _executor.submit(get_audio_scene().classify_to_events, audio_bytes) if audio_bytes else None
-    f_personal = _executor.submit(get_personal().match_current, audio_bytes) if audio_bytes else None
+    f_sound = _executor.submit(get_audio_scene().analyse, audio_bytes) if audio_bytes else None
 
     # LATENCY OPTIMISATION: BLIP scene captioning is slow (~2-3 s).
     # Sample every Nth tick — scene rarely changes second-to-second — and
@@ -402,7 +402,11 @@ def process():
     # Whisper 'base' on CPU with 4s of audio commonly takes 4-8s.
     # Give it 25s and let other panels render in the meantime.
     stt_result      = _safe(f_stt,      {"text": "", "segments": [], "segments_with_speakers": [], "speaker": None, "speaker_name": None}, 25, "STT")
-    sound_events    = _safe(f_sound,    [], 8,  "audio-scene")
+    sound_result    = _safe(f_sound,    {"events": [], "speech_probability": None, "embedding": None}, 8, "audio-scene")
+    sound_events    = sound_result["events"]
+    # Personal sounds reuse the embedding from AST's pass over this audio.
+    f_personal = (_executor.submit(get_personal().match_current, audio_bytes, sound_result.get("embedding"))
+                  if audio_bytes else None)
     personal_events = _safe(f_personal, [], 8,  "personalizer")
     raw_scene       = _safe(f_scene,    "", 12, "scene-BLIP")
     face_attribution = _safe(f_face,    {"speaker_attribution": None, "faces": []}, 6, "face")
@@ -494,6 +498,7 @@ def process():
     fused = get_fuser().fuse(
         stt_result, all_sound_events, personal_events,
         lip_reliability, face_attribution, scene_caption,
+        speech_probability=sound_result.get("speech_probability"),
     )
 
     # --- BRIDGE TO FRONTEND ---
@@ -557,8 +562,8 @@ def process():
 @app.route("/enrol", methods=["POST"])
 def enrol():
     """Enrol a personal sound. Browser-recorded clips (webm/opus) are decoded
-    and converted to WAV before the personalizer embeds them, since YamNet
-    reads WAV, not webm."""
+    and converted to WAV before the personalizer embeds them, since the
+    embedding models read WAV, not webm."""
     data = request.get_json(force=True)
     label = data.get("label", "").strip()
     priority_int = int(data.get("priority", events_mod.Priority.IMPORTANT))

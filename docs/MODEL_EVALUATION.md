@@ -18,7 +18,7 @@ trained from scratch.
 |---|---|---|
 | Speech | Whisper via faster-whisper: `distil-small.en` for final captions, `tiny` for live partials | Captions |
 | Sound events | Audio Spectrogram Transformer (AudioSet) | Generic sound labels |
-| Personal sounds | YamNet embeddings with a calibrated prototypical-network rule | Few-shot enrolled sounds |
+| Personal sounds | AST embeddings with a prototypical-network rule calibrated on browser-coded audio | Few-shot enrolled sounds |
 | Scene | BLIP base | Scene description, one tick in four |
 | Hazards | YOLOv11n | Visual hazard detection |
 | Sign | MediaPipe Tasks landmark and gesture models, geometric rules, fingerspelling | Constrained sign vocabulary |
@@ -34,10 +34,10 @@ trained from scratch.
 |---|---|---|---|---|---|
 | Speech | `distil-small.en` finals, `tiny` partials | wav2vec 2.0 CTC; Conformer; Whisper `small` and `base`; repetition guards | WER on 73 LibriSpeech utterances: distil 6.9%, small 7.1%, base 9.0%, tiny 10.9%; distil 822 ms against small 1233 ms per 2.8 s chunk; the repetition guards had raised small to 15.2% | Measured and published | `whisper_wer.json`, `whisper_ablation.json`, `whisper_ablation_distil.json` |
 | Sound events | AST | YamNet classifier; PANNs | ESC-50 top-3 on all 2,000 clips: AST 77.8%, YamNet 64.5%, same label map and scoring | Measured | `esc50_ast_results.json`, `yamnet_esc50_results.json` |
-| Personal sounds | YamNet embedding, prototypical rule, temperature 0.5 | Spectral fallback features; cosine threshold | With fallback features the cosine rule fired on 78% of never-enrolled clips; calibrated test F1 0.344 against 0.200 for cosine chosen under the same development constraint (difference 0.081 to 0.202, 95% bootstrap interval over the 30 trials) | Measured | `fewshot_results.json`, `fewshot_tune.json` |
+| Personal sounds | AST embedding, prototypical rule, settings chosen on browser-coded audio | YamNet and spectral embeddings; cosine threshold; settings chosen on clean clips with three sounds enrolled | With fallback features the cosine rule fired on 78% of never-enrolled clips; with YamNet, calibrated test F1 0.344 against 0.200 for cosine (difference 0.081 to 0.202, 95% bootstrap interval over the 30 trials). On clean clips AST raised test recall from 0.32 to 0.83 (paired gain 0.44 to 0.58), but those settings matched one enrolled alarm on every fusion-scene tick; re-chosen on Opus-coded 2.8 s ticks with one and three sounds enrolled, test recall is 0.64 at 4.9% false alarms with one sound, where the earlier settings raised 65.6% | Measured | `fewshot_results.json`, `fewshot_tune.json`, `fewshot_embeddings.json`, `fewshot_deployment.json` |
 | Scene | BLIP base | CLIP retrieval | Open-ended captions need a generator; an uncached caption takes 225 ms, so BLIP runs one tick in four | Published and measured | `latency_results.json` |
 | Hazards | YOLOv11n | Detectron2; EfficientDet | Single-stage detector built for CPU; 22 ms for three frames | Published and measured | `latency_results.json` |
-| Sign | MediaPipe Tasks landmarks, rules, TGCN if weights exist | I3D; legacy Holistic API | I3D is more accurate on WLASL (32.48% against 23.65% top-1, Li et al. 2020) but needs RGB video; the Holistic API was removed from MediaPipe | Published and availability | `wlasl_results.json` |
+| Sign | MediaPipe Tasks landmarks and rules; TGCN tier off by default | Published TGCN weights; I3D; legacy Holistic API | Published asl100 TGCN weights scored at chance on MediaPipe keypoints (6 of 100 WLASL100 test clips within the top five); I3D is more accurate on WLASL (32.48% against 23.65% top-1, Li et al. 2020) but needs RGB video; the Holistic API was removed from MediaPipe | Measured and published | `sign_wlasl100.json` |
 | Emotion | DeepFace and wav2vec 2.0, confidence-weighted | Either channel alone | FER-2013 private test (3,589 faces): accuracy 54.7% (95% interval 53.1% to 56.3%), macro-F1 0.51, happy F1 0.76, fear F1 0.37; the neutral-bias recalibration left accuracy almost unchanged (54.9% without it); neutral bias also seen on live smiles | Measured and observed | `emotion_fer2013.json` |
 | Diarization | Off by default | pyannote on every tick | First load of about 1 GB stalled every tick | Measured | none |
 | Language model | `gpt-oss-20b` | Llama 3.3 70B; `gpt-oss-120b`; Qwen3.8-27B; `compound-mini` | 144 calls: 20b median 0.32 s, 120b 0.42 s, both preserved the meaning in 36 of 36 calls; `compound-mini` 0 of 36 (HTTP 400); Llama 3.3 decommissioned by the provider | Measured | `llm_bench.json` |
@@ -49,28 +49,36 @@ Fusion was scored separately, because the models can each be right while the
 alerts are still wrong. `report_experiments/fusion_scenes.py` posts 35 scripted
 scenes (ESC-50 clips and synthetic speech, with urgencies fixed before running)
 through the real `/process` handler, three times each, with live captions off.
-Results are in `backend/eval_results/fusion_eval.json` and Section 5.4 of the
-report.
+A second, held-out set with different clips and sentences was written and
+measured before fusion was changed. The "after" runs include the fusion changes
+(merging related labels and a caption with its alerts, AST speech labels
+demoted, transcripts ignored when AST's speech probability is below 0.18) and
+AST personal-sound embeddings.
 
-| Measure | Result |
-|---|---|
-| First headline is the most urgent real event | 79 of 93 ticks (85%) |
-| Headline slots repeating an event already shown | 84 of 218 (39%) |
-| Headline slots with no urgent event behind them | 41 of 218 (19%), all Whisper transcripts of non-speech |
-| Urgent events given no headline | 15 of 108, none crowded out |
-| Extra detections of one event removed by the merge | 0 of 159 |
+| Measure | Original, before | Original, after | Held-out, before | Held-out, after |
+|---|---|---|---|---|
+| First headline is the most urgent real event | 79/93 (85%) | 84/93 (90%) | 72/93 (77%) | 78/93 (84%) |
+| Headline slots repeating an event already shown | 84/218 (39%) | 0/105 | 63/191 (33%) | 0/93 |
+| Headline slots with no urgent event behind them | 41/218 (19%) | 12/105 (11%) | 38/191 (20%) | 3/93 (3%) |
+| Urgent events given no headline (none crowded out) | 15/108 | 15/108 | 18/108 | 18/108 |
+| Extra detections of one event removed by the merge | 0/159 | 99/168 | 0/141 | 99/150 |
+
+Results are in `backend/eval_results/` (`fusion_eval.json`,
+`fusion_eval_after.json`, `fusion_eval_heldout_before.json`,
+`fusion_eval_heldout_after.json`) and Section 5.4 of the report.
 
 ## Limits of this evidence
 
 - ESC-50 and LibriSpeech are cleaner than a real home, so absolute accuracy in
   use will be lower.
 - Personal sounds were evaluated on a household-class proxy built from ESC-50,
-  not on recordings from users' homes. On the calibration test split the
-  adopted matcher has recall 0.32 and a 20.6% false-alarm rate: it misses an
-  enrolled sound roughly two times in three.
-- Sign recognition did not meet its goal: 5.9% top-1 on 17 WLASL clips covering
-  15 signs (`docs/WLASL_EVAL_RESULTS.md`). No public TGCN checkpoint could be
-  obtained.
+  not on recordings from users' homes. With one sound enrolled and clips passed
+  through the browser codec, the adopted matcher recalls 0.64 at a 4.9%
+  false-alarm rate, so it still misses about one play in three.
+- Sign recognition did not meet its goal: 1% top-1 on 100 of the 258 official
+  WLASL100 test clips. Published TGCN weights were found, but on MediaPipe
+  keypoints they score at chance, so that tier is off by default
+  (`docs/WLASL_EVAL_RESULTS.md`).
 - Language-model latency depends on a hosted provider, which can withdraw
   models, as happened to Llama 3.3 during the project.
 - Five Deaf and hard-of-hearing people gave informal feedback on successive

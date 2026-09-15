@@ -3,8 +3,9 @@ personalizer.py — Few-shot custom-sound enrolment + continuous learning.
 
 Lets a user record 3-10 examples of "this is my doorbell", "this is my
 baby's cry", etc. We:
-    1. Compute an audio embedding for each example (YamNet when available,
-       local librosa features as fallback)
+    1. Compute an audio embedding for each example (AST's pooled embedding
+       when the AST sound classifier is loaded, else YamNet, else local
+       librosa features)
     2. Store the mean embedding + a label in a lightweight JSON store
     3. At inference, compare incoming audio embeddings to enrolled ones
        via cosine similarity. If similarity > threshold, emit a custom
@@ -28,7 +29,7 @@ import os
 import tempfile
 import uuid
 from collections import deque
-from typing import Any, Deque, Dict, List, Optional, Tuple
+from typing import Any, Callable, Deque, Dict, List, Optional, Tuple
 
 import numpy as np
 
@@ -44,10 +45,24 @@ PROFILE_DIR = os.path.join(
 PROFILE_PATH = os.path.join(PROFILE_DIR, "profile.json")
 
 # Prototypical matcher settings, calibrated on a development split of ESC-50
-# and checked on a held-out test split (see match_prototypical).
+# and checked on a held-out test split (see match_prototypical). They depend on
+# the embedding, recognised by its size: AST's pooled output has 768 values,
+# YamNet's 1,024 and the librosa fallback fewer. AST's were chosen on ESC-50
+# clips passed through the browser codec as 2.8 s ticks, with one and with three
+# sounds enrolled (scripts/report_experiments/fewshot_deployment.py).
 PROTO_TEMPERATURE = 0.5
 PROTO_RADIUS_K = 1.5
 PROTO_GATE_FLOOR = 0.10
+AST_EMBEDDING_DIM = 768
+CALIBRATION = {
+    "yamnet": dict(temperature=PROTO_TEMPERATURE, prob_threshold=0.55,
+                   radius_k=PROTO_RADIUS_K, gate_floor=PROTO_GATE_FLOOR),
+    "ast": dict(temperature=0.5, prob_threshold=0.4, radius_k=2.2245, gate_floor=0.1483),
+}
+
+
+def _calibration(dim: int) -> Dict[str, float]:
+    return CALIBRATION["ast" if dim == AST_EMBEDDING_DIM else "yamnet"]
 
 
 def _cosine(a: np.ndarray, b: np.ndarray) -> float:
@@ -72,7 +87,11 @@ def _sqeuclidean(a: np.ndarray, b: np.ndarray) -> float:
 class Personalizer:
     """Few-shot custom sound recogniser using audio embeddings."""
 
-    def __init__(self) -> None:
+    def __init__(self, embedder: Optional[Callable[[bytes], Optional[np.ndarray]]] = None) -> None:
+        # AST's pooled embedding for a WAV clip, returning None when AST is not
+        # the loaded classifier. Preferred to YamNet: on held-out ESC-50 classes
+        # it raised recall from 0.32 to 0.83 (fewshot_embeddings.py).
+        self._ast_embed = embedder
         self._yamnet = None
         os.makedirs(PROFILE_DIR, exist_ok=True)
         self.profile: Dict[str, Any] = self._load()
@@ -185,7 +204,15 @@ class Personalizer:
             return None
 
     def _embed(self, audio_bytes: bytes) -> Optional[np.ndarray]:
-        """Return an audio embedding for a clip."""
+        """Return an audio embedding for a clip: AST when available, else YamNet."""
+        if self._ast_embed is not None:
+            try:
+                emb = self._ast_embed(audio_bytes)
+            except Exception as e:
+                log.warning("AST embedding failed (%s); using YamNet", e)
+                emb = None
+            if emb is not None:
+                return np.asarray(emb, dtype=np.float32)
         self._ensure_yamnet()
         if self._yamnet == "placeholder":
             return self._embed_fallback(audio_bytes)
@@ -214,6 +241,8 @@ class Personalizer:
                 emb_list.append(emb)
         if not emb_list:
             return {"ok": False, "reason": "no_embeddings"}
+        # A clip too short for AST falls back to YamNet; never mix the two.
+        emb_list = [e for e in emb_list if e.shape == emb_list[0].shape]
         mean_emb = np.mean(emb_list, axis=0)
 
         # Prototypical-network representation (Snell et al., 2017): the class
@@ -232,6 +261,8 @@ class Personalizer:
             "prototype": prototype.tolist(),        # normalised, for prototypical
             "radius": radius,
             "embedding_dim": int(mean_emb.shape[0]),
+            "embedder": "ast" if mean_emb.shape[0] == AST_EMBEDDING_DIM else
+                        "yamnet" if mean_emb.shape[0] == 1024 else "fallback",
             "n_examples": len(emb_list),
         }
         self._save()
@@ -303,8 +334,9 @@ class Personalizer:
     # ── Prototypical-network matching (Snell et al., 2017) ──────────
     def match_prototypical(
         self, audio_bytes: bytes,
-        prob_threshold: float = 0.55, radius_k: float = PROTO_RADIUS_K,
-        temperature: float = PROTO_TEMPERATURE, gate_floor: float = PROTO_GATE_FLOOR,
+        prob_threshold: Optional[float] = None, radius_k: Optional[float] = None,
+        temperature: Optional[float] = None, gate_floor: Optional[float] = None,
+        embedding: Optional[np.ndarray] = None,
     ) -> List[Event]:
         """Classify incoming audio against enrolled prototypes.
 
@@ -323,14 +355,30 @@ class Personalizer:
         rejected 59% of correct nearest-prototype decisions on probability
         alone. Calibrated, test F1 rose from 0.327 to 0.344 at an unchanged
         false-acceptance rate.
+
+        Settings left as None come from CALIBRATION for the embedding in use.
+        On clean clips AST embeddings raised test recall from YamNet's 0.32 to
+        0.83. Settings chosen that way matched everything once a single sound
+        was enrolled, since one prototype always gets probability 1 and only
+        the gate rejects, so AST's settings were chosen again on clips passed
+        through the browser codec with one and three sounds enrolled: test
+        recall 0.64 at 4.9% false alarms with one sound (fewshot_deployment.py).
+        `embedding` passes in AST's embedding from the sound classifier's pass
+        over the same audio, so the audio is not embedded twice.
         """
         sounds = self.profile.get("sounds", {})
         if not sounds:
             return []
-        raw = self._embed(audio_bytes)
+        raw = embedding if embedding is not None and self._ast_embed is not None else self._embed(audio_bytes)
         if raw is None:
             return []
+        raw = np.asarray(raw, dtype=np.float32)
         e = _l2norm(raw)
+        cal = _calibration(e.shape[0])
+        prob_threshold = cal["prob_threshold"] if prob_threshold is None else prob_threshold
+        radius_k = cal["radius_k"] if radius_k is None else radius_k
+        temperature = cal["temperature"] if temperature is None else temperature
+        gate_floor = cal["gate_floor"] if gate_floor is None else gate_floor
 
         labels, protos, radii = [], [], []
         for label, s in sounds.items():
@@ -351,8 +399,8 @@ class Personalizer:
         j = int(np.argmax(probs))
 
         # Open-set reject: nearest prototype must be within its radius band.
-        # Floor at 0.20 (≈ cosine 0.90) so a tight enrolment still admits a
-        # genuine play; s['threshold'] (raised by thumbs-down) tightens it.
+        # The floor lets a tight enrolment still admit a genuine play;
+        # s['proto_gate'] (lowered by thumbs-down) tightens it.
         gate = max(radii[j] * radius_k, gate_floor)
         gate = min(gate, sounds[labels[j]].get("proto_gate", gate))
         if probs[j] < prob_threshold or dists[j] > gate:
@@ -379,13 +427,13 @@ class Personalizer:
             },
         )]
 
-    def match_current(self, audio_bytes: bytes) -> List[Event]:
+    def match_current(self, audio_bytes: bytes, embedding: Optional[np.ndarray] = None) -> List[Event]:
         """Dispatch to the configured matcher. Prototypical by default;
         set ACCESSIBILITY_PERSONALIZER_METHOD=cosine to use the baseline."""
         method = os.environ.get("ACCESSIBILITY_PERSONALIZER_METHOD", "prototypical").lower()
         if method == "cosine":
             return self.match(audio_bytes)
-        return self.match_prototypical(audio_bytes)
+        return self.match_prototypical(audio_bytes, embedding=embedding)
 
     # ── Continuous learning ─────────────────────────────────────────
     def feedback(self, match_id: str, is_positive: bool) -> Dict[str, Any]:
@@ -446,7 +494,8 @@ class Personalizer:
             current = float(s.get("threshold", 0.90))
             bumped = min(0.95, current + 0.02)
             s["threshold"] = bumped
-            default_gate = max(float(s.get("radius", 0.0)) * PROTO_RADIUS_K, PROTO_GATE_FLOOR)
+            cal = _calibration(int(s.get("embedding_dim", len(s["embedding"]))))
+            default_gate = max(float(s.get("radius", 0.0)) * cal["radius_k"], cal["gate_floor"])
             gate_before = float(s.get("proto_gate", default_gate))
             s["proto_gate"] = max(0.02, gate_before * 0.85)
             s["last_negative_ts"] = match["similarity"]

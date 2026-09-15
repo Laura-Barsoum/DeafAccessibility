@@ -1,0 +1,6524 @@
+{
+ "method": "[Final report: Section 5.4, Table 5.3]\n\nFusion on scripted scenes whose real events are known in advance.\n\nEach tick is built from ESC-50 clips and synthetic speech from macOS `say`;\nnothing is recorded. Sound and speech are mixed at equal loudness, cut to the\n2.8 s tick, encoded to WebM/Opus as the browser sends them, and posted with\nthree plain grey frames to the real /process handler with live captions off,\nso speech, generic sounds, the enrolled personal sound and name and keyword\nalerts all reach the fusion step. One personal sound (\"Kitchen alarm\") is\nenrolled from three clock-alarm clips; the test scenes use other clips.\n\nThe urgency of each real event is fixed here, before running, following the\npriority bands of Section 3.6:\n  3  siren, crying baby, glass breaking, speech with a safety word, the user's name\n  2  door knock, dog, the enrolled personal sound, ordinary speech\n  0  rain, keyboard typing\nMixed scenes pair events of different urgency, so the correct first headline\nis never a tie.\n\nEvery detection (before and after merge_events) and every headline is\nattributed to the real event it came from: speech-source events and speech-like\nAST labels to the speech, the personal label and other AST labels to the sound,\nanything else to nothing. Per tick this gives duplicate headline slots, whether\nthe first headline is the most urgent real event, missed events, and how many\nexcess detections of one event merge_events removed.\n\nProfiles and the diary go to a temporary directory; the language-model\nnotification is disabled because it runs after ranking. Model weights load\nfrom the local cache, and the script refuses to score unless AST is the loaded\nclassifier and the personal sound is embedded as the application embeds it\n(YamNet, then AST once personal sounds moved to AST embeddings): in a trial run\na failed network request during loading silently replaced AST with YamNet. The scene set runs\nthree times, because Whisper's temperature fallback makes its transcripts of\nnon-speech sounds vary from run to run. Writes eval_results/fusion_eval.json.\n",
+ "scene_set": "heldout",
+ "backends": {
+  "sound_classifier": "ast",
+  "personal_embedding": "ast"
+ },
+ "rules": {
+  "sentences": {
+   "plain_a": [
+    "Could you pass me the salt, please?",
+    2
+   ],
+   "plain_b": [
+    "The meeting has moved to three o'clock.",
+    2
+   ],
+   "safety": [
+    "Help, there is a fire in the kitchen!",
+    3
+   ],
+   "name": [
+    "Laura, can you come here for a moment?",
+    3
+   ],
+   "plain_c": [
+    "Your taxi will be here in about five minutes.",
+    2
+   ],
+   "plain_d": [
+    "Can you pass me the remote control?",
+    2
+   ],
+   "safety2": [
+    "Stop, the pan on the stove is on fire!",
+    3
+   ],
+   "name2": [
+    "Laura, your phone is ringing in the hall.",
+    3
+   ]
+  },
+  "sounds": {
+   "siren": 3,
+   "crying_baby": 3,
+   "glass_breaking": 3,
+   "door_wood_knock": 2,
+   "dog": 2,
+   "clock_alarm": 2,
+   "rain": 0,
+   "keyboard_typing": 0
+  },
+  "self_name": "Laura",
+  "personal_sound": "Kitchen alarm"
+ },
+ "enrolment": {
+  "ok": true,
+  "label": "Kitchen alarm",
+  "n_examples": 3
+ },
+ "summary": {
+  "ticks": 105,
+  "headline_slots": 93,
+  "duplicate_slots": {
+   "n": 0,
+   "of": 93,
+   "rate": 0.0
+  },
+  "unwarranted_slots": {
+   "n": 3,
+   "of": 93,
+   "rate": 0.032
+  },
+  "ticks_with_duplicate_headline": {
+   "n": 0,
+   "of": 105,
+   "rate": 0.0
+  },
+  "correct_first": {
+   "n": 78,
+   "of": 93,
+   "rate": 0.839
+  },
+  "correct_first_by_kind": {
+   "sound only": {
+    "n": 42,
+    "of": 54,
+    "rate": 0.778
+   },
+   "speech and sound": {
+    "n": 24,
+    "of": 27,
+    "rate": 0.889
+   },
+   "speech only": {
+    "n": 12,
+    "of": 12,
+    "rate": 1.0
+   }
+  },
+  "missed_events": {
+   "n": 18,
+   "of": 108,
+   "rate": 0.167
+  },
+  "background_ticks_with_headline": {
+   "n": 0,
+   "of": 12,
+   "rate": 0.0
+  },
+  "excess_detections_before_merge": 150,
+  "removed_by_merge": 99,
+  "identical_label_repeats": 0,
+  "ticks_with_model_warnings": 0,
+  "unwarranted_slots_from_transcripts": 0,
+  "non_speech_ticks_with_transcript": {
+   "n": 38,
+   "of": 66,
+   "rate": 0.576
+  },
+  "ticks_all_slots_one_event": 0,
+  "first_wrong_outranked": 0,
+  "first_wrong_not_headlined": 15,
+  "missed_despite_urgent_detection": 0,
+  "personal_matches": 6,
+  "scenes": 35,
+  "repeats": 3,
+  "per_repeat": [
+   {
+    "correct_first": {
+     "n": 26,
+     "of": 31,
+     "rate": 0.839
+    },
+    "duplicate_slots": {
+     "n": 0,
+     "of": 31,
+     "rate": 0.0
+    },
+    "unwarranted_slots": {
+     "n": 1,
+     "of": 31,
+     "rate": 0.032
+    },
+    "missed_events": 6,
+    "removed_by_merge": 33
+   },
+   {
+    "correct_first": {
+     "n": 26,
+     "of": 31,
+     "rate": 0.839
+    },
+    "duplicate_slots": {
+     "n": 0,
+     "of": 31,
+     "rate": 0.0
+    },
+    "unwarranted_slots": {
+     "n": 1,
+     "of": 31,
+     "rate": 0.032
+    },
+    "missed_events": 6,
+    "removed_by_merge": 33
+   },
+   {
+    "correct_first": {
+     "n": 26,
+     "of": 31,
+     "rate": 0.839
+    },
+    "duplicate_slots": {
+     "n": 0,
+     "of": 31,
+     "rate": 0.0
+    },
+    "unwarranted_slots": {
+     "n": 1,
+     "of": 31,
+     "rate": 0.032
+    },
+    "missed_events": 6,
+    "removed_by_merge": 33
+   }
+  ],
+  "merge_hit_rate": 0.66
+ },
+ "ticks": [
+  {
+   "repeat": 0,
+   "scene": 0,
+   "kind": "sound only",
+   "speech": null,
+   "sound": "siren 1-76831-D-42.wav",
+   "real": {
+    "sound": 3
+   },
+   "transcript": "Oh yeah.",
+   "headlines": [
+    [
+     "sound",
+     "Police car (siren)",
+     "CRITICAL"
+    ]
+   ],
+   "headline_events": [
+    "sound"
+   ],
+   "duplicate_slots": 0,
+   "unwarranted_slots": 0,
+   "unwarranted_transcript_slots": 0,
+   "all_slots_one_event": false,
+   "correct_first": true,
+   "first_wrong_reason": null,
+   "missed": [],
+   "missed_with_urgent_detection": [],
+   "personal_matches": 0,
+   "before_merge": [
+    [
+     "sound",
+     "Emergency vehicle",
+     1
+    ],
+    [
+     "sound",
+     "Police car (siren)",
+     3
+    ],
+    [
+     "sound",
+     "Siren",
+     3
+    ]
+   ],
+   "after_merge": [
+    [
+     "sound",
+     "Police car (siren)",
+     3
+    ]
+   ],
+   "excess_before": 2,
+   "excess_after": 0,
+   "identical_label_repeats": 0,
+   "warnings": [],
+   "latency_ms": 2060
+  },
+  {
+   "repeat": 0,
+   "scene": 1,
+   "kind": "sound only",
+   "speech": null,
+   "sound": "siren 1-76831-E-42.wav",
+   "real": {
+    "sound": 3
+   },
+   "transcript": "",
+   "headlines": [
+    [
+     "sound",
+     "Siren",
+     "CRITICAL"
+    ]
+   ],
+   "headline_events": [
+    "sound"
+   ],
+   "duplicate_slots": 0,
+   "unwarranted_slots": 0,
+   "unwarranted_transcript_slots": 0,
+   "all_slots_one_event": false,
+   "correct_first": true,
+   "first_wrong_reason": null,
+   "missed": [],
+   "missed_with_urgent_detection": [],
+   "personal_matches": 0,
+   "before_merge": [
+    [
+     "sound",
+     "Siren",
+     3
+    ],
+    [
+     "sound",
+     "Police car (siren)",
+     3
+    ],
+    [
+     "sound",
+     "Emergency vehicle",
+     1
+    ]
+   ],
+   "after_merge": [
+    [
+     "sound",
+     "Siren",
+     3
+    ]
+   ],
+   "excess_before": 2,
+   "excess_after": 0,
+   "identical_label_repeats": 0,
+   "warnings": [],
+   "latency_ms": 1788
+  },
+  {
+   "repeat": 0,
+   "scene": 2,
+   "kind": "sound only",
+   "speech": null,
+   "sound": "siren 2-43802-A-42.wav",
+   "real": {
+    "sound": 3
+   },
+   "transcript": "Oh",
+   "headlines": [
+    [
+     "sound",
+     "Civil defense siren",
+     "CRITICAL"
+    ]
+   ],
+   "headline_events": [
+    "sound"
+   ],
+   "duplicate_slots": 0,
+   "unwarranted_slots": 0,
+   "unwarranted_transcript_slots": 0,
+   "all_slots_one_event": false,
+   "correct_first": true,
+   "first_wrong_reason": null,
+   "missed": [],
+   "missed_with_urgent_detection": [],
+   "personal_matches": 0,
+   "before_merge": [
+    [
+     "sound",
+     "Civil defense siren",
+     3
+    ],
+    [
+     "sound",
+     "Siren",
+     3
+    ]
+   ],
+   "after_merge": [
+    [
+     "sound",
+     "Civil defense siren",
+     3
+    ]
+   ],
+   "excess_before": 1,
+   "excess_after": 0,
+   "identical_label_repeats": 0,
+   "warnings": [],
+   "latency_ms": 1118
+  },
+  {
+   "repeat": 0,
+   "scene": 3,
+   "kind": "sound only",
+   "speech": null,
+   "sound": "crying_baby 1-60997-A-20.wav",
+   "real": {
+    "sound": 3
+   },
+   "transcript": "Oh!",
+   "headlines": [
+    [
+     "sound",
+     "Baby cry, infant cry",
+     "CRITICAL"
+    ]
+   ],
+   "headline_events": [
+    "sound"
+   ],
+   "duplicate_slots": 0,
+   "unwarranted_slots": 0,
+   "unwarranted_transcript_slots": 0,
+   "all_slots_one_event": false,
+   "correct_first": true,
+   "first_wrong_reason": null,
+   "missed": [],
+   "missed_with_urgent_detection": [],
+   "personal_matches": 0,
+   "before_merge": [
+    [
+     "sound",
+     "Baby cry, infant cry",
+     3
+    ],
+    [
+     "sound",
+     "Whimper",
+     0
+    ]
+   ],
+   "after_merge": [
+    [
+     "sound",
+     "Baby cry, infant cry",
+     3
+    ],
+    [
+     "sound",
+     "Whimper",
+     0
+    ]
+   ],
+   "excess_before": 1,
+   "excess_after": 1,
+   "identical_label_repeats": 0,
+   "warnings": [],
+   "latency_ms": 1315
+  },
+  {
+   "repeat": 0,
+   "scene": 4,
+   "kind": "sound only",
+   "speech": null,
+   "sound": "crying_baby 1-60997-B-20.wav",
+   "real": {
+    "sound": 3
+   },
+   "transcript": "I don't know.",
+   "headlines": [
+    [
+     "sound",
+     "Baby cry, infant cry",
+     "CRITICAL"
+    ]
+   ],
+   "headline_events": [
+    "sound"
+   ],
+   "duplicate_slots": 0,
+   "unwarranted_slots": 0,
+   "unwarranted_transcript_slots": 0,
+   "all_slots_one_event": false,
+   "correct_first": true,
+   "first_wrong_reason": null,
+   "missed": [],
+   "missed_with_urgent_detection": [],
+   "personal_matches": 0,
+   "before_merge": [
+    [
+     "sound",
+     "Baby cry, infant cry",
+     3
+    ],
+    [
+     "sound",
+     "Crying, sobbing",
+     0
+    ]
+   ],
+   "after_merge": [
+    [
+     "sound",
+     "Baby cry, infant cry",
+     3
+    ]
+   ],
+   "excess_before": 1,
+   "excess_after": 0,
+   "identical_label_repeats": 0,
+   "warnings": [],
+   "latency_ms": 1602
+  },
+  {
+   "repeat": 0,
+   "scene": 5,
+   "kind": "sound only",
+   "speech": null,
+   "sound": "crying_baby 2-107351-A-20.wav",
+   "real": {
+    "sound": 3
+   },
+   "transcript": "R-h-h-h-h-h-h-h-",
+   "headlines": [
+    [
+     "sound",
+     "Baby cry, infant cry",
+     "CRITICAL"
+    ]
+   ],
+   "headline_events": [
+    "sound"
+   ],
+   "duplicate_slots": 0,
+   "unwarranted_slots": 0,
+   "unwarranted_transcript_slots": 0,
+   "all_slots_one_event": false,
+   "correct_first": true,
+   "first_wrong_reason": null,
+   "missed": [],
+   "missed_with_urgent_detection": [],
+   "personal_matches": 0,
+   "before_merge": [
+    [
+     "sound",
+     "Baby cry, infant cry",
+     3
+    ],
+    [
+     "sound",
+     "Crying, sobbing",
+     0
+    ]
+   ],
+   "after_merge": [
+    [
+     "sound",
+     "Baby cry, infant cry",
+     3
+    ]
+   ],
+   "excess_before": 1,
+   "excess_after": 0,
+   "identical_label_repeats": 0,
+   "warnings": [],
+   "latency_ms": 2349
+  },
+  {
+   "repeat": 0,
+   "scene": 6,
+   "kind": "sound only",
+   "speech": null,
+   "sound": "glass_breaking 1-88807-A-39.wav",
+   "real": {
+    "sound": 3
+   },
+   "transcript": "",
+   "headlines": [
+    [
+     "sound",
+     "Glass",
+     "CRITICAL"
+    ]
+   ],
+   "headline_events": [
+    "sound"
+   ],
+   "duplicate_slots": 0,
+   "unwarranted_slots": 0,
+   "unwarranted_transcript_slots": 0,
+   "all_slots_one_event": false,
+   "correct_first": true,
+   "first_wrong_reason": null,
+   "missed": [],
+   "missed_with_urgent_detection": [],
+   "personal_matches": 0,
+   "before_merge": [
+    [
+     "sound",
+     "Breaking",
+     0
+    ],
+    [
+     "sound",
+     "Glass",
+     3
+    ],
+    [
+     "sound",
+     "Chink, clink",
+     0
+    ]
+   ],
+   "after_merge": [
+    [
+     "sound",
+     "Breaking",
+     0
+    ],
+    [
+     "sound",
+     "Glass",
+     3
+    ]
+   ],
+   "excess_before": 2,
+   "excess_after": 1,
+   "identical_label_repeats": 0,
+   "warnings": [],
+   "latency_ms": 1141
+  },
+  {
+   "repeat": 0,
+   "scene": 7,
+   "kind": "sound only",
+   "speech": null,
+   "sound": "glass_breaking 1-977-A-39.wav",
+   "real": {
+    "sound": 3
+   },
+   "transcript": "",
+   "headlines": [],
+   "headline_events": [],
+   "duplicate_slots": 0,
+   "unwarranted_slots": 0,
+   "unwarranted_transcript_slots": 0,
+   "all_slots_one_event": false,
+   "correct_first": false,
+   "first_wrong_reason": "not headlined",
+   "missed": [
+    "sound"
+   ],
+   "missed_with_urgent_detection": [],
+   "personal_matches": 0,
+   "before_merge": [
+    [
+     "sound",
+     "Chink, clink",
+     0
+    ],
+    [
+     "sound",
+     "Breaking",
+     0
+    ]
+   ],
+   "after_merge": [
+    [
+     "sound",
+     "Chink, clink",
+     0
+    ],
+    [
+     "sound",
+     "Breaking",
+     0
+    ]
+   ],
+   "excess_before": 1,
+   "excess_after": 1,
+   "identical_label_repeats": 0,
+   "warnings": [],
+   "latency_ms": 1479
+  },
+  {
+   "repeat": 0,
+   "scene": 8,
+   "kind": "sound only",
+   "speech": null,
+   "sound": "glass_breaking 2-106881-A-39.wav",
+   "real": {
+    "sound": 3
+   },
+   "transcript": "",
+   "headlines": [],
+   "headline_events": [],
+   "duplicate_slots": 0,
+   "unwarranted_slots": 0,
+   "unwarranted_transcript_slots": 0,
+   "all_slots_one_event": false,
+   "correct_first": false,
+   "first_wrong_reason": "not headlined",
+   "missed": [
+    "sound"
+   ],
+   "missed_with_urgent_detection": [],
+   "personal_matches": 0,
+   "before_merge": [
+    [
+     "sound",
+     "Crack",
+     0
+    ],
+    [
+     "sound",
+     "Breaking",
+     0
+    ]
+   ],
+   "after_merge": [
+    [
+     "sound",
+     "Crack",
+     0
+    ],
+    [
+     "sound",
+     "Breaking",
+     0
+    ]
+   ],
+   "excess_before": 1,
+   "excess_after": 1,
+   "identical_label_repeats": 0,
+   "warnings": [],
+   "latency_ms": 1142
+  },
+  {
+   "repeat": 0,
+   "scene": 9,
+   "kind": "sound only",
+   "speech": null,
+   "sound": "door_wood_knock 1-81001-B-30.wav",
+   "real": {
+    "sound": 2
+   },
+   "transcript": "",
+   "headlines": [
+    [
+     "sound",
+     "Knock",
+     "IMPORTANT"
+    ]
+   ],
+   "headline_events": [
+    "sound"
+   ],
+   "duplicate_slots": 0,
+   "unwarranted_slots": 0,
+   "unwarranted_transcript_slots": 0,
+   "all_slots_one_event": false,
+   "correct_first": true,
+   "first_wrong_reason": null,
+   "missed": [],
+   "missed_with_urgent_detection": [],
+   "personal_matches": 0,
+   "before_merge": [
+    [
+     "sound",
+     "Knock",
+     2
+    ]
+   ],
+   "after_merge": [
+    [
+     "sound",
+     "Knock",
+     2
+    ]
+   ],
+   "excess_before": 0,
+   "excess_after": 0,
+   "identical_label_repeats": 0,
+   "warnings": [],
+   "latency_ms": 1302
+  },
+  {
+   "repeat": 0,
+   "scene": 10,
+   "kind": "sound only",
+   "speech": null,
+   "sound": "door_wood_knock 1-82817-A-30.wav",
+   "real": {
+    "sound": 2
+   },
+   "transcript": "No.",
+   "headlines": [
+    [
+     "sound",
+     "Knock",
+     "IMPORTANT"
+    ]
+   ],
+   "headline_events": [
+    "sound"
+   ],
+   "duplicate_slots": 0,
+   "unwarranted_slots": 0,
+   "unwarranted_transcript_slots": 0,
+   "all_slots_one_event": false,
+   "correct_first": true,
+   "first_wrong_reason": null,
+   "missed": [],
+   "missed_with_urgent_detection": [],
+   "personal_matches": 0,
+   "before_merge": [
+    [
+     "sound",
+     "Knock",
+     2
+    ]
+   ],
+   "after_merge": [
+    [
+     "sound",
+     "Knock",
+     2
+    ]
+   ],
+   "excess_before": 0,
+   "excess_after": 0,
+   "identical_label_repeats": 0,
+   "warnings": [],
+   "latency_ms": 1922
+  },
+  {
+   "repeat": 0,
+   "scene": 11,
+   "kind": "sound only",
+   "speech": null,
+   "sound": "door_wood_knock 2-114254-A-30.wav",
+   "real": {
+    "sound": 2
+   },
+   "transcript": "Yeah.",
+   "headlines": [
+    [
+     "sound",
+     "Knock",
+     "IMPORTANT"
+    ]
+   ],
+   "headline_events": [
+    "sound"
+   ],
+   "duplicate_slots": 0,
+   "unwarranted_slots": 0,
+   "unwarranted_transcript_slots": 0,
+   "all_slots_one_event": false,
+   "correct_first": true,
+   "first_wrong_reason": null,
+   "missed": [],
+   "missed_with_urgent_detection": [],
+   "personal_matches": 0,
+   "before_merge": [
+    [
+     "sound",
+     "Knock",
+     2
+    ]
+   ],
+   "after_merge": [
+    [
+     "sound",
+     "Knock",
+     2
+    ]
+   ],
+   "excess_before": 0,
+   "excess_after": 0,
+   "identical_label_repeats": 0,
+   "warnings": [],
+   "latency_ms": 2125
+  },
+  {
+   "repeat": 0,
+   "scene": 12,
+   "kind": "sound only",
+   "speech": null,
+   "sound": "dog 1-85362-A-0.wav",
+   "real": {
+    "sound": 2
+   },
+   "transcript": "What? What? What?",
+   "headlines": [],
+   "headline_events": [],
+   "duplicate_slots": 0,
+   "unwarranted_slots": 0,
+   "unwarranted_transcript_slots": 0,
+   "all_slots_one_event": false,
+   "correct_first": false,
+   "first_wrong_reason": "not headlined",
+   "missed": [
+    "sound"
+   ],
+   "missed_with_urgent_detection": [],
+   "personal_matches": 0,
+   "before_merge": [
+    [
+     "sound",
+     "Bow-wow",
+     0
+    ],
+    [
+     "sound",
+     "Animal",
+     0
+    ],
+    [
+     "sound",
+     "Domestic animals, pets",
+     0
+    ]
+   ],
+   "after_merge": [
+    [
+     "sound",
+     "Bow-wow",
+     0
+    ]
+   ],
+   "excess_before": 2,
+   "excess_after": 0,
+   "identical_label_repeats": 0,
+   "warnings": [],
+   "latency_ms": 1398
+  },
+  {
+   "repeat": 0,
+   "scene": 13,
+   "kind": "sound only",
+   "speech": null,
+   "sound": "dog 1-97392-A-0.wav",
+   "real": {
+    "sound": 2
+   },
+   "transcript": "",
+   "headlines": [
+    [
+     "sound",
+     "Dog",
+     "IMPORTANT"
+    ]
+   ],
+   "headline_events": [
+    "sound"
+   ],
+   "duplicate_slots": 0,
+   "unwarranted_slots": 0,
+   "unwarranted_transcript_slots": 0,
+   "all_slots_one_event": false,
+   "correct_first": true,
+   "first_wrong_reason": null,
+   "missed": [],
+   "missed_with_urgent_detection": [],
+   "personal_matches": 0,
+   "before_merge": [
+    [
+     "sound",
+     "Dog",
+     2
+    ],
+    [
+     "sound",
+     "Bow-wow",
+     0
+    ],
+    [
+     "sound",
+     "Animal",
+     0
+    ]
+   ],
+   "after_merge": [
+    [
+     "sound",
+     "Dog",
+     2
+    ]
+   ],
+   "excess_before": 2,
+   "excess_after": 0,
+   "identical_label_repeats": 0,
+   "warnings": [],
+   "latency_ms": 1686
+  },
+  {
+   "repeat": 0,
+   "scene": 14,
+   "kind": "sound only",
+   "speech": null,
+   "sound": "dog 2-114280-A-0.wav",
+   "real": {
+    "sound": 2
+   },
+   "transcript": "Oh! Oh! Oh! Oh!",
+   "headlines": [
+    [
+     "sound",
+     "Dog",
+     "IMPORTANT"
+    ]
+   ],
+   "headline_events": [
+    "sound"
+   ],
+   "duplicate_slots": 0,
+   "unwarranted_slots": 0,
+   "unwarranted_transcript_slots": 0,
+   "all_slots_one_event": false,
+   "correct_first": true,
+   "first_wrong_reason": null,
+   "missed": [],
+   "missed_with_urgent_detection": [],
+   "personal_matches": 0,
+   "before_merge": [
+    [
+     "sound",
+     "Dog",
+     2
+    ],
+    [
+     "sound",
+     "Animal",
+     0
+    ],
+    [
+     "sound",
+     "Bow-wow",
+     0
+    ]
+   ],
+   "after_merge": [
+    [
+     "sound",
+     "Dog",
+     2
+    ]
+   ],
+   "excess_before": 2,
+   "excess_after": 0,
+   "identical_label_repeats": 0,
+   "warnings": [],
+   "latency_ms": 1245
+  },
+  {
+   "repeat": 0,
+   "scene": 15,
+   "kind": "sound only",
+   "speech": null,
+   "sound": "clock_alarm 1-74517-A-37.wav",
+   "real": {
+    "sound": 2
+   },
+   "transcript": "Beek. Beek.",
+   "headlines": [
+    [
+     "sound",
+     "Kitchen alarm (personal)",
+     "CRITICAL"
+    ]
+   ],
+   "headline_events": [
+    "sound"
+   ],
+   "duplicate_slots": 0,
+   "unwarranted_slots": 0,
+   "unwarranted_transcript_slots": 0,
+   "all_slots_one_event": false,
+   "correct_first": true,
+   "first_wrong_reason": null,
+   "missed": [],
+   "missed_with_urgent_detection": [],
+   "personal_matches": 1,
+   "before_merge": [
+    [
+     "sound",
+     "Kitchen alarm (personal)",
+     2
+    ],
+    [
+     "sound",
+     "Alarm clock",
+     3
+    ]
+   ],
+   "after_merge": [
+    [
+     "sound",
+     "Kitchen alarm (personal)",
+     3
+    ]
+   ],
+   "excess_before": 1,
+   "excess_after": 0,
+   "identical_label_repeats": 0,
+   "warnings": [],
+   "latency_ms": 1271
+  },
+  {
+   "repeat": 0,
+   "scene": 16,
+   "kind": "sound only",
+   "speech": null,
+   "sound": "clock_alarm 1-96890-A-37.wav",
+   "real": {
+    "sound": 2
+   },
+   "transcript": "Beep, beep, beep, beep,",
+   "headlines": [
+    [
+     "sound",
+     "Kitchen alarm (personal)",
+     "CRITICAL"
+    ]
+   ],
+   "headline_events": [
+    "sound"
+   ],
+   "duplicate_slots": 0,
+   "unwarranted_slots": 0,
+   "unwarranted_transcript_slots": 0,
+   "all_slots_one_event": false,
+   "correct_first": true,
+   "first_wrong_reason": null,
+   "missed": [],
+   "missed_with_urgent_detection": [],
+   "personal_matches": 1,
+   "before_merge": [
+    [
+     "sound",
+     "Kitchen alarm (personal)",
+     2
+    ],
+    [
+     "sound",
+     "Alarm clock",
+     3
+    ],
+    [
+     "sound",
+     "Alarm",
+     3
+    ]
+   ],
+   "after_merge": [
+    [
+     "sound",
+     "Kitchen alarm (personal)",
+     3
+    ]
+   ],
+   "excess_before": 2,
+   "excess_after": 0,
+   "identical_label_repeats": 0,
+   "warnings": [],
+   "latency_ms": 1407
+  },
+  {
+   "repeat": 0,
+   "scene": 17,
+   "kind": "sound only",
+   "speech": null,
+   "sound": "clock_alarm 2-102435-A-37.wav",
+   "real": {
+    "sound": 2
+   },
+   "transcript": "",
+   "headlines": [],
+   "headline_events": [],
+   "duplicate_slots": 0,
+   "unwarranted_slots": 0,
+   "unwarranted_transcript_slots": 0,
+   "all_slots_one_event": false,
+   "correct_first": false,
+   "first_wrong_reason": "not headlined",
+   "missed": [
+    "sound"
+   ],
+   "missed_with_urgent_detection": [],
+   "personal_matches": 0,
+   "before_merge": [
+    [
+     "sound",
+     "Tools",
+     0
+    ]
+   ],
+   "after_merge": [
+    [
+     "sound",
+     "Tools",
+     0
+    ]
+   ],
+   "excess_before": 0,
+   "excess_after": 0,
+   "identical_label_repeats": 0,
+   "warnings": [],
+   "latency_ms": 3208
+  },
+  {
+   "repeat": 0,
+   "scene": 18,
+   "kind": "background only",
+   "speech": null,
+   "sound": "rain 1-56311-A-10.wav",
+   "real": {
+    "sound": 0
+   },
+   "transcript": "",
+   "headlines": [],
+   "headline_events": [],
+   "duplicate_slots": 0,
+   "unwarranted_slots": 0,
+   "unwarranted_transcript_slots": 0,
+   "all_slots_one_event": false,
+   "correct_first": null,
+   "first_wrong_reason": null,
+   "missed": [],
+   "missed_with_urgent_detection": [],
+   "personal_matches": 0,
+   "before_merge": [
+    [
+     "sound",
+     "Rain on surface",
+     0
+    ],
+    [
+     "sound",
+     "Rain",
+     0
+    ]
+   ],
+   "after_merge": [
+    [
+     "sound",
+     "Rain on surface",
+     0
+    ]
+   ],
+   "excess_before": 1,
+   "excess_after": 0,
+   "identical_label_repeats": 0,
+   "warnings": [],
+   "latency_ms": 1683
+  },
+  {
+   "repeat": 0,
+   "scene": 19,
+   "kind": "background only",
+   "speech": null,
+   "sound": "rain 1-63871-A-10.wav",
+   "real": {
+    "sound": 0
+   },
+   "transcript": "",
+   "headlines": [],
+   "headline_events": [],
+   "duplicate_slots": 0,
+   "unwarranted_slots": 0,
+   "unwarranted_transcript_slots": 0,
+   "all_slots_one_event": false,
+   "correct_first": null,
+   "first_wrong_reason": null,
+   "missed": [],
+   "missed_with_urgent_detection": [],
+   "personal_matches": 0,
+   "before_merge": [
+    [
+     "sound",
+     "Rain on surface",
+     0
+    ],
+    [
+     "sound",
+     "Rain",
+     0
+    ]
+   ],
+   "after_merge": [
+    [
+     "sound",
+     "Rain on surface",
+     0
+    ]
+   ],
+   "excess_before": 1,
+   "excess_after": 0,
+   "identical_label_repeats": 0,
+   "warnings": [],
+   "latency_ms": 2199
+  },
+  {
+   "repeat": 0,
+   "scene": 20,
+   "kind": "background only",
+   "speech": null,
+   "sound": "keyboard_typing 1-94231-A-32.wav",
+   "real": {
+    "sound": 0
+   },
+   "transcript": "",
+   "headlines": [],
+   "headline_events": [],
+   "duplicate_slots": 0,
+   "unwarranted_slots": 0,
+   "unwarranted_transcript_slots": 0,
+   "all_slots_one_event": false,
+   "correct_first": null,
+   "first_wrong_reason": null,
+   "missed": [],
+   "missed_with_urgent_detection": [],
+   "personal_matches": 0,
+   "before_merge": [
+    [
+     "sound",
+     "Computer keyboard",
+     0
+    ]
+   ],
+   "after_merge": [
+    [
+     "sound",
+     "Computer keyboard",
+     0
+    ]
+   ],
+   "excess_before": 0,
+   "excess_after": 0,
+   "identical_label_repeats": 0,
+   "warnings": [],
+   "latency_ms": 1793
+  },
+  {
+   "repeat": 0,
+   "scene": 21,
+   "kind": "background only",
+   "speech": null,
+   "sound": "keyboard_typing 1-94231-B-32.wav",
+   "real": {
+    "sound": 0
+   },
+   "transcript": "Okay.",
+   "headlines": [],
+   "headline_events": [],
+   "duplicate_slots": 0,
+   "unwarranted_slots": 0,
+   "unwarranted_transcript_slots": 0,
+   "all_slots_one_event": false,
+   "correct_first": null,
+   "first_wrong_reason": null,
+   "missed": [],
+   "missed_with_urgent_detection": [],
+   "personal_matches": 0,
+   "before_merge": [
+    [
+     "sound",
+     "Computer keyboard",
+     0
+    ],
+    [
+     "sound",
+     "Typing",
+     0
+    ]
+   ],
+   "after_merge": [
+    [
+     "sound",
+     "Computer keyboard",
+     0
+    ]
+   ],
+   "excess_before": 1,
+   "excess_after": 0,
+   "identical_label_repeats": 0,
+   "warnings": [],
+   "latency_ms": 3890
+  },
+  {
+   "repeat": 0,
+   "scene": 22,
+   "kind": "speech only",
+   "speech": "Your taxi will be here in about five minutes.",
+   "sound": null,
+   "real": {
+    "speech": 2
+   },
+   "transcript": "Your taxi will be here in about five minutes.",
+   "headlines": [
+    [
+     "speech",
+     "Your taxi will be here in about five minutes.",
+     "IMPORTANT"
+    ]
+   ],
+   "headline_events": [
+    "speech"
+   ],
+   "duplicate_slots": 0,
+   "unwarranted_slots": 0,
+   "unwarranted_transcript_slots": 0,
+   "all_slots_one_event": false,
+   "correct_first": true,
+   "first_wrong_reason": null,
+   "missed": [],
+   "missed_with_urgent_detection": [],
+   "personal_matches": 0,
+   "before_merge": [
+    [
+     "speech",
+     "Your taxi will be here in about five minutes.",
+     2
+    ],
+    [
+     "sound",
+     "Speech",
+     1
+    ]
+   ],
+   "after_merge": [
+    [
+     "sound",
+     "Speech",
+     1
+    ],
+    [
+     "speech",
+     "Your taxi will be here in about five minutes.",
+     2
+    ]
+   ],
+   "excess_before": 1,
+   "excess_after": 1,
+   "identical_label_repeats": 0,
+   "warnings": [],
+   "latency_ms": 1158
+  },
+  {
+   "repeat": 0,
+   "scene": 23,
+   "kind": "speech only",
+   "speech": "Can you pass me the remote control?",
+   "sound": null,
+   "real": {
+    "speech": 2
+   },
+   "transcript": "Can you pass me the remote control?",
+   "headlines": [
+    [
+     "speech",
+     "Can you pass me the remote control?",
+     "IMPORTANT"
+    ]
+   ],
+   "headline_events": [
+    "speech"
+   ],
+   "duplicate_slots": 0,
+   "unwarranted_slots": 0,
+   "unwarranted_transcript_slots": 0,
+   "all_slots_one_event": false,
+   "correct_first": true,
+   "first_wrong_reason": null,
+   "missed": [],
+   "missed_with_urgent_detection": [],
+   "personal_matches": 0,
+   "before_merge": [
+    [
+     "speech",
+     "Can you pass me the remote control?",
+     2
+    ],
+    [
+     "sound",
+     "Speech",
+     1
+    ]
+   ],
+   "after_merge": [
+    [
+     "sound",
+     "Speech",
+     1
+    ],
+    [
+     "speech",
+     "Can you pass me the remote control?",
+     2
+    ]
+   ],
+   "excess_before": 1,
+   "excess_after": 1,
+   "identical_label_repeats": 0,
+   "warnings": [],
+   "latency_ms": 1241
+  },
+  {
+   "repeat": 0,
+   "scene": 24,
+   "kind": "speech only",
+   "speech": "Stop, the pan on the stove is on fire!",
+   "sound": null,
+   "real": {
+    "speech": 3
+   },
+   "transcript": "Stop. The pan on the stove is on fire.",
+   "headlines": [
+    [
+     "speech",
+     "Keyword: \"fire\": Stop. The pan on the stove is on fire.",
+     "CRITICAL"
+    ]
+   ],
+   "headline_events": [
+    "speech"
+   ],
+   "duplicate_slots": 0,
+   "unwarranted_slots": 0,
+   "unwarranted_transcript_slots": 0,
+   "all_slots_one_event": false,
+   "correct_first": true,
+   "first_wrong_reason": null,
+   "missed": [],
+   "missed_with_urgent_detection": [],
+   "personal_matches": 0,
+   "before_merge": [
+    [
+     "speech",
+     "Stop. The pan on the stove is on fire.",
+     3
+    ],
+    [
+     "sound",
+     "Speech",
+     1
+    ],
+    [
+     "speech",
+     "Keyword: \"fire\"",
+     3
+    ],
+    [
+     "speech",
+     "Keyword: \"stop\"",
+     3
+    ]
+   ],
+   "after_merge": [
+    [
+     "sound",
+     "Speech",
+     1
+    ],
+    [
+     "speech",
+     "Keyword: \"fire\": Stop. The pan on the stove is on fire.",
+     3
+    ]
+   ],
+   "excess_before": 3,
+   "excess_after": 1,
+   "identical_label_repeats": 0,
+   "warnings": [],
+   "latency_ms": 1083
+  },
+  {
+   "repeat": 0,
+   "scene": 25,
+   "kind": "speech only",
+   "speech": "Laura, your phone is ringing in the hall.",
+   "sound": null,
+   "real": {
+    "speech": 3
+   },
+   "transcript": "Laura, your phone is ringing in the hall.",
+   "headlines": [
+    [
+     "speech",
+     "Your name was called: Laura, your phone is ringing in the hall.",
+     "CRITICAL"
+    ]
+   ],
+   "headline_events": [
+    "speech"
+   ],
+   "duplicate_slots": 0,
+   "unwarranted_slots": 0,
+   "unwarranted_transcript_slots": 0,
+   "all_slots_one_event": false,
+   "correct_first": true,
+   "first_wrong_reason": null,
+   "missed": [],
+   "missed_with_urgent_detection": [],
+   "personal_matches": 0,
+   "before_merge": [
+    [
+     "speech",
+     "Laura, your phone is ringing in the hall.",
+     2
+    ],
+    [
+     "sound",
+     "Speech",
+     1
+    ],
+    [
+     "sound",
+     "Male speech, man speaking",
+     1
+    ],
+    [
+     "speech",
+     "Your name was called",
+     3
+    ]
+   ],
+   "after_merge": [
+    [
+     "sound",
+     "Speech",
+     1
+    ],
+    [
+     "speech",
+     "Your name was called: Laura, your phone is ringing in the hall.",
+     3
+    ]
+   ],
+   "excess_before": 3,
+   "excess_after": 1,
+   "identical_label_repeats": 0,
+   "warnings": [],
+   "latency_ms": 1077
+  },
+  {
+   "repeat": 0,
+   "scene": 26,
+   "kind": "speech and sound",
+   "speech": "Your taxi will be here in about five minutes.",
+   "sound": "siren 2-43806-A-42.wav",
+   "real": {
+    "speech": 2,
+    "sound": 3
+   },
+   "transcript": "Your taxi will be here in about five minutes.",
+   "headlines": [
+    [
+     "sound",
+     "Police car (siren)",
+     "CRITICAL"
+    ],
+    [
+     "speech",
+     "Your taxi will be here in about five minutes.",
+     "IMPORTANT"
+    ]
+   ],
+   "headline_events": [
+    "sound",
+    "speech"
+   ],
+   "duplicate_slots": 0,
+   "unwarranted_slots": 0,
+   "unwarranted_transcript_slots": 0,
+   "all_slots_one_event": false,
+   "correct_first": true,
+   "first_wrong_reason": null,
+   "missed": [],
+   "missed_with_urgent_detection": [],
+   "personal_matches": 0,
+   "before_merge": [
+    [
+     "speech",
+     "Your taxi will be here in about five minutes.",
+     2
+    ],
+    [
+     "sound",
+     "Speech",
+     1
+    ],
+    [
+     "sound",
+     "Emergency vehicle",
+     1
+    ],
+    [
+     "sound",
+     "Police car (siren)",
+     3
+    ]
+   ],
+   "after_merge": [
+    [
+     "sound",
+     "Speech",
+     1
+    ],
+    [
+     "sound",
+     "Police car (siren)",
+     3
+    ],
+    [
+     "speech",
+     "Your taxi will be here in about five minutes.",
+     2
+    ]
+   ],
+   "excess_before": 2,
+   "excess_after": 1,
+   "identical_label_repeats": 0,
+   "warnings": [],
+   "latency_ms": 1243
+  },
+  {
+   "repeat": 0,
+   "scene": 27,
+   "kind": "speech and sound",
+   "speech": "Your taxi will be here in about five minutes.",
+   "sound": "crying_baby 2-107351-B-20.wav",
+   "real": {
+    "speech": 2,
+    "sound": 3
+   },
+   "transcript": "Your taxi will be here in about five minutes.",
+   "headlines": [
+    [
+     "sound",
+     "Baby cry, infant cry",
+     "CRITICAL"
+    ],
+    [
+     "speech",
+     "Your taxi will be here in about five minutes.",
+     "IMPORTANT"
+    ]
+   ],
+   "headline_events": [
+    "sound",
+    "speech"
+   ],
+   "duplicate_slots": 0,
+   "unwarranted_slots": 0,
+   "unwarranted_transcript_slots": 0,
+   "all_slots_one_event": false,
+   "correct_first": true,
+   "first_wrong_reason": null,
+   "missed": [],
+   "missed_with_urgent_detection": [],
+   "personal_matches": 0,
+   "before_merge": [
+    [
+     "speech",
+     "Your taxi will be here in about five minutes.",
+     2
+    ],
+    [
+     "sound",
+     "Speech",
+     1
+    ],
+    [
+     "sound",
+     "Baby cry, infant cry",
+     3
+    ]
+   ],
+   "after_merge": [
+    [
+     "sound",
+     "Speech",
+     1
+    ],
+    [
+     "sound",
+     "Baby cry, infant cry",
+     3
+    ],
+    [
+     "speech",
+     "Your taxi will be here in about five minutes.",
+     2
+    ]
+   ],
+   "excess_before": 1,
+   "excess_after": 1,
+   "identical_label_repeats": 0,
+   "warnings": [],
+   "latency_ms": 1207
+  },
+  {
+   "repeat": 0,
+   "scene": 28,
+   "kind": "speech and sound",
+   "speech": "Can you pass me the remote control?",
+   "sound": "glass_breaking 2-112213-A-39.wav",
+   "real": {
+    "speech": 2,
+    "sound": 3
+   },
+   "transcript": "You have to be the remote control.",
+   "headlines": [
+    [
+     "speech",
+     "You have to be the remote control.",
+     "IMPORTANT"
+    ]
+   ],
+   "headline_events": [
+    "speech"
+   ],
+   "duplicate_slots": 0,
+   "unwarranted_slots": 0,
+   "unwarranted_transcript_slots": 0,
+   "all_slots_one_event": false,
+   "correct_first": false,
+   "first_wrong_reason": "not headlined",
+   "missed": [
+    "sound"
+   ],
+   "missed_with_urgent_detection": [],
+   "personal_matches": 0,
+   "before_merge": [
+    [
+     "speech",
+     "You have to be the remote control.",
+     2
+    ],
+    [
+     "sound",
+     "Speech",
+     1
+    ],
+    [
+     "sound",
+     "Breaking",
+     0
+    ]
+   ],
+   "after_merge": [
+    [
+     "sound",
+     "Speech",
+     1
+    ],
+    [
+     "sound",
+     "Breaking",
+     0
+    ],
+    [
+     "speech",
+     "You have to be the remote control.",
+     2
+    ]
+   ],
+   "excess_before": 1,
+   "excess_after": 1,
+   "identical_label_repeats": 0,
+   "warnings": [],
+   "latency_ms": 1076
+  },
+  {
+   "repeat": 0,
+   "scene": 29,
+   "kind": "speech and sound",
+   "speech": "Can you pass me the remote control?",
+   "sound": "rain 1-50060-A-10.wav",
+   "real": {
+    "speech": 2,
+    "sound": 0
+   },
+   "transcript": "Can you have me, the remote control?",
+   "headlines": [
+    [
+     "speech",
+     "Can you have me, the remote control?",
+     "IMPORTANT"
+    ]
+   ],
+   "headline_events": [
+    "speech"
+   ],
+   "duplicate_slots": 0,
+   "unwarranted_slots": 0,
+   "unwarranted_transcript_slots": 0,
+   "all_slots_one_event": false,
+   "correct_first": true,
+   "first_wrong_reason": null,
+   "missed": [],
+   "missed_with_urgent_detection": [],
+   "personal_matches": 0,
+   "before_merge": [
+    [
+     "speech",
+     "Can you have me, the remote control?",
+     2
+    ],
+    [
+     "sound",
+     "Speech",
+     1
+    ],
+    [
+     "sound",
+     "Rain on surface",
+     0
+    ],
+    [
+     "sound",
+     "Rain",
+     0
+    ]
+   ],
+   "after_merge": [
+    [
+     "sound",
+     "Speech",
+     1
+    ],
+    [
+     "sound",
+     "Rain on surface",
+     0
+    ],
+    [
+     "speech",
+     "Can you have me, the remote control?",
+     2
+    ]
+   ],
+   "excess_before": 2,
+   "excess_after": 1,
+   "identical_label_repeats": 0,
+   "warnings": [],
+   "latency_ms": 1089
+  },
+  {
+   "repeat": 0,
+   "scene": 30,
+   "kind": "speech and sound",
+   "speech": "Your taxi will be here in about five minutes.",
+   "sound": "keyboard_typing 1-79711-A-32.wav",
+   "real": {
+    "speech": 2,
+    "sound": 0
+   },
+   "transcript": "Your taxi will be here in about five minutes.",
+   "headlines": [
+    [
+     "speech",
+     "Your taxi will be here in about five minutes.",
+     "IMPORTANT"
+    ]
+   ],
+   "headline_events": [
+    "speech"
+   ],
+   "duplicate_slots": 0,
+   "unwarranted_slots": 0,
+   "unwarranted_transcript_slots": 0,
+   "all_slots_one_event": false,
+   "correct_first": true,
+   "first_wrong_reason": null,
+   "missed": [],
+   "missed_with_urgent_detection": [],
+   "personal_matches": 0,
+   "before_merge": [
+    [
+     "speech",
+     "Your taxi will be here in about five minutes.",
+     2
+    ],
+    [
+     "sound",
+     "Computer keyboard",
+     0
+    ],
+    [
+     "sound",
+     "Typing",
+     0
+    ],
+    [
+     "sound",
+     "Speech",
+     1
+    ]
+   ],
+   "after_merge": [
+    [
+     "sound",
+     "Computer keyboard",
+     0
+    ],
+    [
+     "sound",
+     "Speech",
+     1
+    ],
+    [
+     "speech",
+     "Your taxi will be here in about five minutes.",
+     2
+    ]
+   ],
+   "excess_before": 2,
+   "excess_after": 1,
+   "identical_label_repeats": 0,
+   "warnings": [],
+   "latency_ms": 1111
+  },
+  {
+   "repeat": 0,
+   "scene": 31,
+   "kind": "speech and sound",
+   "speech": "Stop, the pan on the stove is on fire!",
+   "sound": "dog 2-114587-A-0.wav",
+   "real": {
+    "speech": 3,
+    "sound": 2
+   },
+   "transcript": "Stop, the pan on the stove is on fire.",
+   "headlines": [
+    [
+     "speech",
+     "Keyword: \"fire\": Stop, the pan on the stove is on fire.",
+     "CRITICAL"
+    ]
+   ],
+   "headline_events": [
+    "speech"
+   ],
+   "duplicate_slots": 0,
+   "unwarranted_slots": 0,
+   "unwarranted_transcript_slots": 0,
+   "all_slots_one_event": false,
+   "correct_first": true,
+   "first_wrong_reason": null,
+   "missed": [
+    "sound"
+   ],
+   "missed_with_urgent_detection": [],
+   "personal_matches": 0,
+   "before_merge": [
+    [
+     "speech",
+     "Stop, the pan on the stove is on fire.",
+     3
+    ],
+    [
+     "sound",
+     "Speech",
+     1
+    ],
+    [
+     "sound",
+     "Domestic animals, pets",
+     0
+    ],
+    [
+     "sound",
+     "Animal",
+     0
+    ],
+    [
+     "speech",
+     "Keyword: \"fire\"",
+     3
+    ],
+    [
+     "speech",
+     "Keyword: \"stop\"",
+     3
+    ]
+   ],
+   "after_merge": [
+    [
+     "sound",
+     "Speech",
+     1
+    ],
+    [
+     "sound",
+     "Domestic animals, pets",
+     0
+    ],
+    [
+     "speech",
+     "Keyword: \"fire\": Stop, the pan on the stove is on fire.",
+     3
+    ]
+   ],
+   "excess_before": 4,
+   "excess_after": 1,
+   "identical_label_repeats": 0,
+   "warnings": [],
+   "latency_ms": 1321
+  },
+  {
+   "repeat": 0,
+   "scene": 32,
+   "kind": "speech and sound",
+   "speech": "Stop, the pan on the stove is on fire!",
+   "sound": "rain 1-54958-A-10.wav",
+   "real": {
+    "speech": 3,
+    "sound": 0
+   },
+   "transcript": "Stop the pan on the stove as on site.",
+   "headlines": [
+    [
+     "speech",
+     "Keyword: \"stop\": Stop the pan on the stove as on site.",
+     "CRITICAL"
+    ]
+   ],
+   "headline_events": [
+    "speech"
+   ],
+   "duplicate_slots": 0,
+   "unwarranted_slots": 0,
+   "unwarranted_transcript_slots": 0,
+   "all_slots_one_event": false,
+   "correct_first": true,
+   "first_wrong_reason": null,
+   "missed": [],
+   "missed_with_urgent_detection": [],
+   "personal_matches": 0,
+   "before_merge": [
+    [
+     "speech",
+     "Stop the pan on the stove as on site.",
+     3
+    ],
+    [
+     "sound",
+     "Speech",
+     1
+    ],
+    [
+     "speech",
+     "Keyword: \"stop\"",
+     3
+    ]
+   ],
+   "after_merge": [
+    [
+     "sound",
+     "Speech",
+     1
+    ],
+    [
+     "speech",
+     "Keyword: \"stop\": Stop the pan on the stove as on site.",
+     3
+    ]
+   ],
+   "excess_before": 2,
+   "excess_after": 1,
+   "identical_label_repeats": 0,
+   "warnings": [],
+   "latency_ms": 1115
+  },
+  {
+   "repeat": 0,
+   "scene": 33,
+   "kind": "speech and sound",
+   "speech": "Laura, your phone is ringing in the hall.",
+   "sound": "door_wood_knock 2-118624-A-30.wav",
+   "real": {
+    "speech": 3,
+    "sound": 2
+   },
+   "transcript": "Laura, your phone is ringing in the hall.",
+   "headlines": [
+    [
+     "speech",
+     "Your name was called: Laura, your phone is ringing in the hall.",
+     "CRITICAL"
+    ],
+    [
+     "sound",
+     "Knock",
+     "IMPORTANT"
+    ]
+   ],
+   "headline_events": [
+    "speech",
+    "sound"
+   ],
+   "duplicate_slots": 0,
+   "unwarranted_slots": 0,
+   "unwarranted_transcript_slots": 0,
+   "all_slots_one_event": false,
+   "correct_first": true,
+   "first_wrong_reason": null,
+   "missed": [],
+   "missed_with_urgent_detection": [],
+   "personal_matches": 0,
+   "before_merge": [
+    [
+     "speech",
+     "Laura, your phone is ringing in the hall.",
+     2
+    ],
+    [
+     "sound",
+     "Knock",
+     2
+    ],
+    [
+     "sound",
+     "Speech",
+     1
+    ],
+    [
+     "speech",
+     "Your name was called",
+     3
+    ]
+   ],
+   "after_merge": [
+    [
+     "sound",
+     "Knock",
+     2
+    ],
+    [
+     "sound",
+     "Speech",
+     1
+    ],
+    [
+     "speech",
+     "Your name was called: Laura, your phone is ringing in the hall.",
+     3
+    ]
+   ],
+   "excess_before": 2,
+   "excess_after": 1,
+   "identical_label_repeats": 0,
+   "warnings": [],
+   "latency_ms": 1124
+  },
+  {
+   "repeat": 0,
+   "scene": 34,
+   "kind": "speech and sound",
+   "speech": "Laura, your phone is ringing in the hall.",
+   "sound": "keyboard_typing 1-84393-A-32.wav",
+   "real": {
+    "speech": 3,
+    "sound": 0
+   },
+   "transcript": "Laura, your phone is ringing in the hall.",
+   "headlines": [
+    [
+     "speech",
+     "Your name was called: Laura, your phone is ringing in the hall.",
+     "CRITICAL"
+    ],
+    [
+     "sound",
+     "Knock",
+     "IMPORTANT"
+    ]
+   ],
+   "headline_events": [
+    "speech",
+    "sound"
+   ],
+   "duplicate_slots": 0,
+   "unwarranted_slots": 1,
+   "unwarranted_transcript_slots": 0,
+   "all_slots_one_event": false,
+   "correct_first": true,
+   "first_wrong_reason": null,
+   "missed": [],
+   "missed_with_urgent_detection": [],
+   "personal_matches": 0,
+   "before_merge": [
+    [
+     "speech",
+     "Laura, your phone is ringing in the hall.",
+     2
+    ],
+    [
+     "sound",
+     "Speech",
+     1
+    ],
+    [
+     "sound",
+     "Knock",
+     2
+    ],
+    [
+     "speech",
+     "Your name was called",
+     3
+    ]
+   ],
+   "after_merge": [
+    [
+     "sound",
+     "Speech",
+     1
+    ],
+    [
+     "sound",
+     "Knock",
+     2
+    ],
+    [
+     "speech",
+     "Your name was called: Laura, your phone is ringing in the hall.",
+     3
+    ]
+   ],
+   "excess_before": 2,
+   "excess_after": 1,
+   "identical_label_repeats": 0,
+   "warnings": [],
+   "latency_ms": 1084
+  },
+  {
+   "repeat": 1,
+   "scene": 0,
+   "kind": "sound only",
+   "speech": null,
+   "sound": "siren 1-76831-D-42.wav",
+   "real": {
+    "sound": 3
+   },
+   "transcript": "Oh yeah.",
+   "headlines": [
+    [
+     "sound",
+     "Police car (siren)",
+     "CRITICAL"
+    ]
+   ],
+   "headline_events": [
+    "sound"
+   ],
+   "duplicate_slots": 0,
+   "unwarranted_slots": 0,
+   "unwarranted_transcript_slots": 0,
+   "all_slots_one_event": false,
+   "correct_first": true,
+   "first_wrong_reason": null,
+   "missed": [],
+   "missed_with_urgent_detection": [],
+   "personal_matches": 0,
+   "before_merge": [
+    [
+     "sound",
+     "Emergency vehicle",
+     1
+    ],
+    [
+     "sound",
+     "Police car (siren)",
+     3
+    ],
+    [
+     "sound",
+     "Siren",
+     3
+    ]
+   ],
+   "after_merge": [
+    [
+     "sound",
+     "Police car (siren)",
+     3
+    ]
+   ],
+   "excess_before": 2,
+   "excess_after": 0,
+   "identical_label_repeats": 0,
+   "warnings": [],
+   "latency_ms": 2330
+  },
+  {
+   "repeat": 1,
+   "scene": 1,
+   "kind": "sound only",
+   "speech": null,
+   "sound": "siren 1-76831-E-42.wav",
+   "real": {
+    "sound": 3
+   },
+   "transcript": "",
+   "headlines": [
+    [
+     "sound",
+     "Siren",
+     "CRITICAL"
+    ]
+   ],
+   "headline_events": [
+    "sound"
+   ],
+   "duplicate_slots": 0,
+   "unwarranted_slots": 0,
+   "unwarranted_transcript_slots": 0,
+   "all_slots_one_event": false,
+   "correct_first": true,
+   "first_wrong_reason": null,
+   "missed": [],
+   "missed_with_urgent_detection": [],
+   "personal_matches": 0,
+   "before_merge": [
+    [
+     "sound",
+     "Siren",
+     3
+    ],
+    [
+     "sound",
+     "Police car (siren)",
+     3
+    ],
+    [
+     "sound",
+     "Emergency vehicle",
+     1
+    ]
+   ],
+   "after_merge": [
+    [
+     "sound",
+     "Siren",
+     3
+    ]
+   ],
+   "excess_before": 2,
+   "excess_after": 0,
+   "identical_label_repeats": 0,
+   "warnings": [],
+   "latency_ms": 1924
+  },
+  {
+   "repeat": 1,
+   "scene": 2,
+   "kind": "sound only",
+   "speech": null,
+   "sound": "siren 2-43802-A-42.wav",
+   "real": {
+    "sound": 3
+   },
+   "transcript": "Oh",
+   "headlines": [
+    [
+     "sound",
+     "Civil defense siren",
+     "CRITICAL"
+    ]
+   ],
+   "headline_events": [
+    "sound"
+   ],
+   "duplicate_slots": 0,
+   "unwarranted_slots": 0,
+   "unwarranted_transcript_slots": 0,
+   "all_slots_one_event": false,
+   "correct_first": true,
+   "first_wrong_reason": null,
+   "missed": [],
+   "missed_with_urgent_detection": [],
+   "personal_matches": 0,
+   "before_merge": [
+    [
+     "sound",
+     "Civil defense siren",
+     3
+    ],
+    [
+     "sound",
+     "Siren",
+     3
+    ]
+   ],
+   "after_merge": [
+    [
+     "sound",
+     "Civil defense siren",
+     3
+    ]
+   ],
+   "excess_before": 1,
+   "excess_after": 0,
+   "identical_label_repeats": 0,
+   "warnings": [],
+   "latency_ms": 1113
+  },
+  {
+   "repeat": 1,
+   "scene": 3,
+   "kind": "sound only",
+   "speech": null,
+   "sound": "crying_baby 1-60997-A-20.wav",
+   "real": {
+    "sound": 3
+   },
+   "transcript": "Oh!",
+   "headlines": [
+    [
+     "sound",
+     "Baby cry, infant cry",
+     "CRITICAL"
+    ]
+   ],
+   "headline_events": [
+    "sound"
+   ],
+   "duplicate_slots": 0,
+   "unwarranted_slots": 0,
+   "unwarranted_transcript_slots": 0,
+   "all_slots_one_event": false,
+   "correct_first": true,
+   "first_wrong_reason": null,
+   "missed": [],
+   "missed_with_urgent_detection": [],
+   "personal_matches": 0,
+   "before_merge": [
+    [
+     "sound",
+     "Baby cry, infant cry",
+     3
+    ],
+    [
+     "sound",
+     "Whimper",
+     0
+    ]
+   ],
+   "after_merge": [
+    [
+     "sound",
+     "Baby cry, infant cry",
+     3
+    ],
+    [
+     "sound",
+     "Whimper",
+     0
+    ]
+   ],
+   "excess_before": 1,
+   "excess_after": 1,
+   "identical_label_repeats": 0,
+   "warnings": [],
+   "latency_ms": 1137
+  },
+  {
+   "repeat": 1,
+   "scene": 4,
+   "kind": "sound only",
+   "speech": null,
+   "sound": "crying_baby 1-60997-B-20.wav",
+   "real": {
+    "sound": 3
+   },
+   "transcript": "I don't know.",
+   "headlines": [
+    [
+     "sound",
+     "Baby cry, infant cry",
+     "CRITICAL"
+    ]
+   ],
+   "headline_events": [
+    "sound"
+   ],
+   "duplicate_slots": 0,
+   "unwarranted_slots": 0,
+   "unwarranted_transcript_slots": 0,
+   "all_slots_one_event": false,
+   "correct_first": true,
+   "first_wrong_reason": null,
+   "missed": [],
+   "missed_with_urgent_detection": [],
+   "personal_matches": 0,
+   "before_merge": [
+    [
+     "sound",
+     "Baby cry, infant cry",
+     3
+    ],
+    [
+     "sound",
+     "Crying, sobbing",
+     0
+    ]
+   ],
+   "after_merge": [
+    [
+     "sound",
+     "Baby cry, infant cry",
+     3
+    ]
+   ],
+   "excess_before": 1,
+   "excess_after": 0,
+   "identical_label_repeats": 0,
+   "warnings": [],
+   "latency_ms": 1273
+  },
+  {
+   "repeat": 1,
+   "scene": 5,
+   "kind": "sound only",
+   "speech": null,
+   "sound": "crying_baby 2-107351-A-20.wav",
+   "real": {
+    "sound": 3
+   },
+   "transcript": "Oh yeah!",
+   "headlines": [
+    [
+     "sound",
+     "Baby cry, infant cry",
+     "CRITICAL"
+    ]
+   ],
+   "headline_events": [
+    "sound"
+   ],
+   "duplicate_slots": 0,
+   "unwarranted_slots": 0,
+   "unwarranted_transcript_slots": 0,
+   "all_slots_one_event": false,
+   "correct_first": true,
+   "first_wrong_reason": null,
+   "missed": [],
+   "missed_with_urgent_detection": [],
+   "personal_matches": 0,
+   "before_merge": [
+    [
+     "sound",
+     "Baby cry, infant cry",
+     3
+    ],
+    [
+     "sound",
+     "Crying, sobbing",
+     0
+    ]
+   ],
+   "after_merge": [
+    [
+     "sound",
+     "Baby cry, infant cry",
+     3
+    ]
+   ],
+   "excess_before": 1,
+   "excess_after": 0,
+   "identical_label_repeats": 0,
+   "warnings": [],
+   "latency_ms": 1449
+  },
+  {
+   "repeat": 1,
+   "scene": 6,
+   "kind": "sound only",
+   "speech": null,
+   "sound": "glass_breaking 1-88807-A-39.wav",
+   "real": {
+    "sound": 3
+   },
+   "transcript": "",
+   "headlines": [
+    [
+     "sound",
+     "Glass",
+     "CRITICAL"
+    ]
+   ],
+   "headline_events": [
+    "sound"
+   ],
+   "duplicate_slots": 0,
+   "unwarranted_slots": 0,
+   "unwarranted_transcript_slots": 0,
+   "all_slots_one_event": false,
+   "correct_first": true,
+   "first_wrong_reason": null,
+   "missed": [],
+   "missed_with_urgent_detection": [],
+   "personal_matches": 0,
+   "before_merge": [
+    [
+     "sound",
+     "Breaking",
+     0
+    ],
+    [
+     "sound",
+     "Glass",
+     3
+    ],
+    [
+     "sound",
+     "Chink, clink",
+     0
+    ]
+   ],
+   "after_merge": [
+    [
+     "sound",
+     "Breaking",
+     0
+    ],
+    [
+     "sound",
+     "Glass",
+     3
+    ]
+   ],
+   "excess_before": 2,
+   "excess_after": 1,
+   "identical_label_repeats": 0,
+   "warnings": [],
+   "latency_ms": 1122
+  },
+  {
+   "repeat": 1,
+   "scene": 7,
+   "kind": "sound only",
+   "speech": null,
+   "sound": "glass_breaking 1-977-A-39.wav",
+   "real": {
+    "sound": 3
+   },
+   "transcript": "",
+   "headlines": [],
+   "headline_events": [],
+   "duplicate_slots": 0,
+   "unwarranted_slots": 0,
+   "unwarranted_transcript_slots": 0,
+   "all_slots_one_event": false,
+   "correct_first": false,
+   "first_wrong_reason": "not headlined",
+   "missed": [
+    "sound"
+   ],
+   "missed_with_urgent_detection": [],
+   "personal_matches": 0,
+   "before_merge": [
+    [
+     "sound",
+     "Chink, clink",
+     0
+    ],
+    [
+     "sound",
+     "Breaking",
+     0
+    ]
+   ],
+   "after_merge": [
+    [
+     "sound",
+     "Chink, clink",
+     0
+    ],
+    [
+     "sound",
+     "Breaking",
+     0
+    ]
+   ],
+   "excess_before": 1,
+   "excess_after": 1,
+   "identical_label_repeats": 0,
+   "warnings": [],
+   "latency_ms": 1307
+  },
+  {
+   "repeat": 1,
+   "scene": 8,
+   "kind": "sound only",
+   "speech": null,
+   "sound": "glass_breaking 2-106881-A-39.wav",
+   "real": {
+    "sound": 3
+   },
+   "transcript": "",
+   "headlines": [],
+   "headline_events": [],
+   "duplicate_slots": 0,
+   "unwarranted_slots": 0,
+   "unwarranted_transcript_slots": 0,
+   "all_slots_one_event": false,
+   "correct_first": false,
+   "first_wrong_reason": "not headlined",
+   "missed": [
+    "sound"
+   ],
+   "missed_with_urgent_detection": [],
+   "personal_matches": 0,
+   "before_merge": [
+    [
+     "sound",
+     "Crack",
+     0
+    ],
+    [
+     "sound",
+     "Breaking",
+     0
+    ]
+   ],
+   "after_merge": [
+    [
+     "sound",
+     "Crack",
+     0
+    ],
+    [
+     "sound",
+     "Breaking",
+     0
+    ]
+   ],
+   "excess_before": 1,
+   "excess_after": 1,
+   "identical_label_repeats": 0,
+   "warnings": [],
+   "latency_ms": 1350
+  },
+  {
+   "repeat": 1,
+   "scene": 9,
+   "kind": "sound only",
+   "speech": null,
+   "sound": "door_wood_knock 1-81001-B-30.wav",
+   "real": {
+    "sound": 2
+   },
+   "transcript": "So, I don't know.",
+   "headlines": [
+    [
+     "sound",
+     "Knock",
+     "IMPORTANT"
+    ]
+   ],
+   "headline_events": [
+    "sound"
+   ],
+   "duplicate_slots": 0,
+   "unwarranted_slots": 0,
+   "unwarranted_transcript_slots": 0,
+   "all_slots_one_event": false,
+   "correct_first": true,
+   "first_wrong_reason": null,
+   "missed": [],
+   "missed_with_urgent_detection": [],
+   "personal_matches": 0,
+   "before_merge": [
+    [
+     "sound",
+     "Knock",
+     2
+    ]
+   ],
+   "after_merge": [
+    [
+     "sound",
+     "Knock",
+     2
+    ]
+   ],
+   "excess_before": 0,
+   "excess_after": 0,
+   "identical_label_repeats": 0,
+   "warnings": [],
+   "latency_ms": 2013
+  },
+  {
+   "repeat": 1,
+   "scene": 10,
+   "kind": "sound only",
+   "speech": null,
+   "sound": "door_wood_knock 1-82817-A-30.wav",
+   "real": {
+    "sound": 2
+   },
+   "transcript": "No.",
+   "headlines": [
+    [
+     "sound",
+     "Knock",
+     "IMPORTANT"
+    ]
+   ],
+   "headline_events": [
+    "sound"
+   ],
+   "duplicate_slots": 0,
+   "unwarranted_slots": 0,
+   "unwarranted_transcript_slots": 0,
+   "all_slots_one_event": false,
+   "correct_first": true,
+   "first_wrong_reason": null,
+   "missed": [],
+   "missed_with_urgent_detection": [],
+   "personal_matches": 0,
+   "before_merge": [
+    [
+     "sound",
+     "Knock",
+     2
+    ]
+   ],
+   "after_merge": [
+    [
+     "sound",
+     "Knock",
+     2
+    ]
+   ],
+   "excess_before": 0,
+   "excess_after": 0,
+   "identical_label_repeats": 0,
+   "warnings": [],
+   "latency_ms": 1859
+  },
+  {
+   "repeat": 1,
+   "scene": 11,
+   "kind": "sound only",
+   "speech": null,
+   "sound": "door_wood_knock 2-114254-A-30.wav",
+   "real": {
+    "sound": 2
+   },
+   "transcript": "Oh.",
+   "headlines": [
+    [
+     "sound",
+     "Knock",
+     "IMPORTANT"
+    ]
+   ],
+   "headline_events": [
+    "sound"
+   ],
+   "duplicate_slots": 0,
+   "unwarranted_slots": 0,
+   "unwarranted_transcript_slots": 0,
+   "all_slots_one_event": false,
+   "correct_first": true,
+   "first_wrong_reason": null,
+   "missed": [],
+   "missed_with_urgent_detection": [],
+   "personal_matches": 0,
+   "before_merge": [
+    [
+     "sound",
+     "Knock",
+     2
+    ]
+   ],
+   "after_merge": [
+    [
+     "sound",
+     "Knock",
+     2
+    ]
+   ],
+   "excess_before": 0,
+   "excess_after": 0,
+   "identical_label_repeats": 0,
+   "warnings": [],
+   "latency_ms": 1451
+  },
+  {
+   "repeat": 1,
+   "scene": 12,
+   "kind": "sound only",
+   "speech": null,
+   "sound": "dog 1-85362-A-0.wav",
+   "real": {
+    "sound": 2
+   },
+   "transcript": "What? What? What?",
+   "headlines": [],
+   "headline_events": [],
+   "duplicate_slots": 0,
+   "unwarranted_slots": 0,
+   "unwarranted_transcript_slots": 0,
+   "all_slots_one_event": false,
+   "correct_first": false,
+   "first_wrong_reason": "not headlined",
+   "missed": [
+    "sound"
+   ],
+   "missed_with_urgent_detection": [],
+   "personal_matches": 0,
+   "before_merge": [
+    [
+     "sound",
+     "Bow-wow",
+     0
+    ],
+    [
+     "sound",
+     "Animal",
+     0
+    ],
+    [
+     "sound",
+     "Domestic animals, pets",
+     0
+    ]
+   ],
+   "after_merge": [
+    [
+     "sound",
+     "Bow-wow",
+     0
+    ]
+   ],
+   "excess_before": 2,
+   "excess_after": 0,
+   "identical_label_repeats": 0,
+   "warnings": [],
+   "latency_ms": 1525
+  },
+  {
+   "repeat": 1,
+   "scene": 13,
+   "kind": "sound only",
+   "speech": null,
+   "sound": "dog 1-97392-A-0.wav",
+   "real": {
+    "sound": 2
+   },
+   "transcript": "you Thank you.",
+   "headlines": [
+    [
+     "sound",
+     "Dog",
+     "IMPORTANT"
+    ]
+   ],
+   "headline_events": [
+    "sound"
+   ],
+   "duplicate_slots": 0,
+   "unwarranted_slots": 0,
+   "unwarranted_transcript_slots": 0,
+   "all_slots_one_event": false,
+   "correct_first": true,
+   "first_wrong_reason": null,
+   "missed": [],
+   "missed_with_urgent_detection": [],
+   "personal_matches": 0,
+   "before_merge": [
+    [
+     "sound",
+     "Dog",
+     2
+    ],
+    [
+     "sound",
+     "Bow-wow",
+     0
+    ],
+    [
+     "sound",
+     "Animal",
+     0
+    ]
+   ],
+   "after_merge": [
+    [
+     "sound",
+     "Dog",
+     2
+    ]
+   ],
+   "excess_before": 2,
+   "excess_after": 0,
+   "identical_label_repeats": 0,
+   "warnings": [],
+   "latency_ms": 2923
+  },
+  {
+   "repeat": 1,
+   "scene": 14,
+   "kind": "sound only",
+   "speech": null,
+   "sound": "dog 2-114280-A-0.wav",
+   "real": {
+    "sound": 2
+   },
+   "transcript": "Oh! Oh! Oh! Oh!",
+   "headlines": [
+    [
+     "sound",
+     "Dog",
+     "IMPORTANT"
+    ]
+   ],
+   "headline_events": [
+    "sound"
+   ],
+   "duplicate_slots": 0,
+   "unwarranted_slots": 0,
+   "unwarranted_transcript_slots": 0,
+   "all_slots_one_event": false,
+   "correct_first": true,
+   "first_wrong_reason": null,
+   "missed": [],
+   "missed_with_urgent_detection": [],
+   "personal_matches": 0,
+   "before_merge": [
+    [
+     "sound",
+     "Dog",
+     2
+    ],
+    [
+     "sound",
+     "Animal",
+     0
+    ],
+    [
+     "sound",
+     "Bow-wow",
+     0
+    ]
+   ],
+   "after_merge": [
+    [
+     "sound",
+     "Dog",
+     2
+    ]
+   ],
+   "excess_before": 2,
+   "excess_after": 0,
+   "identical_label_repeats": 0,
+   "warnings": [],
+   "latency_ms": 1251
+  },
+  {
+   "repeat": 1,
+   "scene": 15,
+   "kind": "sound only",
+   "speech": null,
+   "sound": "clock_alarm 1-74517-A-37.wav",
+   "real": {
+    "sound": 2
+   },
+   "transcript": "Beek. Beek.",
+   "headlines": [
+    [
+     "sound",
+     "Kitchen alarm (personal)",
+     "CRITICAL"
+    ]
+   ],
+   "headline_events": [
+    "sound"
+   ],
+   "duplicate_slots": 0,
+   "unwarranted_slots": 0,
+   "unwarranted_transcript_slots": 0,
+   "all_slots_one_event": false,
+   "correct_first": true,
+   "first_wrong_reason": null,
+   "missed": [],
+   "missed_with_urgent_detection": [],
+   "personal_matches": 1,
+   "before_merge": [
+    [
+     "sound",
+     "Kitchen alarm (personal)",
+     2
+    ],
+    [
+     "sound",
+     "Alarm clock",
+     3
+    ]
+   ],
+   "after_merge": [
+    [
+     "sound",
+     "Kitchen alarm (personal)",
+     3
+    ]
+   ],
+   "excess_before": 1,
+   "excess_after": 0,
+   "identical_label_repeats": 0,
+   "warnings": [],
+   "latency_ms": 1175
+  },
+  {
+   "repeat": 1,
+   "scene": 16,
+   "kind": "sound only",
+   "speech": null,
+   "sound": "clock_alarm 1-96890-A-37.wav",
+   "real": {
+    "sound": 2
+   },
+   "transcript": "Beep, beep, beep, beep,",
+   "headlines": [
+    [
+     "sound",
+     "Kitchen alarm (personal)",
+     "CRITICAL"
+    ]
+   ],
+   "headline_events": [
+    "sound"
+   ],
+   "duplicate_slots": 0,
+   "unwarranted_slots": 0,
+   "unwarranted_transcript_slots": 0,
+   "all_slots_one_event": false,
+   "correct_first": true,
+   "first_wrong_reason": null,
+   "missed": [],
+   "missed_with_urgent_detection": [],
+   "personal_matches": 1,
+   "before_merge": [
+    [
+     "sound",
+     "Kitchen alarm (personal)",
+     2
+    ],
+    [
+     "sound",
+     "Alarm clock",
+     3
+    ],
+    [
+     "sound",
+     "Alarm",
+     3
+    ]
+   ],
+   "after_merge": [
+    [
+     "sound",
+     "Kitchen alarm (personal)",
+     3
+    ]
+   ],
+   "excess_before": 2,
+   "excess_after": 0,
+   "identical_label_repeats": 0,
+   "warnings": [],
+   "latency_ms": 1457
+  },
+  {
+   "repeat": 1,
+   "scene": 17,
+   "kind": "sound only",
+   "speech": null,
+   "sound": "clock_alarm 2-102435-A-37.wav",
+   "real": {
+    "sound": 2
+   },
+   "transcript": "",
+   "headlines": [],
+   "headline_events": [],
+   "duplicate_slots": 0,
+   "unwarranted_slots": 0,
+   "unwarranted_transcript_slots": 0,
+   "all_slots_one_event": false,
+   "correct_first": false,
+   "first_wrong_reason": "not headlined",
+   "missed": [
+    "sound"
+   ],
+   "missed_with_urgent_detection": [],
+   "personal_matches": 0,
+   "before_merge": [
+    [
+     "sound",
+     "Tools",
+     0
+    ]
+   ],
+   "after_merge": [
+    [
+     "sound",
+     "Tools",
+     0
+    ]
+   ],
+   "excess_before": 0,
+   "excess_after": 0,
+   "identical_label_repeats": 0,
+   "warnings": [],
+   "latency_ms": 2105
+  },
+  {
+   "repeat": 1,
+   "scene": 18,
+   "kind": "background only",
+   "speech": null,
+   "sound": "rain 1-56311-A-10.wav",
+   "real": {
+    "sound": 0
+   },
+   "transcript": "",
+   "headlines": [],
+   "headline_events": [],
+   "duplicate_slots": 0,
+   "unwarranted_slots": 0,
+   "unwarranted_transcript_slots": 0,
+   "all_slots_one_event": false,
+   "correct_first": null,
+   "first_wrong_reason": null,
+   "missed": [],
+   "missed_with_urgent_detection": [],
+   "personal_matches": 0,
+   "before_merge": [
+    [
+     "sound",
+     "Rain on surface",
+     0
+    ],
+    [
+     "sound",
+     "Rain",
+     0
+    ]
+   ],
+   "after_merge": [
+    [
+     "sound",
+     "Rain on surface",
+     0
+    ]
+   ],
+   "excess_before": 1,
+   "excess_after": 0,
+   "identical_label_repeats": 0,
+   "warnings": [],
+   "latency_ms": 1835
+  },
+  {
+   "repeat": 1,
+   "scene": 19,
+   "kind": "background only",
+   "speech": null,
+   "sound": "rain 1-63871-A-10.wav",
+   "real": {
+    "sound": 0
+   },
+   "transcript": "",
+   "headlines": [],
+   "headline_events": [],
+   "duplicate_slots": 0,
+   "unwarranted_slots": 0,
+   "unwarranted_transcript_slots": 0,
+   "all_slots_one_event": false,
+   "correct_first": null,
+   "first_wrong_reason": null,
+   "missed": [],
+   "missed_with_urgent_detection": [],
+   "personal_matches": 0,
+   "before_merge": [
+    [
+     "sound",
+     "Rain on surface",
+     0
+    ],
+    [
+     "sound",
+     "Rain",
+     0
+    ]
+   ],
+   "after_merge": [
+    [
+     "sound",
+     "Rain on surface",
+     0
+    ]
+   ],
+   "excess_before": 1,
+   "excess_after": 0,
+   "identical_label_repeats": 0,
+   "warnings": [],
+   "latency_ms": 2107
+  },
+  {
+   "repeat": 1,
+   "scene": 20,
+   "kind": "background only",
+   "speech": null,
+   "sound": "keyboard_typing 1-94231-A-32.wav",
+   "real": {
+    "sound": 0
+   },
+   "transcript": "",
+   "headlines": [],
+   "headline_events": [],
+   "duplicate_slots": 0,
+   "unwarranted_slots": 0,
+   "unwarranted_transcript_slots": 0,
+   "all_slots_one_event": false,
+   "correct_first": null,
+   "first_wrong_reason": null,
+   "missed": [],
+   "missed_with_urgent_detection": [],
+   "personal_matches": 0,
+   "before_merge": [
+    [
+     "sound",
+     "Computer keyboard",
+     0
+    ]
+   ],
+   "after_merge": [
+    [
+     "sound",
+     "Computer keyboard",
+     0
+    ]
+   ],
+   "excess_before": 0,
+   "excess_after": 0,
+   "identical_label_repeats": 0,
+   "warnings": [],
+   "latency_ms": 2016
+  },
+  {
+   "repeat": 1,
+   "scene": 21,
+   "kind": "background only",
+   "speech": null,
+   "sound": "keyboard_typing 1-94231-B-32.wav",
+   "real": {
+    "sound": 0
+   },
+   "transcript": "Okay.",
+   "headlines": [],
+   "headline_events": [],
+   "duplicate_slots": 0,
+   "unwarranted_slots": 0,
+   "unwarranted_transcript_slots": 0,
+   "all_slots_one_event": false,
+   "correct_first": null,
+   "first_wrong_reason": null,
+   "missed": [],
+   "missed_with_urgent_detection": [],
+   "personal_matches": 0,
+   "before_merge": [
+    [
+     "sound",
+     "Computer keyboard",
+     0
+    ],
+    [
+     "sound",
+     "Typing",
+     0
+    ]
+   ],
+   "after_merge": [
+    [
+     "sound",
+     "Computer keyboard",
+     0
+    ]
+   ],
+   "excess_before": 1,
+   "excess_after": 0,
+   "identical_label_repeats": 0,
+   "warnings": [],
+   "latency_ms": 1943
+  },
+  {
+   "repeat": 1,
+   "scene": 22,
+   "kind": "speech only",
+   "speech": "Your taxi will be here in about five minutes.",
+   "sound": null,
+   "real": {
+    "speech": 2
+   },
+   "transcript": "Your taxi will be here in about five minutes.",
+   "headlines": [
+    [
+     "speech",
+     "Your taxi will be here in about five minutes.",
+     "IMPORTANT"
+    ]
+   ],
+   "headline_events": [
+    "speech"
+   ],
+   "duplicate_slots": 0,
+   "unwarranted_slots": 0,
+   "unwarranted_transcript_slots": 0,
+   "all_slots_one_event": false,
+   "correct_first": true,
+   "first_wrong_reason": null,
+   "missed": [],
+   "missed_with_urgent_detection": [],
+   "personal_matches": 0,
+   "before_merge": [
+    [
+     "speech",
+     "Your taxi will be here in about five minutes.",
+     2
+    ],
+    [
+     "sound",
+     "Speech",
+     1
+    ]
+   ],
+   "after_merge": [
+    [
+     "sound",
+     "Speech",
+     1
+    ],
+    [
+     "speech",
+     "Your taxi will be here in about five minutes.",
+     2
+    ]
+   ],
+   "excess_before": 1,
+   "excess_after": 1,
+   "identical_label_repeats": 0,
+   "warnings": [],
+   "latency_ms": 1088
+  },
+  {
+   "repeat": 1,
+   "scene": 23,
+   "kind": "speech only",
+   "speech": "Can you pass me the remote control?",
+   "sound": null,
+   "real": {
+    "speech": 2
+   },
+   "transcript": "Can you pass me the remote control?",
+   "headlines": [
+    [
+     "speech",
+     "Can you pass me the remote control?",
+     "IMPORTANT"
+    ]
+   ],
+   "headline_events": [
+    "speech"
+   ],
+   "duplicate_slots": 0,
+   "unwarranted_slots": 0,
+   "unwarranted_transcript_slots": 0,
+   "all_slots_one_event": false,
+   "correct_first": true,
+   "first_wrong_reason": null,
+   "missed": [],
+   "missed_with_urgent_detection": [],
+   "personal_matches": 0,
+   "before_merge": [
+    [
+     "speech",
+     "Can you pass me the remote control?",
+     2
+    ],
+    [
+     "sound",
+     "Speech",
+     1
+    ]
+   ],
+   "after_merge": [
+    [
+     "sound",
+     "Speech",
+     1
+    ],
+    [
+     "speech",
+     "Can you pass me the remote control?",
+     2
+    ]
+   ],
+   "excess_before": 1,
+   "excess_after": 1,
+   "identical_label_repeats": 0,
+   "warnings": [],
+   "latency_ms": 1084
+  },
+  {
+   "repeat": 1,
+   "scene": 24,
+   "kind": "speech only",
+   "speech": "Stop, the pan on the stove is on fire!",
+   "sound": null,
+   "real": {
+    "speech": 3
+   },
+   "transcript": "Stop. The pan on the stove is on fire.",
+   "headlines": [
+    [
+     "speech",
+     "Keyword: \"fire\": Stop. The pan on the stove is on fire.",
+     "CRITICAL"
+    ]
+   ],
+   "headline_events": [
+    "speech"
+   ],
+   "duplicate_slots": 0,
+   "unwarranted_slots": 0,
+   "unwarranted_transcript_slots": 0,
+   "all_slots_one_event": false,
+   "correct_first": true,
+   "first_wrong_reason": null,
+   "missed": [],
+   "missed_with_urgent_detection": [],
+   "personal_matches": 0,
+   "before_merge": [
+    [
+     "speech",
+     "Stop. The pan on the stove is on fire.",
+     3
+    ],
+    [
+     "sound",
+     "Speech",
+     1
+    ],
+    [
+     "speech",
+     "Keyword: \"fire\"",
+     3
+    ],
+    [
+     "speech",
+     "Keyword: \"stop\"",
+     3
+    ]
+   ],
+   "after_merge": [
+    [
+     "sound",
+     "Speech",
+     1
+    ],
+    [
+     "speech",
+     "Keyword: \"fire\": Stop. The pan on the stove is on fire.",
+     3
+    ]
+   ],
+   "excess_before": 3,
+   "excess_after": 1,
+   "identical_label_repeats": 0,
+   "warnings": [],
+   "latency_ms": 1329
+  },
+  {
+   "repeat": 1,
+   "scene": 25,
+   "kind": "speech only",
+   "speech": "Laura, your phone is ringing in the hall.",
+   "sound": null,
+   "real": {
+    "speech": 3
+   },
+   "transcript": "Laura, your phone is ringing in the hall.",
+   "headlines": [
+    [
+     "speech",
+     "Your name was called: Laura, your phone is ringing in the hall.",
+     "CRITICAL"
+    ]
+   ],
+   "headline_events": [
+    "speech"
+   ],
+   "duplicate_slots": 0,
+   "unwarranted_slots": 0,
+   "unwarranted_transcript_slots": 0,
+   "all_slots_one_event": false,
+   "correct_first": true,
+   "first_wrong_reason": null,
+   "missed": [],
+   "missed_with_urgent_detection": [],
+   "personal_matches": 0,
+   "before_merge": [
+    [
+     "speech",
+     "Laura, your phone is ringing in the hall.",
+     2
+    ],
+    [
+     "sound",
+     "Speech",
+     1
+    ],
+    [
+     "sound",
+     "Male speech, man speaking",
+     1
+    ],
+    [
+     "speech",
+     "Your name was called",
+     3
+    ]
+   ],
+   "after_merge": [
+    [
+     "sound",
+     "Speech",
+     1
+    ],
+    [
+     "speech",
+     "Your name was called: Laura, your phone is ringing in the hall.",
+     3
+    ]
+   ],
+   "excess_before": 3,
+   "excess_after": 1,
+   "identical_label_repeats": 0,
+   "warnings": [],
+   "latency_ms": 1269
+  },
+  {
+   "repeat": 1,
+   "scene": 26,
+   "kind": "speech and sound",
+   "speech": "Your taxi will be here in about five minutes.",
+   "sound": "siren 2-43806-A-42.wav",
+   "real": {
+    "speech": 2,
+    "sound": 3
+   },
+   "transcript": "Your taxi will be here in about five minutes.",
+   "headlines": [
+    [
+     "sound",
+     "Police car (siren)",
+     "CRITICAL"
+    ],
+    [
+     "speech",
+     "Your taxi will be here in about five minutes.",
+     "IMPORTANT"
+    ]
+   ],
+   "headline_events": [
+    "sound",
+    "speech"
+   ],
+   "duplicate_slots": 0,
+   "unwarranted_slots": 0,
+   "unwarranted_transcript_slots": 0,
+   "all_slots_one_event": false,
+   "correct_first": true,
+   "first_wrong_reason": null,
+   "missed": [],
+   "missed_with_urgent_detection": [],
+   "personal_matches": 0,
+   "before_merge": [
+    [
+     "speech",
+     "Your taxi will be here in about five minutes.",
+     2
+    ],
+    [
+     "sound",
+     "Speech",
+     1
+    ],
+    [
+     "sound",
+     "Emergency vehicle",
+     1
+    ],
+    [
+     "sound",
+     "Police car (siren)",
+     3
+    ]
+   ],
+   "after_merge": [
+    [
+     "sound",
+     "Speech",
+     1
+    ],
+    [
+     "sound",
+     "Police car (siren)",
+     3
+    ],
+    [
+     "speech",
+     "Your taxi will be here in about five minutes.",
+     2
+    ]
+   ],
+   "excess_before": 2,
+   "excess_after": 1,
+   "identical_label_repeats": 0,
+   "warnings": [],
+   "latency_ms": 1123
+  },
+  {
+   "repeat": 1,
+   "scene": 27,
+   "kind": "speech and sound",
+   "speech": "Your taxi will be here in about five minutes.",
+   "sound": "crying_baby 2-107351-B-20.wav",
+   "real": {
+    "speech": 2,
+    "sound": 3
+   },
+   "transcript": "Your taxi will be here in about five minutes.",
+   "headlines": [
+    [
+     "sound",
+     "Baby cry, infant cry",
+     "CRITICAL"
+    ],
+    [
+     "speech",
+     "Your taxi will be here in about five minutes.",
+     "IMPORTANT"
+    ]
+   ],
+   "headline_events": [
+    "sound",
+    "speech"
+   ],
+   "duplicate_slots": 0,
+   "unwarranted_slots": 0,
+   "unwarranted_transcript_slots": 0,
+   "all_slots_one_event": false,
+   "correct_first": true,
+   "first_wrong_reason": null,
+   "missed": [],
+   "missed_with_urgent_detection": [],
+   "personal_matches": 0,
+   "before_merge": [
+    [
+     "speech",
+     "Your taxi will be here in about five minutes.",
+     2
+    ],
+    [
+     "sound",
+     "Speech",
+     1
+    ],
+    [
+     "sound",
+     "Baby cry, infant cry",
+     3
+    ]
+   ],
+   "after_merge": [
+    [
+     "sound",
+     "Speech",
+     1
+    ],
+    [
+     "sound",
+     "Baby cry, infant cry",
+     3
+    ],
+    [
+     "speech",
+     "Your taxi will be here in about five minutes.",
+     2
+    ]
+   ],
+   "excess_before": 1,
+   "excess_after": 1,
+   "identical_label_repeats": 0,
+   "warnings": [],
+   "latency_ms": 1125
+  },
+  {
+   "repeat": 1,
+   "scene": 28,
+   "kind": "speech and sound",
+   "speech": "Can you pass me the remote control?",
+   "sound": "glass_breaking 2-112213-A-39.wav",
+   "real": {
+    "speech": 2,
+    "sound": 3
+   },
+   "transcript": "You have to be the remote control.",
+   "headlines": [
+    [
+     "speech",
+     "You have to be the remote control.",
+     "IMPORTANT"
+    ]
+   ],
+   "headline_events": [
+    "speech"
+   ],
+   "duplicate_slots": 0,
+   "unwarranted_slots": 0,
+   "unwarranted_transcript_slots": 0,
+   "all_slots_one_event": false,
+   "correct_first": false,
+   "first_wrong_reason": "not headlined",
+   "missed": [
+    "sound"
+   ],
+   "missed_with_urgent_detection": [],
+   "personal_matches": 0,
+   "before_merge": [
+    [
+     "speech",
+     "You have to be the remote control.",
+     2
+    ],
+    [
+     "sound",
+     "Speech",
+     1
+    ],
+    [
+     "sound",
+     "Breaking",
+     0
+    ]
+   ],
+   "after_merge": [
+    [
+     "sound",
+     "Speech",
+     1
+    ],
+    [
+     "sound",
+     "Breaking",
+     0
+    ],
+    [
+     "speech",
+     "You have to be the remote control.",
+     2
+    ]
+   ],
+   "excess_before": 1,
+   "excess_after": 1,
+   "identical_label_repeats": 0,
+   "warnings": [],
+   "latency_ms": 1145
+  },
+  {
+   "repeat": 1,
+   "scene": 29,
+   "kind": "speech and sound",
+   "speech": "Can you pass me the remote control?",
+   "sound": "rain 1-50060-A-10.wav",
+   "real": {
+    "speech": 2,
+    "sound": 0
+   },
+   "transcript": "Can you have me, the remote control?",
+   "headlines": [
+    [
+     "speech",
+     "Can you have me, the remote control?",
+     "IMPORTANT"
+    ]
+   ],
+   "headline_events": [
+    "speech"
+   ],
+   "duplicate_slots": 0,
+   "unwarranted_slots": 0,
+   "unwarranted_transcript_slots": 0,
+   "all_slots_one_event": false,
+   "correct_first": true,
+   "first_wrong_reason": null,
+   "missed": [],
+   "missed_with_urgent_detection": [],
+   "personal_matches": 0,
+   "before_merge": [
+    [
+     "speech",
+     "Can you have me, the remote control?",
+     2
+    ],
+    [
+     "sound",
+     "Speech",
+     1
+    ],
+    [
+     "sound",
+     "Rain on surface",
+     0
+    ],
+    [
+     "sound",
+     "Rain",
+     0
+    ]
+   ],
+   "after_merge": [
+    [
+     "sound",
+     "Speech",
+     1
+    ],
+    [
+     "sound",
+     "Rain on surface",
+     0
+    ],
+    [
+     "speech",
+     "Can you have me, the remote control?",
+     2
+    ]
+   ],
+   "excess_before": 2,
+   "excess_after": 1,
+   "identical_label_repeats": 0,
+   "warnings": [],
+   "latency_ms": 1064
+  },
+  {
+   "repeat": 1,
+   "scene": 30,
+   "kind": "speech and sound",
+   "speech": "Your taxi will be here in about five minutes.",
+   "sound": "keyboard_typing 1-79711-A-32.wav",
+   "real": {
+    "speech": 2,
+    "sound": 0
+   },
+   "transcript": "Your taxi will be here in about five minutes.",
+   "headlines": [
+    [
+     "speech",
+     "Your taxi will be here in about five minutes.",
+     "IMPORTANT"
+    ]
+   ],
+   "headline_events": [
+    "speech"
+   ],
+   "duplicate_slots": 0,
+   "unwarranted_slots": 0,
+   "unwarranted_transcript_slots": 0,
+   "all_slots_one_event": false,
+   "correct_first": true,
+   "first_wrong_reason": null,
+   "missed": [],
+   "missed_with_urgent_detection": [],
+   "personal_matches": 0,
+   "before_merge": [
+    [
+     "speech",
+     "Your taxi will be here in about five minutes.",
+     2
+    ],
+    [
+     "sound",
+     "Computer keyboard",
+     0
+    ],
+    [
+     "sound",
+     "Typing",
+     0
+    ],
+    [
+     "sound",
+     "Speech",
+     1
+    ]
+   ],
+   "after_merge": [
+    [
+     "sound",
+     "Computer keyboard",
+     0
+    ],
+    [
+     "sound",
+     "Speech",
+     1
+    ],
+    [
+     "speech",
+     "Your taxi will be here in about five minutes.",
+     2
+    ]
+   ],
+   "excess_before": 2,
+   "excess_after": 1,
+   "identical_label_repeats": 0,
+   "warnings": [],
+   "latency_ms": 1067
+  },
+  {
+   "repeat": 1,
+   "scene": 31,
+   "kind": "speech and sound",
+   "speech": "Stop, the pan on the stove is on fire!",
+   "sound": "dog 2-114587-A-0.wav",
+   "real": {
+    "speech": 3,
+    "sound": 2
+   },
+   "transcript": "Stop, the pan on the stove is on fire.",
+   "headlines": [
+    [
+     "speech",
+     "Keyword: \"fire\": Stop, the pan on the stove is on fire.",
+     "CRITICAL"
+    ]
+   ],
+   "headline_events": [
+    "speech"
+   ],
+   "duplicate_slots": 0,
+   "unwarranted_slots": 0,
+   "unwarranted_transcript_slots": 0,
+   "all_slots_one_event": false,
+   "correct_first": true,
+   "first_wrong_reason": null,
+   "missed": [
+    "sound"
+   ],
+   "missed_with_urgent_detection": [],
+   "personal_matches": 0,
+   "before_merge": [
+    [
+     "speech",
+     "Stop, the pan on the stove is on fire.",
+     3
+    ],
+    [
+     "sound",
+     "Speech",
+     1
+    ],
+    [
+     "sound",
+     "Domestic animals, pets",
+     0
+    ],
+    [
+     "sound",
+     "Animal",
+     0
+    ],
+    [
+     "speech",
+     "Keyword: \"fire\"",
+     3
+    ],
+    [
+     "speech",
+     "Keyword: \"stop\"",
+     3
+    ]
+   ],
+   "after_merge": [
+    [
+     "sound",
+     "Speech",
+     1
+    ],
+    [
+     "sound",
+     "Domestic animals, pets",
+     0
+    ],
+    [
+     "speech",
+     "Keyword: \"fire\": Stop, the pan on the stove is on fire.",
+     3
+    ]
+   ],
+   "excess_before": 4,
+   "excess_after": 1,
+   "identical_label_repeats": 0,
+   "warnings": [],
+   "latency_ms": 1081
+  },
+  {
+   "repeat": 1,
+   "scene": 32,
+   "kind": "speech and sound",
+   "speech": "Stop, the pan on the stove is on fire!",
+   "sound": "rain 1-54958-A-10.wav",
+   "real": {
+    "speech": 3,
+    "sound": 0
+   },
+   "transcript": "Stop the pan on the stove as on site.",
+   "headlines": [
+    [
+     "speech",
+     "Keyword: \"stop\": Stop the pan on the stove as on site.",
+     "CRITICAL"
+    ]
+   ],
+   "headline_events": [
+    "speech"
+   ],
+   "duplicate_slots": 0,
+   "unwarranted_slots": 0,
+   "unwarranted_transcript_slots": 0,
+   "all_slots_one_event": false,
+   "correct_first": true,
+   "first_wrong_reason": null,
+   "missed": [],
+   "missed_with_urgent_detection": [],
+   "personal_matches": 0,
+   "before_merge": [
+    [
+     "speech",
+     "Stop the pan on the stove as on site.",
+     3
+    ],
+    [
+     "sound",
+     "Speech",
+     1
+    ],
+    [
+     "speech",
+     "Keyword: \"stop\"",
+     3
+    ]
+   ],
+   "after_merge": [
+    [
+     "sound",
+     "Speech",
+     1
+    ],
+    [
+     "speech",
+     "Keyword: \"stop\": Stop the pan on the stove as on site.",
+     3
+    ]
+   ],
+   "excess_before": 2,
+   "excess_after": 1,
+   "identical_label_repeats": 0,
+   "warnings": [],
+   "latency_ms": 1260
+  },
+  {
+   "repeat": 1,
+   "scene": 33,
+   "kind": "speech and sound",
+   "speech": "Laura, your phone is ringing in the hall.",
+   "sound": "door_wood_knock 2-118624-A-30.wav",
+   "real": {
+    "speech": 3,
+    "sound": 2
+   },
+   "transcript": "Laura, your phone is ringing in the hall.",
+   "headlines": [
+    [
+     "speech",
+     "Your name was called: Laura, your phone is ringing in the hall.",
+     "CRITICAL"
+    ],
+    [
+     "sound",
+     "Knock",
+     "IMPORTANT"
+    ]
+   ],
+   "headline_events": [
+    "speech",
+    "sound"
+   ],
+   "duplicate_slots": 0,
+   "unwarranted_slots": 0,
+   "unwarranted_transcript_slots": 0,
+   "all_slots_one_event": false,
+   "correct_first": true,
+   "first_wrong_reason": null,
+   "missed": [],
+   "missed_with_urgent_detection": [],
+   "personal_matches": 0,
+   "before_merge": [
+    [
+     "speech",
+     "Laura, your phone is ringing in the hall.",
+     2
+    ],
+    [
+     "sound",
+     "Knock",
+     2
+    ],
+    [
+     "sound",
+     "Speech",
+     1
+    ],
+    [
+     "speech",
+     "Your name was called",
+     3
+    ]
+   ],
+   "after_merge": [
+    [
+     "sound",
+     "Knock",
+     2
+    ],
+    [
+     "sound",
+     "Speech",
+     1
+    ],
+    [
+     "speech",
+     "Your name was called: Laura, your phone is ringing in the hall.",
+     3
+    ]
+   ],
+   "excess_before": 2,
+   "excess_after": 1,
+   "identical_label_repeats": 0,
+   "warnings": [],
+   "latency_ms": 1108
+  },
+  {
+   "repeat": 1,
+   "scene": 34,
+   "kind": "speech and sound",
+   "speech": "Laura, your phone is ringing in the hall.",
+   "sound": "keyboard_typing 1-84393-A-32.wav",
+   "real": {
+    "speech": 3,
+    "sound": 0
+   },
+   "transcript": "Laura, your phone is ringing in the hall.",
+   "headlines": [
+    [
+     "speech",
+     "Your name was called: Laura, your phone is ringing in the hall.",
+     "CRITICAL"
+    ],
+    [
+     "sound",
+     "Knock",
+     "IMPORTANT"
+    ]
+   ],
+   "headline_events": [
+    "speech",
+    "sound"
+   ],
+   "duplicate_slots": 0,
+   "unwarranted_slots": 1,
+   "unwarranted_transcript_slots": 0,
+   "all_slots_one_event": false,
+   "correct_first": true,
+   "first_wrong_reason": null,
+   "missed": [],
+   "missed_with_urgent_detection": [],
+   "personal_matches": 0,
+   "before_merge": [
+    [
+     "speech",
+     "Laura, your phone is ringing in the hall.",
+     2
+    ],
+    [
+     "sound",
+     "Speech",
+     1
+    ],
+    [
+     "sound",
+     "Knock",
+     2
+    ],
+    [
+     "speech",
+     "Your name was called",
+     3
+    ]
+   ],
+   "after_merge": [
+    [
+     "sound",
+     "Speech",
+     1
+    ],
+    [
+     "sound",
+     "Knock",
+     2
+    ],
+    [
+     "speech",
+     "Your name was called: Laura, your phone is ringing in the hall.",
+     3
+    ]
+   ],
+   "excess_before": 2,
+   "excess_after": 1,
+   "identical_label_repeats": 0,
+   "warnings": [],
+   "latency_ms": 1138
+  },
+  {
+   "repeat": 2,
+   "scene": 0,
+   "kind": "sound only",
+   "speech": null,
+   "sound": "siren 1-76831-D-42.wav",
+   "real": {
+    "sound": 3
+   },
+   "transcript": "Oh yeah.",
+   "headlines": [
+    [
+     "sound",
+     "Police car (siren)",
+     "CRITICAL"
+    ]
+   ],
+   "headline_events": [
+    "sound"
+   ],
+   "duplicate_slots": 0,
+   "unwarranted_slots": 0,
+   "unwarranted_transcript_slots": 0,
+   "all_slots_one_event": false,
+   "correct_first": true,
+   "first_wrong_reason": null,
+   "missed": [],
+   "missed_with_urgent_detection": [],
+   "personal_matches": 0,
+   "before_merge": [
+    [
+     "sound",
+     "Emergency vehicle",
+     1
+    ],
+    [
+     "sound",
+     "Police car (siren)",
+     3
+    ],
+    [
+     "sound",
+     "Siren",
+     3
+    ]
+   ],
+   "after_merge": [
+    [
+     "sound",
+     "Police car (siren)",
+     3
+    ]
+   ],
+   "excess_before": 2,
+   "excess_after": 0,
+   "identical_label_repeats": 0,
+   "warnings": [],
+   "latency_ms": 2000
+  },
+  {
+   "repeat": 2,
+   "scene": 1,
+   "kind": "sound only",
+   "speech": null,
+   "sound": "siren 1-76831-E-42.wav",
+   "real": {
+    "sound": 3
+   },
+   "transcript": "the",
+   "headlines": [
+    [
+     "sound",
+     "Siren",
+     "CRITICAL"
+    ]
+   ],
+   "headline_events": [
+    "sound"
+   ],
+   "duplicate_slots": 0,
+   "unwarranted_slots": 0,
+   "unwarranted_transcript_slots": 0,
+   "all_slots_one_event": false,
+   "correct_first": true,
+   "first_wrong_reason": null,
+   "missed": [],
+   "missed_with_urgent_detection": [],
+   "personal_matches": 0,
+   "before_merge": [
+    [
+     "sound",
+     "Siren",
+     3
+    ],
+    [
+     "sound",
+     "Police car (siren)",
+     3
+    ],
+    [
+     "sound",
+     "Emergency vehicle",
+     1
+    ]
+   ],
+   "after_merge": [
+    [
+     "sound",
+     "Siren",
+     3
+    ]
+   ],
+   "excess_before": 2,
+   "excess_after": 0,
+   "identical_label_repeats": 0,
+   "warnings": [],
+   "latency_ms": 1843
+  },
+  {
+   "repeat": 2,
+   "scene": 2,
+   "kind": "sound only",
+   "speech": null,
+   "sound": "siren 2-43802-A-42.wav",
+   "real": {
+    "sound": 3
+   },
+   "transcript": "Oh",
+   "headlines": [
+    [
+     "sound",
+     "Civil defense siren",
+     "CRITICAL"
+    ]
+   ],
+   "headline_events": [
+    "sound"
+   ],
+   "duplicate_slots": 0,
+   "unwarranted_slots": 0,
+   "unwarranted_transcript_slots": 0,
+   "all_slots_one_event": false,
+   "correct_first": true,
+   "first_wrong_reason": null,
+   "missed": [],
+   "missed_with_urgent_detection": [],
+   "personal_matches": 0,
+   "before_merge": [
+    [
+     "sound",
+     "Civil defense siren",
+     3
+    ],
+    [
+     "sound",
+     "Siren",
+     3
+    ]
+   ],
+   "after_merge": [
+    [
+     "sound",
+     "Civil defense siren",
+     3
+    ]
+   ],
+   "excess_before": 1,
+   "excess_after": 0,
+   "identical_label_repeats": 0,
+   "warnings": [],
+   "latency_ms": 1126
+  },
+  {
+   "repeat": 2,
+   "scene": 3,
+   "kind": "sound only",
+   "speech": null,
+   "sound": "crying_baby 1-60997-A-20.wav",
+   "real": {
+    "sound": 3
+   },
+   "transcript": "Oh!",
+   "headlines": [
+    [
+     "sound",
+     "Baby cry, infant cry",
+     "CRITICAL"
+    ]
+   ],
+   "headline_events": [
+    "sound"
+   ],
+   "duplicate_slots": 0,
+   "unwarranted_slots": 0,
+   "unwarranted_transcript_slots": 0,
+   "all_slots_one_event": false,
+   "correct_first": true,
+   "first_wrong_reason": null,
+   "missed": [],
+   "missed_with_urgent_detection": [],
+   "personal_matches": 0,
+   "before_merge": [
+    [
+     "sound",
+     "Baby cry, infant cry",
+     3
+    ],
+    [
+     "sound",
+     "Whimper",
+     0
+    ]
+   ],
+   "after_merge": [
+    [
+     "sound",
+     "Baby cry, infant cry",
+     3
+    ],
+    [
+     "sound",
+     "Whimper",
+     0
+    ]
+   ],
+   "excess_before": 1,
+   "excess_after": 1,
+   "identical_label_repeats": 0,
+   "warnings": [],
+   "latency_ms": 1138
+  },
+  {
+   "repeat": 2,
+   "scene": 4,
+   "kind": "sound only",
+   "speech": null,
+   "sound": "crying_baby 1-60997-B-20.wav",
+   "real": {
+    "sound": 3
+   },
+   "transcript": "I don't know.",
+   "headlines": [
+    [
+     "sound",
+     "Baby cry, infant cry",
+     "CRITICAL"
+    ]
+   ],
+   "headline_events": [
+    "sound"
+   ],
+   "duplicate_slots": 0,
+   "unwarranted_slots": 0,
+   "unwarranted_transcript_slots": 0,
+   "all_slots_one_event": false,
+   "correct_first": true,
+   "first_wrong_reason": null,
+   "missed": [],
+   "missed_with_urgent_detection": [],
+   "personal_matches": 0,
+   "before_merge": [
+    [
+     "sound",
+     "Baby cry, infant cry",
+     3
+    ],
+    [
+     "sound",
+     "Crying, sobbing",
+     0
+    ]
+   ],
+   "after_merge": [
+    [
+     "sound",
+     "Baby cry, infant cry",
+     3
+    ]
+   ],
+   "excess_before": 1,
+   "excess_after": 0,
+   "identical_label_repeats": 0,
+   "warnings": [],
+   "latency_ms": 1198
+  },
+  {
+   "repeat": 2,
+   "scene": 5,
+   "kind": "sound only",
+   "speech": null,
+   "sound": "crying_baby 2-107351-A-20.wav",
+   "real": {
+    "sound": 3
+   },
+   "transcript": "I don't know.",
+   "headlines": [
+    [
+     "sound",
+     "Baby cry, infant cry",
+     "CRITICAL"
+    ]
+   ],
+   "headline_events": [
+    "sound"
+   ],
+   "duplicate_slots": 0,
+   "unwarranted_slots": 0,
+   "unwarranted_transcript_slots": 0,
+   "all_slots_one_event": false,
+   "correct_first": true,
+   "first_wrong_reason": null,
+   "missed": [],
+   "missed_with_urgent_detection": [],
+   "personal_matches": 0,
+   "before_merge": [
+    [
+     "sound",
+     "Baby cry, infant cry",
+     3
+    ],
+    [
+     "sound",
+     "Crying, sobbing",
+     0
+    ]
+   ],
+   "after_merge": [
+    [
+     "sound",
+     "Baby cry, infant cry",
+     3
+    ]
+   ],
+   "excess_before": 1,
+   "excess_after": 0,
+   "identical_label_repeats": 0,
+   "warnings": [],
+   "latency_ms": 1568
+  },
+  {
+   "repeat": 2,
+   "scene": 6,
+   "kind": "sound only",
+   "speech": null,
+   "sound": "glass_breaking 1-88807-A-39.wav",
+   "real": {
+    "sound": 3
+   },
+   "transcript": "",
+   "headlines": [
+    [
+     "sound",
+     "Glass",
+     "CRITICAL"
+    ]
+   ],
+   "headline_events": [
+    "sound"
+   ],
+   "duplicate_slots": 0,
+   "unwarranted_slots": 0,
+   "unwarranted_transcript_slots": 0,
+   "all_slots_one_event": false,
+   "correct_first": true,
+   "first_wrong_reason": null,
+   "missed": [],
+   "missed_with_urgent_detection": [],
+   "personal_matches": 0,
+   "before_merge": [
+    [
+     "sound",
+     "Breaking",
+     0
+    ],
+    [
+     "sound",
+     "Glass",
+     3
+    ],
+    [
+     "sound",
+     "Chink, clink",
+     0
+    ]
+   ],
+   "after_merge": [
+    [
+     "sound",
+     "Breaking",
+     0
+    ],
+    [
+     "sound",
+     "Glass",
+     3
+    ]
+   ],
+   "excess_before": 2,
+   "excess_after": 1,
+   "identical_label_repeats": 0,
+   "warnings": [],
+   "latency_ms": 1237
+  },
+  {
+   "repeat": 2,
+   "scene": 7,
+   "kind": "sound only",
+   "speech": null,
+   "sound": "glass_breaking 1-977-A-39.wav",
+   "real": {
+    "sound": 3
+   },
+   "transcript": "",
+   "headlines": [],
+   "headline_events": [],
+   "duplicate_slots": 0,
+   "unwarranted_slots": 0,
+   "unwarranted_transcript_slots": 0,
+   "all_slots_one_event": false,
+   "correct_first": false,
+   "first_wrong_reason": "not headlined",
+   "missed": [
+    "sound"
+   ],
+   "missed_with_urgent_detection": [],
+   "personal_matches": 0,
+   "before_merge": [
+    [
+     "sound",
+     "Chink, clink",
+     0
+    ],
+    [
+     "sound",
+     "Breaking",
+     0
+    ]
+   ],
+   "after_merge": [
+    [
+     "sound",
+     "Chink, clink",
+     0
+    ],
+    [
+     "sound",
+     "Breaking",
+     0
+    ]
+   ],
+   "excess_before": 1,
+   "excess_after": 1,
+   "identical_label_repeats": 0,
+   "warnings": [],
+   "latency_ms": 1313
+  },
+  {
+   "repeat": 2,
+   "scene": 8,
+   "kind": "sound only",
+   "speech": null,
+   "sound": "glass_breaking 2-106881-A-39.wav",
+   "real": {
+    "sound": 3
+   },
+   "transcript": "",
+   "headlines": [],
+   "headline_events": [],
+   "duplicate_slots": 0,
+   "unwarranted_slots": 0,
+   "unwarranted_transcript_slots": 0,
+   "all_slots_one_event": false,
+   "correct_first": false,
+   "first_wrong_reason": "not headlined",
+   "missed": [
+    "sound"
+   ],
+   "missed_with_urgent_detection": [],
+   "personal_matches": 0,
+   "before_merge": [
+    [
+     "sound",
+     "Crack",
+     0
+    ],
+    [
+     "sound",
+     "Breaking",
+     0
+    ]
+   ],
+   "after_merge": [
+    [
+     "sound",
+     "Crack",
+     0
+    ],
+    [
+     "sound",
+     "Breaking",
+     0
+    ]
+   ],
+   "excess_before": 1,
+   "excess_after": 1,
+   "identical_label_repeats": 0,
+   "warnings": [],
+   "latency_ms": 1122
+  },
+  {
+   "repeat": 2,
+   "scene": 9,
+   "kind": "sound only",
+   "speech": null,
+   "sound": "door_wood_knock 1-81001-B-30.wav",
+   "real": {
+    "sound": 2
+   },
+   "transcript": "the",
+   "headlines": [
+    [
+     "sound",
+     "Knock",
+     "IMPORTANT"
+    ]
+   ],
+   "headline_events": [
+    "sound"
+   ],
+   "duplicate_slots": 0,
+   "unwarranted_slots": 0,
+   "unwarranted_transcript_slots": 0,
+   "all_slots_one_event": false,
+   "correct_first": true,
+   "first_wrong_reason": null,
+   "missed": [],
+   "missed_with_urgent_detection": [],
+   "personal_matches": 0,
+   "before_merge": [
+    [
+     "sound",
+     "Knock",
+     2
+    ]
+   ],
+   "after_merge": [
+    [
+     "sound",
+     "Knock",
+     2
+    ]
+   ],
+   "excess_before": 0,
+   "excess_after": 0,
+   "identical_label_repeats": 0,
+   "warnings": [],
+   "latency_ms": 2115
+  },
+  {
+   "repeat": 2,
+   "scene": 10,
+   "kind": "sound only",
+   "speech": null,
+   "sound": "door_wood_knock 1-82817-A-30.wav",
+   "real": {
+    "sound": 2
+   },
+   "transcript": "",
+   "headlines": [
+    [
+     "sound",
+     "Knock",
+     "IMPORTANT"
+    ]
+   ],
+   "headline_events": [
+    "sound"
+   ],
+   "duplicate_slots": 0,
+   "unwarranted_slots": 0,
+   "unwarranted_transcript_slots": 0,
+   "all_slots_one_event": false,
+   "correct_first": true,
+   "first_wrong_reason": null,
+   "missed": [],
+   "missed_with_urgent_detection": [],
+   "personal_matches": 0,
+   "before_merge": [
+    [
+     "sound",
+     "Knock",
+     2
+    ]
+   ],
+   "after_merge": [
+    [
+     "sound",
+     "Knock",
+     2
+    ]
+   ],
+   "excess_before": 0,
+   "excess_after": 0,
+   "identical_label_repeats": 0,
+   "warnings": [],
+   "latency_ms": 2249
+  },
+  {
+   "repeat": 2,
+   "scene": 11,
+   "kind": "sound only",
+   "speech": null,
+   "sound": "door_wood_knock 2-114254-A-30.wav",
+   "real": {
+    "sound": 2
+   },
+   "transcript": "Oh yeah.",
+   "headlines": [
+    [
+     "sound",
+     "Knock",
+     "IMPORTANT"
+    ]
+   ],
+   "headline_events": [
+    "sound"
+   ],
+   "duplicate_slots": 0,
+   "unwarranted_slots": 0,
+   "unwarranted_transcript_slots": 0,
+   "all_slots_one_event": false,
+   "correct_first": true,
+   "first_wrong_reason": null,
+   "missed": [],
+   "missed_with_urgent_detection": [],
+   "personal_matches": 0,
+   "before_merge": [
+    [
+     "sound",
+     "Knock",
+     2
+    ]
+   ],
+   "after_merge": [
+    [
+     "sound",
+     "Knock",
+     2
+    ]
+   ],
+   "excess_before": 0,
+   "excess_after": 0,
+   "identical_label_repeats": 0,
+   "warnings": [],
+   "latency_ms": 1734
+  },
+  {
+   "repeat": 2,
+   "scene": 12,
+   "kind": "sound only",
+   "speech": null,
+   "sound": "dog 1-85362-A-0.wav",
+   "real": {
+    "sound": 2
+   },
+   "transcript": "What? What? What?",
+   "headlines": [],
+   "headline_events": [],
+   "duplicate_slots": 0,
+   "unwarranted_slots": 0,
+   "unwarranted_transcript_slots": 0,
+   "all_slots_one_event": false,
+   "correct_first": false,
+   "first_wrong_reason": "not headlined",
+   "missed": [
+    "sound"
+   ],
+   "missed_with_urgent_detection": [],
+   "personal_matches": 0,
+   "before_merge": [
+    [
+     "sound",
+     "Bow-wow",
+     0
+    ],
+    [
+     "sound",
+     "Animal",
+     0
+    ],
+    [
+     "sound",
+     "Domestic animals, pets",
+     0
+    ]
+   ],
+   "after_merge": [
+    [
+     "sound",
+     "Bow-wow",
+     0
+    ]
+   ],
+   "excess_before": 2,
+   "excess_after": 0,
+   "identical_label_repeats": 0,
+   "warnings": [],
+   "latency_ms": 1514
+  },
+  {
+   "repeat": 2,
+   "scene": 13,
+   "kind": "sound only",
+   "speech": null,
+   "sound": "dog 1-97392-A-0.wav",
+   "real": {
+    "sound": 2
+   },
+   "transcript": "",
+   "headlines": [
+    [
+     "sound",
+     "Dog",
+     "IMPORTANT"
+    ]
+   ],
+   "headline_events": [
+    "sound"
+   ],
+   "duplicate_slots": 0,
+   "unwarranted_slots": 0,
+   "unwarranted_transcript_slots": 0,
+   "all_slots_one_event": false,
+   "correct_first": true,
+   "first_wrong_reason": null,
+   "missed": [],
+   "missed_with_urgent_detection": [],
+   "personal_matches": 0,
+   "before_merge": [
+    [
+     "sound",
+     "Dog",
+     2
+    ],
+    [
+     "sound",
+     "Bow-wow",
+     0
+    ],
+    [
+     "sound",
+     "Animal",
+     0
+    ]
+   ],
+   "after_merge": [
+    [
+     "sound",
+     "Dog",
+     2
+    ]
+   ],
+   "excess_before": 2,
+   "excess_after": 0,
+   "identical_label_repeats": 0,
+   "warnings": [],
+   "latency_ms": 1609
+  },
+  {
+   "repeat": 2,
+   "scene": 14,
+   "kind": "sound only",
+   "speech": null,
+   "sound": "dog 2-114280-A-0.wav",
+   "real": {
+    "sound": 2
+   },
+   "transcript": "Oh! Oh! Oh! Oh!",
+   "headlines": [
+    [
+     "sound",
+     "Dog",
+     "IMPORTANT"
+    ]
+   ],
+   "headline_events": [
+    "sound"
+   ],
+   "duplicate_slots": 0,
+   "unwarranted_slots": 0,
+   "unwarranted_transcript_slots": 0,
+   "all_slots_one_event": false,
+   "correct_first": true,
+   "first_wrong_reason": null,
+   "missed": [],
+   "missed_with_urgent_detection": [],
+   "personal_matches": 0,
+   "before_merge": [
+    [
+     "sound",
+     "Dog",
+     2
+    ],
+    [
+     "sound",
+     "Animal",
+     0
+    ],
+    [
+     "sound",
+     "Bow-wow",
+     0
+    ]
+   ],
+   "after_merge": [
+    [
+     "sound",
+     "Dog",
+     2
+    ]
+   ],
+   "excess_before": 2,
+   "excess_after": 0,
+   "identical_label_repeats": 0,
+   "warnings": [],
+   "latency_ms": 1227
+  },
+  {
+   "repeat": 2,
+   "scene": 15,
+   "kind": "sound only",
+   "speech": null,
+   "sound": "clock_alarm 1-74517-A-37.wav",
+   "real": {
+    "sound": 2
+   },
+   "transcript": "Beek. Beek.",
+   "headlines": [
+    [
+     "sound",
+     "Kitchen alarm (personal)",
+     "CRITICAL"
+    ]
+   ],
+   "headline_events": [
+    "sound"
+   ],
+   "duplicate_slots": 0,
+   "unwarranted_slots": 0,
+   "unwarranted_transcript_slots": 0,
+   "all_slots_one_event": false,
+   "correct_first": true,
+   "first_wrong_reason": null,
+   "missed": [],
+   "missed_with_urgent_detection": [],
+   "personal_matches": 1,
+   "before_merge": [
+    [
+     "sound",
+     "Kitchen alarm (personal)",
+     2
+    ],
+    [
+     "sound",
+     "Alarm clock",
+     3
+    ]
+   ],
+   "after_merge": [
+    [
+     "sound",
+     "Kitchen alarm (personal)",
+     3
+    ]
+   ],
+   "excess_before": 1,
+   "excess_after": 0,
+   "identical_label_repeats": 0,
+   "warnings": [],
+   "latency_ms": 1166
+  },
+  {
+   "repeat": 2,
+   "scene": 16,
+   "kind": "sound only",
+   "speech": null,
+   "sound": "clock_alarm 1-96890-A-37.wav",
+   "real": {
+    "sound": 2
+   },
+   "transcript": "Beep, beep, beep, beep,",
+   "headlines": [
+    [
+     "sound",
+     "Kitchen alarm (personal)",
+     "CRITICAL"
+    ]
+   ],
+   "headline_events": [
+    "sound"
+   ],
+   "duplicate_slots": 0,
+   "unwarranted_slots": 0,
+   "unwarranted_transcript_slots": 0,
+   "all_slots_one_event": false,
+   "correct_first": true,
+   "first_wrong_reason": null,
+   "missed": [],
+   "missed_with_urgent_detection": [],
+   "personal_matches": 1,
+   "before_merge": [
+    [
+     "sound",
+     "Kitchen alarm (personal)",
+     2
+    ],
+    [
+     "sound",
+     "Alarm clock",
+     3
+    ],
+    [
+     "sound",
+     "Alarm",
+     3
+    ]
+   ],
+   "after_merge": [
+    [
+     "sound",
+     "Kitchen alarm (personal)",
+     3
+    ]
+   ],
+   "excess_before": 2,
+   "excess_after": 0,
+   "identical_label_repeats": 0,
+   "warnings": [],
+   "latency_ms": 1413
+  },
+  {
+   "repeat": 2,
+   "scene": 17,
+   "kind": "sound only",
+   "speech": null,
+   "sound": "clock_alarm 2-102435-A-37.wav",
+   "real": {
+    "sound": 2
+   },
+   "transcript": "",
+   "headlines": [],
+   "headline_events": [],
+   "duplicate_slots": 0,
+   "unwarranted_slots": 0,
+   "unwarranted_transcript_slots": 0,
+   "all_slots_one_event": false,
+   "correct_first": false,
+   "first_wrong_reason": "not headlined",
+   "missed": [
+    "sound"
+   ],
+   "missed_with_urgent_detection": [],
+   "personal_matches": 0,
+   "before_merge": [
+    [
+     "sound",
+     "Tools",
+     0
+    ]
+   ],
+   "after_merge": [
+    [
+     "sound",
+     "Tools",
+     0
+    ]
+   ],
+   "excess_before": 0,
+   "excess_after": 0,
+   "identical_label_repeats": 0,
+   "warnings": [],
+   "latency_ms": 2004
+  },
+  {
+   "repeat": 2,
+   "scene": 18,
+   "kind": "background only",
+   "speech": null,
+   "sound": "rain 1-56311-A-10.wav",
+   "real": {
+    "sound": 0
+   },
+   "transcript": "",
+   "headlines": [],
+   "headline_events": [],
+   "duplicate_slots": 0,
+   "unwarranted_slots": 0,
+   "unwarranted_transcript_slots": 0,
+   "all_slots_one_event": false,
+   "correct_first": null,
+   "first_wrong_reason": null,
+   "missed": [],
+   "missed_with_urgent_detection": [],
+   "personal_matches": 0,
+   "before_merge": [
+    [
+     "sound",
+     "Rain on surface",
+     0
+    ],
+    [
+     "sound",
+     "Rain",
+     0
+    ]
+   ],
+   "after_merge": [
+    [
+     "sound",
+     "Rain on surface",
+     0
+    ]
+   ],
+   "excess_before": 1,
+   "excess_after": 0,
+   "identical_label_repeats": 0,
+   "warnings": [],
+   "latency_ms": 1841
+  },
+  {
+   "repeat": 2,
+   "scene": 19,
+   "kind": "background only",
+   "speech": null,
+   "sound": "rain 1-63871-A-10.wav",
+   "real": {
+    "sound": 0
+   },
+   "transcript": "",
+   "headlines": [],
+   "headline_events": [],
+   "duplicate_slots": 0,
+   "unwarranted_slots": 0,
+   "unwarranted_transcript_slots": 0,
+   "all_slots_one_event": false,
+   "correct_first": null,
+   "first_wrong_reason": null,
+   "missed": [],
+   "missed_with_urgent_detection": [],
+   "personal_matches": 0,
+   "before_merge": [
+    [
+     "sound",
+     "Rain on surface",
+     0
+    ],
+    [
+     "sound",
+     "Rain",
+     0
+    ]
+   ],
+   "after_merge": [
+    [
+     "sound",
+     "Rain on surface",
+     0
+    ]
+   ],
+   "excess_before": 1,
+   "excess_after": 0,
+   "identical_label_repeats": 0,
+   "warnings": [],
+   "latency_ms": 1870
+  },
+  {
+   "repeat": 2,
+   "scene": 20,
+   "kind": "background only",
+   "speech": null,
+   "sound": "keyboard_typing 1-94231-A-32.wav",
+   "real": {
+    "sound": 0
+   },
+   "transcript": "",
+   "headlines": [],
+   "headline_events": [],
+   "duplicate_slots": 0,
+   "unwarranted_slots": 0,
+   "unwarranted_transcript_slots": 0,
+   "all_slots_one_event": false,
+   "correct_first": null,
+   "first_wrong_reason": null,
+   "missed": [],
+   "missed_with_urgent_detection": [],
+   "personal_matches": 0,
+   "before_merge": [
+    [
+     "sound",
+     "Computer keyboard",
+     0
+    ]
+   ],
+   "after_merge": [
+    [
+     "sound",
+     "Computer keyboard",
+     0
+    ]
+   ],
+   "excess_before": 0,
+   "excess_after": 0,
+   "identical_label_repeats": 0,
+   "warnings": [],
+   "latency_ms": 1777
+  },
+  {
+   "repeat": 2,
+   "scene": 21,
+   "kind": "background only",
+   "speech": null,
+   "sound": "keyboard_typing 1-94231-B-32.wav",
+   "real": {
+    "sound": 0
+   },
+   "transcript": "",
+   "headlines": [],
+   "headline_events": [],
+   "duplicate_slots": 0,
+   "unwarranted_slots": 0,
+   "unwarranted_transcript_slots": 0,
+   "all_slots_one_event": false,
+   "correct_first": null,
+   "first_wrong_reason": null,
+   "missed": [],
+   "missed_with_urgent_detection": [],
+   "personal_matches": 0,
+   "before_merge": [
+    [
+     "sound",
+     "Computer keyboard",
+     0
+    ],
+    [
+     "sound",
+     "Typing",
+     0
+    ]
+   ],
+   "after_merge": [
+    [
+     "sound",
+     "Computer keyboard",
+     0
+    ]
+   ],
+   "excess_before": 1,
+   "excess_after": 0,
+   "identical_label_repeats": 0,
+   "warnings": [],
+   "latency_ms": 1670
+  },
+  {
+   "repeat": 2,
+   "scene": 22,
+   "kind": "speech only",
+   "speech": "Your taxi will be here in about five minutes.",
+   "sound": null,
+   "real": {
+    "speech": 2
+   },
+   "transcript": "Your taxi will be here in about five minutes.",
+   "headlines": [
+    [
+     "speech",
+     "Your taxi will be here in about five minutes.",
+     "IMPORTANT"
+    ]
+   ],
+   "headline_events": [
+    "speech"
+   ],
+   "duplicate_slots": 0,
+   "unwarranted_slots": 0,
+   "unwarranted_transcript_slots": 0,
+   "all_slots_one_event": false,
+   "correct_first": true,
+   "first_wrong_reason": null,
+   "missed": [],
+   "missed_with_urgent_detection": [],
+   "personal_matches": 0,
+   "before_merge": [
+    [
+     "speech",
+     "Your taxi will be here in about five minutes.",
+     2
+    ],
+    [
+     "sound",
+     "Speech",
+     1
+    ]
+   ],
+   "after_merge": [
+    [
+     "sound",
+     "Speech",
+     1
+    ],
+    [
+     "speech",
+     "Your taxi will be here in about five minutes.",
+     2
+    ]
+   ],
+   "excess_before": 1,
+   "excess_after": 1,
+   "identical_label_repeats": 0,
+   "warnings": [],
+   "latency_ms": 1090
+  },
+  {
+   "repeat": 2,
+   "scene": 23,
+   "kind": "speech only",
+   "speech": "Can you pass me the remote control?",
+   "sound": null,
+   "real": {
+    "speech": 2
+   },
+   "transcript": "Can you pass me the remote control?",
+   "headlines": [
+    [
+     "speech",
+     "Can you pass me the remote control?",
+     "IMPORTANT"
+    ]
+   ],
+   "headline_events": [
+    "speech"
+   ],
+   "duplicate_slots": 0,
+   "unwarranted_slots": 0,
+   "unwarranted_transcript_slots": 0,
+   "all_slots_one_event": false,
+   "correct_first": true,
+   "first_wrong_reason": null,
+   "missed": [],
+   "missed_with_urgent_detection": [],
+   "personal_matches": 0,
+   "before_merge": [
+    [
+     "speech",
+     "Can you pass me the remote control?",
+     2
+    ],
+    [
+     "sound",
+     "Speech",
+     1
+    ]
+   ],
+   "after_merge": [
+    [
+     "sound",
+     "Speech",
+     1
+    ],
+    [
+     "speech",
+     "Can you pass me the remote control?",
+     2
+    ]
+   ],
+   "excess_before": 1,
+   "excess_after": 1,
+   "identical_label_repeats": 0,
+   "warnings": [],
+   "latency_ms": 1069
+  },
+  {
+   "repeat": 2,
+   "scene": 24,
+   "kind": "speech only",
+   "speech": "Stop, the pan on the stove is on fire!",
+   "sound": null,
+   "real": {
+    "speech": 3
+   },
+   "transcript": "Stop. The pan on the stove is on fire.",
+   "headlines": [
+    [
+     "speech",
+     "Keyword: \"fire\": Stop. The pan on the stove is on fire.",
+     "CRITICAL"
+    ]
+   ],
+   "headline_events": [
+    "speech"
+   ],
+   "duplicate_slots": 0,
+   "unwarranted_slots": 0,
+   "unwarranted_transcript_slots": 0,
+   "all_slots_one_event": false,
+   "correct_first": true,
+   "first_wrong_reason": null,
+   "missed": [],
+   "missed_with_urgent_detection": [],
+   "personal_matches": 0,
+   "before_merge": [
+    [
+     "speech",
+     "Stop. The pan on the stove is on fire.",
+     3
+    ],
+    [
+     "sound",
+     "Speech",
+     1
+    ],
+    [
+     "speech",
+     "Keyword: \"fire\"",
+     3
+    ],
+    [
+     "speech",
+     "Keyword: \"stop\"",
+     3
+    ]
+   ],
+   "after_merge": [
+    [
+     "sound",
+     "Speech",
+     1
+    ],
+    [
+     "speech",
+     "Keyword: \"fire\": Stop. The pan on the stove is on fire.",
+     3
+    ]
+   ],
+   "excess_before": 3,
+   "excess_after": 1,
+   "identical_label_repeats": 0,
+   "warnings": [],
+   "latency_ms": 1080
+  },
+  {
+   "repeat": 2,
+   "scene": 25,
+   "kind": "speech only",
+   "speech": "Laura, your phone is ringing in the hall.",
+   "sound": null,
+   "real": {
+    "speech": 3
+   },
+   "transcript": "Laura, your phone is ringing in the hall.",
+   "headlines": [
+    [
+     "speech",
+     "Your name was called: Laura, your phone is ringing in the hall.",
+     "CRITICAL"
+    ]
+   ],
+   "headline_events": [
+    "speech"
+   ],
+   "duplicate_slots": 0,
+   "unwarranted_slots": 0,
+   "unwarranted_transcript_slots": 0,
+   "all_slots_one_event": false,
+   "correct_first": true,
+   "first_wrong_reason": null,
+   "missed": [],
+   "missed_with_urgent_detection": [],
+   "personal_matches": 0,
+   "before_merge": [
+    [
+     "speech",
+     "Laura, your phone is ringing in the hall.",
+     2
+    ],
+    [
+     "sound",
+     "Speech",
+     1
+    ],
+    [
+     "sound",
+     "Male speech, man speaking",
+     1
+    ],
+    [
+     "speech",
+     "Your name was called",
+     3
+    ]
+   ],
+   "after_merge": [
+    [
+     "sound",
+     "Speech",
+     1
+    ],
+    [
+     "speech",
+     "Your name was called: Laura, your phone is ringing in the hall.",
+     3
+    ]
+   ],
+   "excess_before": 3,
+   "excess_after": 1,
+   "identical_label_repeats": 0,
+   "warnings": [],
+   "latency_ms": 1280
+  },
+  {
+   "repeat": 2,
+   "scene": 26,
+   "kind": "speech and sound",
+   "speech": "Your taxi will be here in about five minutes.",
+   "sound": "siren 2-43806-A-42.wav",
+   "real": {
+    "speech": 2,
+    "sound": 3
+   },
+   "transcript": "Your taxi will be here in about five minutes.",
+   "headlines": [
+    [
+     "sound",
+     "Police car (siren)",
+     "CRITICAL"
+    ],
+    [
+     "speech",
+     "Your taxi will be here in about five minutes.",
+     "IMPORTANT"
+    ]
+   ],
+   "headline_events": [
+    "sound",
+    "speech"
+   ],
+   "duplicate_slots": 0,
+   "unwarranted_slots": 0,
+   "unwarranted_transcript_slots": 0,
+   "all_slots_one_event": false,
+   "correct_first": true,
+   "first_wrong_reason": null,
+   "missed": [],
+   "missed_with_urgent_detection": [],
+   "personal_matches": 0,
+   "before_merge": [
+    [
+     "speech",
+     "Your taxi will be here in about five minutes.",
+     2
+    ],
+    [
+     "sound",
+     "Speech",
+     1
+    ],
+    [
+     "sound",
+     "Emergency vehicle",
+     1
+    ],
+    [
+     "sound",
+     "Police car (siren)",
+     3
+    ]
+   ],
+   "after_merge": [
+    [
+     "sound",
+     "Speech",
+     1
+    ],
+    [
+     "sound",
+     "Police car (siren)",
+     3
+    ],
+    [
+     "speech",
+     "Your taxi will be here in about five minutes.",
+     2
+    ]
+   ],
+   "excess_before": 2,
+   "excess_after": 1,
+   "identical_label_repeats": 0,
+   "warnings": [],
+   "latency_ms": 1158
+  },
+  {
+   "repeat": 2,
+   "scene": 27,
+   "kind": "speech and sound",
+   "speech": "Your taxi will be here in about five minutes.",
+   "sound": "crying_baby 2-107351-B-20.wav",
+   "real": {
+    "speech": 2,
+    "sound": 3
+   },
+   "transcript": "Your taxi will be here in about five minutes.",
+   "headlines": [
+    [
+     "sound",
+     "Baby cry, infant cry",
+     "CRITICAL"
+    ],
+    [
+     "speech",
+     "Your taxi will be here in about five minutes.",
+     "IMPORTANT"
+    ]
+   ],
+   "headline_events": [
+    "sound",
+    "speech"
+   ],
+   "duplicate_slots": 0,
+   "unwarranted_slots": 0,
+   "unwarranted_transcript_slots": 0,
+   "all_slots_one_event": false,
+   "correct_first": true,
+   "first_wrong_reason": null,
+   "missed": [],
+   "missed_with_urgent_detection": [],
+   "personal_matches": 0,
+   "before_merge": [
+    [
+     "speech",
+     "Your taxi will be here in about five minutes.",
+     2
+    ],
+    [
+     "sound",
+     "Speech",
+     1
+    ],
+    [
+     "sound",
+     "Baby cry, infant cry",
+     3
+    ]
+   ],
+   "after_merge": [
+    [
+     "sound",
+     "Speech",
+     1
+    ],
+    [
+     "sound",
+     "Baby cry, infant cry",
+     3
+    ],
+    [
+     "speech",
+     "Your taxi will be here in about five minutes.",
+     2
+    ]
+   ],
+   "excess_before": 1,
+   "excess_after": 1,
+   "identical_label_repeats": 0,
+   "warnings": [],
+   "latency_ms": 1087
+  },
+  {
+   "repeat": 2,
+   "scene": 28,
+   "kind": "speech and sound",
+   "speech": "Can you pass me the remote control?",
+   "sound": "glass_breaking 2-112213-A-39.wav",
+   "real": {
+    "speech": 2,
+    "sound": 3
+   },
+   "transcript": "You have to be the remote control.",
+   "headlines": [
+    [
+     "speech",
+     "You have to be the remote control.",
+     "IMPORTANT"
+    ]
+   ],
+   "headline_events": [
+    "speech"
+   ],
+   "duplicate_slots": 0,
+   "unwarranted_slots": 0,
+   "unwarranted_transcript_slots": 0,
+   "all_slots_one_event": false,
+   "correct_first": false,
+   "first_wrong_reason": "not headlined",
+   "missed": [
+    "sound"
+   ],
+   "missed_with_urgent_detection": [],
+   "personal_matches": 0,
+   "before_merge": [
+    [
+     "speech",
+     "You have to be the remote control.",
+     2
+    ],
+    [
+     "sound",
+     "Speech",
+     1
+    ],
+    [
+     "sound",
+     "Breaking",
+     0
+    ]
+   ],
+   "after_merge": [
+    [
+     "sound",
+     "Speech",
+     1
+    ],
+    [
+     "sound",
+     "Breaking",
+     0
+    ],
+    [
+     "speech",
+     "You have to be the remote control.",
+     2
+    ]
+   ],
+   "excess_before": 1,
+   "excess_after": 1,
+   "identical_label_repeats": 0,
+   "warnings": [],
+   "latency_ms": 1075
+  },
+  {
+   "repeat": 2,
+   "scene": 29,
+   "kind": "speech and sound",
+   "speech": "Can you pass me the remote control?",
+   "sound": "rain 1-50060-A-10.wav",
+   "real": {
+    "speech": 2,
+    "sound": 0
+   },
+   "transcript": "Can you have me, the remote control?",
+   "headlines": [
+    [
+     "speech",
+     "Can you have me, the remote control?",
+     "IMPORTANT"
+    ]
+   ],
+   "headline_events": [
+    "speech"
+   ],
+   "duplicate_slots": 0,
+   "unwarranted_slots": 0,
+   "unwarranted_transcript_slots": 0,
+   "all_slots_one_event": false,
+   "correct_first": true,
+   "first_wrong_reason": null,
+   "missed": [],
+   "missed_with_urgent_detection": [],
+   "personal_matches": 0,
+   "before_merge": [
+    [
+     "speech",
+     "Can you have me, the remote control?",
+     2
+    ],
+    [
+     "sound",
+     "Speech",
+     1
+    ],
+    [
+     "sound",
+     "Rain on surface",
+     0
+    ],
+    [
+     "sound",
+     "Rain",
+     0
+    ]
+   ],
+   "after_merge": [
+    [
+     "sound",
+     "Speech",
+     1
+    ],
+    [
+     "sound",
+     "Rain on surface",
+     0
+    ],
+    [
+     "speech",
+     "Can you have me, the remote control?",
+     2
+    ]
+   ],
+   "excess_before": 2,
+   "excess_after": 1,
+   "identical_label_repeats": 0,
+   "warnings": [],
+   "latency_ms": 1202
+  },
+  {
+   "repeat": 2,
+   "scene": 30,
+   "kind": "speech and sound",
+   "speech": "Your taxi will be here in about five minutes.",
+   "sound": "keyboard_typing 1-79711-A-32.wav",
+   "real": {
+    "speech": 2,
+    "sound": 0
+   },
+   "transcript": "Your taxi will be here in about five minutes.",
+   "headlines": [
+    [
+     "speech",
+     "Your taxi will be here in about five minutes.",
+     "IMPORTANT"
+    ]
+   ],
+   "headline_events": [
+    "speech"
+   ],
+   "duplicate_slots": 0,
+   "unwarranted_slots": 0,
+   "unwarranted_transcript_slots": 0,
+   "all_slots_one_event": false,
+   "correct_first": true,
+   "first_wrong_reason": null,
+   "missed": [],
+   "missed_with_urgent_detection": [],
+   "personal_matches": 0,
+   "before_merge": [
+    [
+     "speech",
+     "Your taxi will be here in about five minutes.",
+     2
+    ],
+    [
+     "sound",
+     "Computer keyboard",
+     0
+    ],
+    [
+     "sound",
+     "Typing",
+     0
+    ],
+    [
+     "sound",
+     "Speech",
+     1
+    ]
+   ],
+   "after_merge": [
+    [
+     "sound",
+     "Computer keyboard",
+     0
+    ],
+    [
+     "sound",
+     "Speech",
+     1
+    ],
+    [
+     "speech",
+     "Your taxi will be here in about five minutes.",
+     2
+    ]
+   ],
+   "excess_before": 2,
+   "excess_after": 1,
+   "identical_label_repeats": 0,
+   "warnings": [],
+   "latency_ms": 1084
+  },
+  {
+   "repeat": 2,
+   "scene": 31,
+   "kind": "speech and sound",
+   "speech": "Stop, the pan on the stove is on fire!",
+   "sound": "dog 2-114587-A-0.wav",
+   "real": {
+    "speech": 3,
+    "sound": 2
+   },
+   "transcript": "Stop, the pan on the stove is on fire.",
+   "headlines": [
+    [
+     "speech",
+     "Keyword: \"fire\": Stop, the pan on the stove is on fire.",
+     "CRITICAL"
+    ]
+   ],
+   "headline_events": [
+    "speech"
+   ],
+   "duplicate_slots": 0,
+   "unwarranted_slots": 0,
+   "unwarranted_transcript_slots": 0,
+   "all_slots_one_event": false,
+   "correct_first": true,
+   "first_wrong_reason": null,
+   "missed": [
+    "sound"
+   ],
+   "missed_with_urgent_detection": [],
+   "personal_matches": 0,
+   "before_merge": [
+    [
+     "speech",
+     "Stop, the pan on the stove is on fire.",
+     3
+    ],
+    [
+     "sound",
+     "Speech",
+     1
+    ],
+    [
+     "sound",
+     "Domestic animals, pets",
+     0
+    ],
+    [
+     "sound",
+     "Animal",
+     0
+    ],
+    [
+     "speech",
+     "Keyword: \"fire\"",
+     3
+    ],
+    [
+     "speech",
+     "Keyword: \"stop\"",
+     3
+    ]
+   ],
+   "after_merge": [
+    [
+     "sound",
+     "Speech",
+     1
+    ],
+    [
+     "sound",
+     "Domestic animals, pets",
+     0
+    ],
+    [
+     "speech",
+     "Keyword: \"fire\": Stop, the pan on the stove is on fire.",
+     3
+    ]
+   ],
+   "excess_before": 4,
+   "excess_after": 1,
+   "identical_label_repeats": 0,
+   "warnings": [],
+   "latency_ms": 1080
+  },
+  {
+   "repeat": 2,
+   "scene": 32,
+   "kind": "speech and sound",
+   "speech": "Stop, the pan on the stove is on fire!",
+   "sound": "rain 1-54958-A-10.wav",
+   "real": {
+    "speech": 3,
+    "sound": 0
+   },
+   "transcript": "Stop the pan on the stove as on site.",
+   "headlines": [
+    [
+     "speech",
+     "Keyword: \"stop\": Stop the pan on the stove as on site.",
+     "CRITICAL"
+    ]
+   ],
+   "headline_events": [
+    "speech"
+   ],
+   "duplicate_slots": 0,
+   "unwarranted_slots": 0,
+   "unwarranted_transcript_slots": 0,
+   "all_slots_one_event": false,
+   "correct_first": true,
+   "first_wrong_reason": null,
+   "missed": [],
+   "missed_with_urgent_detection": [],
+   "personal_matches": 0,
+   "before_merge": [
+    [
+     "speech",
+     "Stop the pan on the stove as on site.",
+     3
+    ],
+    [
+     "sound",
+     "Speech",
+     1
+    ],
+    [
+     "speech",
+     "Keyword: \"stop\"",
+     3
+    ]
+   ],
+   "after_merge": [
+    [
+     "sound",
+     "Speech",
+     1
+    ],
+    [
+     "speech",
+     "Keyword: \"stop\": Stop the pan on the stove as on site.",
+     3
+    ]
+   ],
+   "excess_before": 2,
+   "excess_after": 1,
+   "identical_label_repeats": 0,
+   "warnings": [],
+   "latency_ms": 1085
+  },
+  {
+   "repeat": 2,
+   "scene": 33,
+   "kind": "speech and sound",
+   "speech": "Laura, your phone is ringing in the hall.",
+   "sound": "door_wood_knock 2-118624-A-30.wav",
+   "real": {
+    "speech": 3,
+    "sound": 2
+   },
+   "transcript": "Laura, your phone is ringing in the hall.",
+   "headlines": [
+    [
+     "speech",
+     "Your name was called: Laura, your phone is ringing in the hall.",
+     "CRITICAL"
+    ],
+    [
+     "sound",
+     "Knock",
+     "IMPORTANT"
+    ]
+   ],
+   "headline_events": [
+    "speech",
+    "sound"
+   ],
+   "duplicate_slots": 0,
+   "unwarranted_slots": 0,
+   "unwarranted_transcript_slots": 0,
+   "all_slots_one_event": false,
+   "correct_first": true,
+   "first_wrong_reason": null,
+   "missed": [],
+   "missed_with_urgent_detection": [],
+   "personal_matches": 0,
+   "before_merge": [
+    [
+     "speech",
+     "Laura, your phone is ringing in the hall.",
+     2
+    ],
+    [
+     "sound",
+     "Knock",
+     2
+    ],
+    [
+     "sound",
+     "Speech",
+     1
+    ],
+    [
+     "speech",
+     "Your name was called",
+     3
+    ]
+   ],
+   "after_merge": [
+    [
+     "sound",
+     "Knock",
+     2
+    ],
+    [
+     "sound",
+     "Speech",
+     1
+    ],
+    [
+     "speech",
+     "Your name was called: Laura, your phone is ringing in the hall.",
+     3
+    ]
+   ],
+   "excess_before": 2,
+   "excess_after": 1,
+   "identical_label_repeats": 0,
+   "warnings": [],
+   "latency_ms": 1283
+  },
+  {
+   "repeat": 2,
+   "scene": 34,
+   "kind": "speech and sound",
+   "speech": "Laura, your phone is ringing in the hall.",
+   "sound": "keyboard_typing 1-84393-A-32.wav",
+   "real": {
+    "speech": 3,
+    "sound": 0
+   },
+   "transcript": "Laura, your phone is ringing in the hall.",
+   "headlines": [
+    [
+     "speech",
+     "Your name was called: Laura, your phone is ringing in the hall.",
+     "CRITICAL"
+    ],
+    [
+     "sound",
+     "Knock",
+     "IMPORTANT"
+    ]
+   ],
+   "headline_events": [
+    "speech",
+    "sound"
+   ],
+   "duplicate_slots": 0,
+   "unwarranted_slots": 1,
+   "unwarranted_transcript_slots": 0,
+   "all_slots_one_event": false,
+   "correct_first": true,
+   "first_wrong_reason": null,
+   "missed": [],
+   "missed_with_urgent_detection": [],
+   "personal_matches": 0,
+   "before_merge": [
+    [
+     "speech",
+     "Laura, your phone is ringing in the hall.",
+     2
+    ],
+    [
+     "sound",
+     "Speech",
+     1
+    ],
+    [
+     "sound",
+     "Knock",
+     2
+    ],
+    [
+     "speech",
+     "Your name was called",
+     3
+    ]
+   ],
+   "after_merge": [
+    [
+     "sound",
+     "Speech",
+     1
+    ],
+    [
+     "sound",
+     "Knock",
+     2
+    ],
+    [
+     "speech",
+     "Your name was called: Laura, your phone is ringing in the hall.",
+     3
+    ]
+   ],
+   "excess_before": 2,
+   "excess_after": 1,
+   "identical_label_repeats": 0,
+   "warnings": [],
+   "latency_ms": 1104
+  }
+ ]
+}
