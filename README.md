@@ -4,8 +4,8 @@ Final-year project, BSc Computer Science, University of London.
 Project template: CM3020 Artificial Intelligence, 4.1 Project Idea 1:
 *Orchestrating AI models to achieve a goal*.
 
-A browser-based assistant that combines **eight pre-trained perception models
-and a language model on a laptop CPU** to provide situational awareness beyond
+A browser-based assistant that combines **seven pre-trained perception models,
+a sign network trained here and a language model on a laptop CPU** to provide situational awareness beyond
 speech captioning.
 It transcribes speech, classifies environmental sounds, recognises sounds the
 user has personally enrolled, detects visual hazards, describes the scene,

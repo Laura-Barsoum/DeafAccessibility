@@ -11,10 +11,11 @@ that folder's README says which script produces which table or figure.
 
 ## Models in the running system
 
-Eight pre-trained perception models and one language model, plus a sign
+Seven pre-trained perception models and one language model, plus a sign
 network (the TGCN) trained here on WLASL100 keypoints extracted by the
 application, because the published weights, learned from OpenPose keypoints,
-reached only 8% top-1 on them.
+reached only 8% top-1 on them. YamNet is kept only as the fallback when AST
+cannot load.
 
 | Channel | Model | Role |
 |---|---|---|
