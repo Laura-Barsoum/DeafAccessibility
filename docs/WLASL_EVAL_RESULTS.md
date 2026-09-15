@@ -1,47 +1,73 @@
 # WLASL Evaluation Results
 
-## Update, September 2026: official test clips and the TGCN tier
+## Update, September 2026: official test clips, two silent defects and a retrained TGCN
 
 This supersedes the May 2026 run further down, which is kept for the record.
 
-**Test clips.** 100 of the 258 official WLASL100 test clips could still be
-obtained (the Voxel51 mirror on Hugging Face), each trimmed to its annotated
-frame range. They are not committed (`backend/data/WLASL-master/videos_test100/`).
+**Clips.** 100 of the 258 official WLASL100 test clips, 744 of the 1,442
+training clips and 163 of the 338 validation clips could still be obtained from
+the Voxel51 mirror on Hugging Face. Each is cut to its annotated frame range.
+None is committed (`backend/data/WLASL-master/videos_test100/`,
+`videos_trainval100/`).
 
-**TGCN weights.** An asl100 checkpoint was found at
-`huggingface.co/sharonn18/tgcn-wlasl` (64 hidden features, 20 stages, 50
-frames). Loading it exposed a defect: `tgcn_sign_model.py` defined an attention
-block, an extra graph convolution and a flattening classifier that no
-checkpoint contains, and loaded with `strict=False`, so those layers would have
-kept random weights. The network now matches the released `GCN_muti_att` key
-for key, and a checkpoint that does not fit is refused.
+**Defect 1: a network no checkpoint fits.** `tgcn_sign_model.py` defined an
+attention block, an extra graph convolution and a flattening classifier that no
+published checkpoint contains, and loaded with `strict=False`, so those layers
+would have kept random weights. The network now matches the released
+`GCN_muti_att` key for key, and a checkpoint that does not fit is refused.
 
-**Input conventions.** The checkpoint was trained on OpenPose keypoints and its
-release does not state the keypoint order, coordinate range or class order.
-These were chosen on 14 older local WLASL clips outside the test split
-(`backend/eval_results/sign_wlasl100_select.json`) before any test clip was
-scored: OpenPose order, coordinates in [-1, 1], alphabetical classes. The best
-variant got 3 of 14 right within its top five.
+**Defect 2: no hands.** MediaPipe's Tasks API gives hand landmarks
+`visibility=None`. The adapter in `sign_language.py` converted it with
+`float()`, which raised inside a catch-all, so both hand slots were empty on
+every frame and every hand-based sign tier ran on body pose alone. An earlier
+version of this page concluded, from runs with this defect, that the published
+weights were at chance on MediaPipe keypoints; that conclusion was wrong. The
+adapter is now None-safe, with a regression test.
 
-| Configuration, 100 test clips | Top-1 | Top-5 |
-|---|---|---|
-| Pipeline without the TGCN tier (as shipped) | 1% | 1% |
-| Pipeline with the TGCN tier | 1% | 2% |
-| TGCN model alone | 1% | 6% (95% Wilson interval 3% to 12%) |
+**Published weights, with hands.** The asl100 checkpoint at
+`huggingface.co/sharonn18/tgcn-wlasl` expects OpenPose keypoints. Its keypoint
+order (hands swapped), coordinates ([-1, 1]) and class order (alphabetical)
+were chosen on 14 older local clips outside the test split.
 
-Top-5 chance for 100 signs is 5%, so the published weights perform at chance
-on MediaPipe keypoints, most likely because weights learned on OpenPose
-keypoints do not transfer. The tier is therefore off by default
-(`ACCESSIBILITY_ENABLE_TGCN=1` turns it on), because a confident wrong sign is
-worse than none. The realistic fix is retraining the TGCN on MediaPipe
-keypoints extracted from the WLASL training videos.
+**Retrained on MediaPipe keypoints.** `sign_train_tgcn.py` trains the same
+network on keypoints extracted by the application's own adapter
+(`sign_keypoints.py`). The starting weights (published or random), the
+coordinates (image, or normalised to the signer's shoulders), the epoch and the
+display threshold were all chosen on the validation clips: random start,
+body-normalised keypoints, 60.1% validation top-1. The test clips were then
+scored once.
+
+| Configuration, 100 test clips | Top-1 | Top-3 | Top-5 |
+|---|---|---|---|
+| Sign cascade without the TGCN tier | 1% | 1% | 1% |
+| Published weights, model alone | 8% | not recorded | 31% |
+| Retrained weights, model alone | 60% (95% Wilson interval 50% to 69%) | 72% | 78% (69% to 85%) |
+| Retrained weights, full sign cascade (as shipped) | 21% (14% to 30%) | 41% | 56% |
+
+The full cascade keeps far fewer correct answers than the model because it
+puts the TGCN's word first only when that word is more confident than the
+curated hand-shape and gesture tiers, which cover everyday signs such as "ok"
+and "hello" that are not among the 100 WLASL signs. In 38 of the 59 test clips
+where the TGCN's answer was right, one of those labels came first. Letting the
+TGCN lead would raise the word-level score but would mislabel signs outside its
+vocabulary; that trade-off has not been measured.
+
+The retrained weights and their settings are in
+`backend/data/tgcn/asl100_mediapipe/`, and the tier runs by default when they
+are present (`ACCESSIBILITY_ENABLE_TGCN=0` turns it off). They cover only the
+100 WLASL100 signs and were trained and tested on WLASL's signers, a narrow
+population; webcam signing by Deaf users is untested.
 
 Commands, from `backend/`:
 ```
 python scripts/report_experiments/sign_wlasl100.py --select
 python scripts/report_experiments/sign_wlasl100.py
+python scripts/report_experiments/sign_keypoints.py
+python scripts/report_experiments/sign_train_tgcn.py
+python scripts/report_experiments/sign_wlasl100.py --trained --frames 50
 ```
-Results: `backend/eval_results/sign_wlasl100.json`.
+Results: `backend/eval_results/sign_wlasl100.json`, `sign_tgcn_train.json` and
+`sign_wlasl100_trained.json`.
 
 ---
 

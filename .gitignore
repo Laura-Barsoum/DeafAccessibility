@@ -59,4 +59,6 @@ backend/data/emotion_eval/fer2013/
 
 # Sign-recognition test clips and the TGCN checkpoint (third-party, not versioned)
 backend/data/WLASL-master/videos_test100/
-backend/data/tgcn/
+backend/data/WLASL-master/videos_trainval100/
+backend/data/tgcn/*
+!backend/data/tgcn/asl100_mediapipe/

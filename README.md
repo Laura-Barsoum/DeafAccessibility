@@ -9,12 +9,14 @@ and a language model on a laptop CPU** to provide situational awareness beyond
 speech captioning.
 It transcribes speech, classifies environmental sounds, recognises sounds the
 user has personally enrolled, detects visual hazards, describes the scene,
-reads emotional tone, and interprets a constrained sign vocabulary. Detections
+reads emotional tone, and recognises 100 common signs. Detections
 converge on a shared event bus that ranks them into four priority bands and
 escalates genuinely urgent events with a sustained visual flash and a haptic
 pulse.
 
-No model is trained from scratch. The contribution is the orchestration layer:
+The only model trained here is the small sign network, trained on the app's own
+MediaPipe keypoints because the published weights, learned from OpenPose
+keypoints, reached only 8% top-1 on them. The contribution is the orchestration layer:
 concurrency under per-model timeouts, priority-based fusion, few-shot
 personalisation with open-set rejection, and graceful degradation.
 
@@ -33,7 +35,7 @@ personalisation with open-set rejection, and graceful degradation.
 | Visual hazard detection | YOLOv11n | Working |
 | Scene description | BLIP | Working, throttled to every 4th tick |
 | Emotion (tone) | DeepFace + wav2vec2, confidence-weighted fusion | Working, 54.7% on FER-2013 test faces (an upper bound for webcam frames) |
-| Sign recognition | MediaPipe Tasks + geometric rules + fingerspelling | Partial, see limitations |
+| Sign recognition | TGCN trained on MediaPipe keypoints (WLASL100) + geometric rules + fingerspelling | Working for 100 signs: 60% top-1 on WLASL100 test clips |
 | Sign to speech | LLM gloss polishing (`gpt-oss-20b` via Groq) + neural TTS | Working |
 | Name and keyword alerts | Transcript matching, word-boundary safe | Working |
 | Caption reliability | Heuristic scorer from lip motion | Working (**not** lip reading) |
@@ -61,12 +63,15 @@ feedback.
 
 ### Honest limitations
 
-- **Sign recognition is constrained.** Recognition uses a small curated
-  vocabulary of conversational and safety signs plus fingerspelling: 1% top-1
-  on 100 official WLASL100 test clips. Published TGCN weights for WLASL were
-  found, but on MediaPipe keypoints they score at chance (6 of 100 within the
-  top five), most likely because they were trained on OpenPose keypoints, so
-  that tier is off unless `ACCESSIBILITY_ENABLE_TGCN=1`. See
+- **Sign recognition covers 100 signs.** A TGCN trained on the application's
+  own MediaPipe keypoints from WLASL100 recognises 60% of 100 official test
+  clips first time and 78% within its top five. Through the full sign cascade
+  it leads only 21% of the time, because the cascade puts its word first only
+  when it beats the older hand-shape rules, which often answer "ok" or
+  "hello". It knows only those 100 signs, was trained and tested on
+  WLASL's signers, and has not been tested on webcam signing by Deaf users. Two
+  silent defects had held sign recognition at 1%: a network no checkpoint
+  fitted, and hand landmarks dropped on every frame. See
   `docs/WLASL_EVAL_RESULTS.md`.
 - **Personal sounds miss about a third of plays.** On a household-class proxy
   built from ESC-50 and passed through the browser's Opus codec, the matcher
@@ -181,7 +186,7 @@ cd backend && source venv/bin/activate
 python -m pytest tests/ -q
 ```
 
-157 unit and integration tests. Unit tests cover pure logic (fusion ranking,
+164 unit and integration tests. Unit tests cover pure logic (fusion ranking,
 priority mapping, prototypical matching, the feedback loop, fingerspelling,
 name matching, the language-model fallback chain). Integration tests exercise
 the HTTP layer, including graceful degradation when audio or frames are absent.
@@ -204,6 +209,8 @@ python scripts/report_experiments/latency_on_recorded_media.py  # per-stage and 
 python scripts/report_experiments/fewshot_embeddings.py         # personal sounds: AST against YamNet embeddings
 python scripts/report_experiments/fewshot_deployment.py         # AST personal-sound settings on browser-coded ticks
 python scripts/report_experiments/sign_wlasl100.py --select     # then without --select: WLASL100 test clips
+python scripts/report_experiments/sign_keypoints.py             # MediaPipe keypoints for WLASL100 clips
+python scripts/report_experiments/sign_train_tgcn.py            # train the sign model; then sign_wlasl100.py --trained
 python scripts/report_experiments/fusion_scenes.py              # fusion on scripted scenes with known events
 python scripts/report_experiments/fusion_scenes.py --scene-set heldout --out fusion_eval_heldout_after.json
 ```

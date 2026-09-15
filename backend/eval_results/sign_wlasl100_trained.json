@@ -1,15 +1,24 @@
 {
  "method": "[Final report: Section 5.2 signing, Table 5.1]\n\nWord-level sign recognition on the WLASL100 test split (Li et al., 2020), before\nand after the TGCN tier is available, through the application's own classifier.\n\nClips: the 100 official WLASL100 test clips that could still be obtained (of 258),\nfrom the Voxel51 mirror on Hugging Face, each trimmed to its annotated frame range\n(backend/data/WLASL-master/videos_test100, not committed). Frames are sampled as\neval_wlasl.py samples them and passed to\nSignLanguageRecognizer.classify_all_frames_combined, the method behind\n/sign/recognize: once with the TGCN tier disabled (the configuration reported so\nfar) and once with the asl100 checkpoint from huggingface.co/sharonn18/tgcn-wlasl.\nThe ASL letter tier needs a model that is not cached here, so it is off in both\nruns; the model is loaded from the local cache only.\n\nThe checkpoint's documentation leaves three things open: how MediaPipe's\nlandmarks map onto the 55 OpenPose keypoints it was trained on (the app's old\nlayout, OpenPose order, or OpenPose order with the hands swapped), whether\ncoordinates are in [0, 1] or [-1, 1], and the class order. `--select` settles\nall three on the 14 older local WLASL100 clips, none of which is in the test split,\nbefore any test clip is scored. The model's own top-1 and top-5 on the test clips are reported alongside\nthe pipeline's. Writes eval_results/sign_wlasl100.json (or sign_wlasl100_select.json).\n",
- "checkpoint": "huggingface.co/sharonn18/tgcn-wlasl checkpoints/asl100",
+ "checkpoint": "data/tgcn/asl100_mediapipe, trained by sign_train_tgcn.py",
  "checkpoint_load": {
   "missing": 0,
   "unexpected": 0
  },
- "variant": "openpose_swapped/signed/alphabetical",
+ "variant": "openpose_swapped/body/alphabetical (trained, threshold 0.05)",
  "test_clips": 100,
  "official_test_clips": 258,
  "before": {
   "top1": {
+   "n": 1,
+   "of": 100,
+   "rate": 0.01,
+   "ci95": [
+    0.0017673865655472645,
+    0.0544875247609346
+   ]
+  },
+  "top3": {
    "n": 1,
    "of": 100,
    "rate": 0.01,
@@ -30,531 +39,605 @@
  },
  "after": {
   "top1": {
-   "n": 8,
+   "n": 21,
    "of": 100,
-   "rate": 0.08,
+   "rate": 0.21,
    "ci95": [
-    0.04109296948581091,
-    0.14998266879403072
+    0.14165549531645788,
+    0.2998014930196232
+   ]
+  },
+  "top3": {
+   "n": 41,
+   "of": 100,
+   "rate": 0.41,
+   "ci95": [
+    0.31867157095664655,
+    0.5079874943890338
    ]
   },
   "top5": {
-   "n": 9,
+   "n": 56,
    "of": 100,
-   "rate": 0.09,
+   "rate": 0.56,
    "ci95": [
-    0.04807199516388488,
-    0.16226374696643667
+    0.4622792771125631,
+    0.6532813459903167
    ]
   }
  },
  "model": {
   "top1": {
-   "n": 8,
+   "n": 60,
    "of": 100,
-   "rate": 0.08,
+   "rate": 0.6,
    "ci95": [
-    0.04109296948581091,
-    0.14998266879403072
+    0.5020007846184025,
+    0.6906002538863971
+   ]
+  },
+  "top3": {
+   "n": 72,
+   "of": 100,
+   "rate": 0.72,
+   "ci95": [
+    0.6251178763865427,
+    0.7986044083240164
    ]
   },
   "top5": {
-   "n": 31,
+   "n": 78,
    "of": 100,
-   "rate": 0.31,
+   "rate": 0.78,
    "ci95": [
-    0.22779563206132378,
-    0.40626239477955695
+    0.6892946528499969,
+    0.849988254963442
    ]
   }
  },
  "median_ms": {
-  "before": 1847.0,
-  "after": 1855.0
+  "before": 3035.5,
+  "after": 3055.5
  },
  "records": [
   {
    "video": "00625",
    "gloss": "accident",
-   "frames": 30,
+   "frames": 50,
    "before": {
     "labels": [
-     "phone"
+     "phone",
+     "hello"
     ],
     "top1": false,
+    "top3": false,
     "top5": false,
     "tgcn": null,
-    "ms": 4038
+    "ms": 4976
    },
    "after": {
     "labels": [
-     "bed",
-     "phone"
+     "phone",
+     "hello",
+     "wrong"
     ],
     "top1": false,
+    "top3": false,
     "top5": false,
     "tgcn": [
-     "bed",
-     0.88843834400177
+     "wrong",
+     0.32768890261650085
     ],
-    "ms": 2054
+    "ms": 2988
    },
    "model": {
-    "keypoint_frames": 30,
+    "keypoint_frames": 50,
     "top5": [
-     "bed",
+     "wrong",
+     "accident",
+     "cool",
      "eat",
-     "cousin",
-     "mother",
-     "brown"
+     "thanksgiving"
     ],
     "top1_hit": false,
-    "top5_hit": false
+    "top3_hit": true,
+    "top5_hit": true
    }
   },
   {
    "video": "00634",
    "gloss": "accident",
-   "frames": 30,
+   "frames": 50,
    "before": {
     "labels": [
      "letter_d",
      "ok"
     ],
     "top1": false,
+    "top3": false,
     "top5": false,
     "tgcn": null,
-    "ms": 2420
+    "ms": 3615
    },
    "after": {
     "labels": [
      "letter_d",
      "ok",
-     "jacket"
+     "accident"
     ],
     "top1": false,
-    "top5": false,
+    "top3": true,
+    "top5": true,
     "tgcn": [
-     "jacket",
-     0.5548897385597229
+     "accident",
+     0.4538847804069519
     ],
-    "ms": 2415
+    "ms": 3619
    },
    "model": {
-    "keypoint_frames": 30,
+    "keypoint_frames": 50,
     "top5": [
+     "accident",
      "jacket",
      "play",
-     "accident",
-     "fish",
-     "letter"
+     "pull",
+     "right"
     ],
-    "top1_hit": false,
+    "top1_hit": true,
+    "top3_hit": true,
     "top5_hit": true
    }
   },
   {
    "video": "01386",
    "gloss": "africa",
-   "frames": 30,
+   "frames": 50,
    "before": {
     "labels": [
+     "ok",
      "yes",
      "ok"
     ],
     "top1": false,
+    "top3": false,
     "top5": false,
     "tgcn": null,
-    "ms": 2012
+    "ms": 3031
    },
    "after": {
     "labels": [
+     "ok",
      "yes",
      "ok",
-     "mother"
+     "orange"
     ],
     "top1": false,
+    "top3": false,
     "top5": false,
     "tgcn": [
-     "mother",
-     0.41439059376716614
+     "orange",
+     0.4131968319416046
     ],
-    "ms": 2000
+    "ms": 3003
    },
    "model": {
-    "keypoint_frames": 30,
+    "keypoint_frames": 50,
     "top5": [
-     "mother",
-     "pizza",
-     "tall",
-     "meet",
-     "computer"
+     "orange",
+     "dog",
+     "who",
+     "forget",
+     "help"
     ],
     "top1_hit": false,
+    "top3_hit": false,
     "top5_hit": false
    }
   },
   {
    "video": "01986",
    "gloss": "all",
-   "frames": 30,
+   "frames": 50,
    "before": {
     "labels": [
      "hello"
     ],
     "top1": false,
+    "top3": false,
     "top5": false,
     "tgcn": null,
-    "ms": 2022
+    "ms": 3109
    },
    "after": {
     "labels": [
      "hello",
-     "city"
+     "all"
     ],
     "top1": false,
-    "top5": false,
+    "top3": true,
+    "top5": true,
     "tgcn": [
-     "city",
-     0.4576728641986847
+     "all",
+     0.6007059812545776
     ],
-    "ms": 2041
+    "ms": 3250
    },
    "model": {
-    "keypoint_frames": 30,
+    "keypoint_frames": 50,
     "top5": [
-     "city",
-     "book",
      "all",
+     "cook",
      "how",
-     "family"
+     "family",
+     "graduate"
     ],
-    "top1_hit": false,
+    "top1_hit": true,
+    "top3_hit": true,
     "top5_hit": true
    }
   },
   {
    "video": "05727",
    "gloss": "before",
-   "frames": 30,
+   "frames": 50,
    "before": {
     "labels": [
      "hello"
     ],
     "top1": false,
+    "top3": false,
     "top5": false,
     "tgcn": null,
-    "ms": 2346
+    "ms": 4017
    },
    "after": {
     "labels": [
-     "secretary",
-     "hello"
+     "hello",
+     "decide"
     ],
     "top1": false,
+    "top3": false,
     "top5": false,
     "tgcn": [
-     "secretary",
-     0.9158657789230347
+     "decide",
+     0.21704448759555817
     ],
-    "ms": 2321
+    "ms": 3712
    },
    "model": {
-    "keypoint_frames": 30,
+    "keypoint_frames": 50,
     "top5": [
-     "secretary",
+     "accident",
      "decide",
-     "many",
-     "kiss",
-     "finish"
+     "what",
+     "all",
+     "pull"
     ],
     "top1_hit": false,
+    "top3_hit": false,
     "top5_hit": false
    }
   },
   {
    "video": "05739",
    "gloss": "before",
-   "frames": 30,
+   "frames": 50,
    "before": {
     "labels": [
      "hello"
     ],
     "top1": false,
+    "top3": false,
     "top5": false,
     "tgcn": null,
-    "ms": 2450
+    "ms": 3832
    },
    "after": {
     "labels": [
-     "cook",
+     "enjoy",
      "hello"
     ],
     "top1": false,
+    "top3": false,
     "top5": false,
     "tgcn": [
-     "cook",
-     0.6057643890380859
+     "enjoy",
+     0.4179328680038452
     ],
-    "ms": 2572
+    "ms": 3717
    },
    "model": {
-    "keypoint_frames": 30,
+    "keypoint_frames": 50,
     "top5": [
-     "cook",
+     "enjoy",
+     "before",
      "fish",
-     "how",
-     "help",
-     "enjoy"
+     "study",
+     "play"
     ],
     "top1_hit": false,
-    "top5_hit": false
+    "top3_hit": true,
+    "top5_hit": true
    }
   },
   {
    "video": "05741",
    "gloss": "before",
-   "frames": 30,
+   "frames": 50,
    "before": {
     "labels": [
+     "hello",
+     "ok",
      "hello",
      "ok"
     ],
     "top1": false,
+    "top3": false,
     "top5": false,
     "tgcn": null,
-    "ms": 1914
+    "ms": 2790
    },
    "after": {
     "labels": [
      "hello",
      "ok",
-     "cousin"
+     "hello",
+     "ok",
+     "before"
     ],
     "top1": false,
-    "top5": false,
+    "top3": false,
+    "top5": true,
     "tgcn": [
-     "cousin",
-     0.47964152693748474
+     "before",
+     0.8899102210998535
     ],
-    "ms": 1950
+    "ms": 2968
    },
    "model": {
-    "keypoint_frames": 30,
+    "keypoint_frames": 50,
     "top5": [
-     "cousin",
+     "before",
+     "last",
      "forget",
-     "eat",
-     "tall",
-     "blue"
+     "shirt",
+     "wrong"
     ],
-    "top1_hit": false,
-    "top5_hit": false
+    "top1_hit": true,
+    "top3_hit": true,
+    "top5_hit": true
    }
   },
   {
    "video": "06335",
    "gloss": "bird",
-   "frames": 30,
+   "frames": 50,
    "before": {
     "labels": [
      "you",
-     "yes",
-     "you"
+     "hello"
     ],
     "top1": false,
+    "top3": false,
     "top5": false,
     "tgcn": null,
-    "ms": 1686
+    "ms": 2406
    },
    "after": {
     "labels": [
-     "mother",
      "you",
-     "yes",
-     "you"
+     "hello",
+     "bird"
     ],
     "top1": false,
-    "top5": false,
+    "top3": true,
+    "top5": true,
     "tgcn": [
-     "mother",
-     0.6750462651252747
+     "bird",
+     0.45335251092910767
     ],
-    "ms": 1665
+    "ms": 2408
    },
    "model": {
-    "keypoint_frames": 29,
+    "keypoint_frames": 49,
     "top5": [
-     "mother",
-     "bed",
-     "brown",
-     "computer",
-     "tall"
+     "bird",
+     "orange",
+     "drink",
+     "work",
+     "yes"
     ],
-    "top1_hit": false,
-    "top5_hit": false
+    "top1_hit": true,
+    "top3_hit": true,
+    "top5_hit": true
    }
   },
   {
    "video": "06360",
    "gloss": "birthday",
-   "frames": 30,
+   "frames": 50,
    "before": {
     "labels": [
-     "hello"
+     "hello",
+     "ok"
     ],
     "top1": false,
+    "top3": false,
     "top5": false,
     "tgcn": null,
-    "ms": 1624
+    "ms": 2396
    },
    "after": {
     "labels": [
-     "cool",
-     "hello"
+     "birthday",
+     "hello",
+     "ok"
     ],
-    "top1": false,
-    "top5": false,
+    "top1": true,
+    "top3": true,
+    "top5": true,
     "tgcn": [
-     "cool",
-     0.5826203227043152
+     "birthday",
+     0.5962137579917908
     ],
-    "ms": 1632
+    "ms": 2393
    },
    "model": {
-    "keypoint_frames": 29,
+    "keypoint_frames": 49,
     "top5": [
-     "cool",
-     "pink",
+     "birthday",
      "color",
-     "book",
-     "mother"
+     "accident",
+     "cheat",
+     "dark"
     ],
-    "top1_hit": false,
-    "top5_hit": false
+    "top1_hit": true,
+    "top3_hit": true,
+    "top5_hit": true
    }
   },
   {
    "video": "06845",
    "gloss": "blue",
-   "frames": 30,
+   "frames": 50,
    "before": {
     "labels": [
-     "hello"
+     "hello",
+     "ok"
     ],
     "top1": false,
+    "top3": false,
     "top5": false,
     "tgcn": null,
-    "ms": 1997
+    "ms": 3025
    },
    "after": {
     "labels": [
-     "book",
-     "hello"
+     "blue",
+     "hello",
+     "ok"
     ],
-    "top1": false,
-    "top5": false,
+    "top1": true,
+    "top3": true,
+    "top5": true,
     "tgcn": [
-     "book",
-     0.4154520332813263
+     "blue",
+     0.8040978312492371
     ],
-    "ms": 1995
+    "ms": 3027
    },
    "model": {
-    "keypoint_frames": 29,
+    "keypoint_frames": 49,
     "top5": [
-     "book",
+     "blue",
+     "mother",
      "cool",
-     "candy",
      "cousin",
-     "computer"
+     "dog"
     ],
-    "top1_hit": false,
-    "top5_hit": false
+    "top1_hit": true,
+    "top3_hit": true,
+    "top5_hit": true
    }
   },
   {
    "video": "07400",
    "gloss": "bowling",
-   "frames": 30,
+   "frames": 50,
    "before": {
     "labels": [
      "hello",
-     "ok"
+     "ok",
+     "hello"
     ],
     "top1": false,
+    "top3": false,
     "top5": false,
     "tgcn": null,
-    "ms": 2388
+    "ms": 3539
    },
    "after": {
     "labels": [
-     "bowling",
      "hello",
-     "ok"
+     "ok",
+     "hello",
+     "dog"
     ],
-    "top1": true,
-    "top5": true,
+    "top1": false,
+    "top3": false,
+    "top5": false,
     "tgcn": [
-     "bowling",
-     0.9648754596710205
+     "dog",
+     0.5909045338630676
     ],
-    "ms": 2409
+    "ms": 3540
    },
    "model": {
-    "keypoint_frames": 30,
+    "keypoint_frames": 50,
     "top5": [
-     "bowling",
      "dog",
-     "give",
-     "want",
-     "now"
+     "can",
+     "now",
+     "many",
+     "bowling"
     ],
-    "top1_hit": true,
+    "top1_hit": false,
+    "top3_hit": false,
     "top5_hit": true
    }
   },
   {
    "video": "08425",
    "gloss": "but",
-   "frames": 30,
+   "frames": 50,
    "before": {
     "labels": [
      "help",
-     "you"
+     "you",
+     "help",
+     "hello"
     ],
     "top1": false,
+    "top3": false,
     "top5": false,
     "tgcn": null,
-    "ms": 2329
+    "ms": 3414
    },
    "after": {
     "labels": [
      "help",
-     "you"
+     "you",
+     "help",
+     "hello",
+     "but"
     ],
     "top1": false,
-    "top5": false,
-    "tgcn": null,
-    "ms": 2331
+    "top3": false,
+    "top5": true,
+    "tgcn": [
+     "but",
+     0.7760766744613647
+    ],
+    "ms": 3423
    },
    "model": {
-    "keypoint_frames": 30,
+    "keypoint_frames": 50,
     "top5": [
-     "short",
-     "decide",
      "but",
-     "candy",
-     "many"
+     "short",
+     "language",
+     "last",
+     "chair"
     ],
-    "top1_hit": false,
+    "top1_hit": true,
+    "top3_hit": true,
     "top5_hit": true
    }
   },
   {
    "video": "08429",
    "gloss": "but",
-   "frames": 30,
+   "frames": 50,
    "before": {
     "labels": [
      "hello",
@@ -562,1631 +645,1828 @@
      "yes"
     ],
     "top1": false,
+    "top3": false,
     "top5": false,
     "tgcn": null,
-    "ms": 1913
+    "ms": 2777
    },
    "after": {
     "labels": [
      "hello",
      "you",
      "yes",
-     "mother"
+     "africa"
     ],
     "top1": false,
+    "top3": false,
     "top5": false,
     "tgcn": [
-     "mother",
-     0.3628537654876709
+     "africa",
+     0.29639339447021484
     ],
-    "ms": 1940
+    "ms": 2775
    },
    "model": {
-    "keypoint_frames": 30,
+    "keypoint_frames": 50,
     "top5": [
-     "city",
-     "bed",
-     "blue",
-     "mother",
-     "tall"
+     "africa",
+     "fine",
+     "pizza",
+     "right",
+     "no"
     ],
     "top1_hit": false,
+    "top3_hit": false,
     "top5_hit": false
    }
   },
   {
    "video": "08915",
    "gloss": "candy",
-   "frames": 30,
+   "frames": 50,
    "before": {
     "labels": [
+     "help",
      "you",
      "help"
     ],
     "top1": false,
-    "top5": false,
-    "tgcn": null,
-    "ms": 1519
-   },
-   "after": {
-    "labels": [
-     "tall",
-     "you",
-     "help"
-    ],
-    "top1": false,
-    "top5": false,
-    "tgcn": [
-     "tall",
-     0.7670048475265503
-    ],
-    "ms": 1523
-   },
-   "model": {
-    "keypoint_frames": 30,
-    "top5": [
-     "tall",
-     "candy",
-     "book",
-     "dog",
-     "cousin"
-    ],
-    "top1_hit": false,
-    "top5_hit": true
-   }
-  },
-  {
-   "video": "08925",
-   "gloss": "candy",
-   "frames": 30,
-   "before": {
-    "labels": [
-     "help"
-    ],
-    "top1": false,
-    "top5": false,
-    "tgcn": null,
-    "ms": 1795
-   },
-   "after": {
-    "labels": [
-     "candy",
-     "help"
-    ],
-    "top1": true,
-    "top5": true,
-    "tgcn": [
-     "candy",
-     0.8941603899002075
-    ],
-    "ms": 1789
-   },
-   "model": {
-    "keypoint_frames": 30,
-    "top5": [
-     "candy",
-     "cool",
-     "who",
-     "apple",
-     "pizza"
-    ],
-    "top1_hit": true,
-    "top5_hit": true
-   }
-  },
-  {
-   "video": "09950",
-   "gloss": "change",
-   "frames": 30,
-   "before": {
-    "labels": [
-     "help",
-     "you"
-    ],
-    "top1": false,
-    "top5": false,
-    "tgcn": null,
-    "ms": 1759
-   },
-   "after": {
-    "labels": [
-     "help",
-     "you",
-     "book"
-    ],
-    "top1": false,
-    "top5": false,
-    "tgcn": [
-     "book",
-     0.9252012372016907
-    ],
-    "ms": 1757
-   },
-   "model": {
-    "keypoint_frames": 30,
-    "top5": [
-     "book",
-     "tall",
-     "meet",
-     "bed",
-     "cousin"
-    ],
-    "top1_hit": false,
-    "top5_hit": false
-   }
-  },
-  {
-   "video": "10159",
-   "gloss": "cheat",
-   "frames": 30,
-   "before": {
-    "labels": [
-     "help"
-    ],
-    "top1": false,
-    "top5": false,
-    "tgcn": null,
-    "ms": 2070
-   },
-   "after": {
-    "labels": [
-     "cheat",
-     "help"
-    ],
-    "top1": true,
-    "top5": true,
-    "tgcn": [
-     "cheat",
-     0.9744358062744141
-    ],
-    "ms": 2073
-   },
-   "model": {
-    "keypoint_frames": 30,
-    "top5": [
-     "cheat",
-     "same",
-     "later",
-     "doctor",
-     "computer"
-    ],
-    "top1_hit": true,
-    "top5_hit": true
-   }
-  },
-  {
-   "video": "11311",
-   "gloss": "clothes",
-   "frames": 30,
-   "before": {
-    "labels": [
-     "ok",
-     "hello"
-    ],
-    "top1": false,
-    "top5": false,
-    "tgcn": null,
-    "ms": 1799
-   },
-   "after": {
-    "labels": [
-     "ok",
-     "hello",
-     "accident"
-    ],
-    "top1": false,
-    "top5": false,
-    "tgcn": [
-     "accident",
-     0.4067477285861969
-    ],
-    "ms": 1882
-   },
-   "model": {
-    "keypoint_frames": 29,
-    "top5": [
-     "accident",
-     "short",
-     "city",
-     "jacket",
-     "go"
-    ],
-    "top1_hit": false,
-    "top5_hit": false
-   }
-  },
-  {
-   "video": "11772",
-   "gloss": "color",
-   "frames": 30,
-   "before": {
-    "labels": [
-     "hello",
-     "ok"
-    ],
-    "top1": false,
-    "top5": false,
-    "tgcn": null,
-    "ms": 2021
-   },
-   "after": {
-    "labels": [
-     "hello",
-     "ok",
-     "bed"
-    ],
-    "top1": false,
-    "top5": false,
-    "tgcn": [
-     "bed",
-     0.7304540872573853
-    ],
-    "ms": 2022
-   },
-   "model": {
-    "keypoint_frames": 30,
-    "top5": [
-     "bed",
-     "accident",
-     "city",
-     "thin",
-     "book"
-    ],
-    "top1_hit": false,
-    "top5_hit": false
-   }
-  },
-  {
-   "video": "12320",
-   "gloss": "computer",
-   "frames": 30,
-   "before": {
-    "labels": [
-     "hello"
-    ],
-    "top1": false,
-    "top5": false,
-    "tgcn": null,
-    "ms": 1843
-   },
-   "after": {
-    "labels": [
-     "computer",
-     "hello"
-    ],
-    "top1": true,
-    "top5": true,
-    "tgcn": [
-     "computer",
-     0.9694217443466187
-    ],
-    "ms": 1848
-   },
-   "model": {
-    "keypoint_frames": 29,
-    "top5": [
-     "computer",
-     "dark",
-     "basketball",
-     "finish",
-     "decide"
-    ],
-    "top1_hit": true,
-    "top5_hit": true
-   }
-  },
-  {
-   "video": "13196",
-   "gloss": "cool",
-   "frames": 30,
-   "before": {
-    "labels": [
-     "ok"
-    ],
-    "top1": false,
-    "top5": false,
-    "tgcn": null,
-    "ms": 1757
-   },
-   "after": {
-    "labels": [
-     "tall",
-     "ok"
-    ],
-    "top1": false,
-    "top5": false,
-    "tgcn": [
-     "tall",
-     0.9170721769332886
-    ],
-    "ms": 1755
-   },
-   "model": {
-    "keypoint_frames": 30,
-    "top5": [
-     "tall",
-     "later",
-     "cousin",
-     "brown",
-     "candy"
-    ],
-    "top1_hit": false,
-    "top5_hit": false
-   }
-  },
-  {
-   "video": "13198",
-   "gloss": "cool",
-   "frames": 30,
-   "before": {
-    "labels": [],
-    "top1": false,
-    "top5": false,
-    "tgcn": null,
-    "ms": 1840
-   },
-   "after": {
-    "labels": [
-     "fine"
-    ],
-    "top1": false,
-    "top5": false,
-    "tgcn": [
-     "fine",
-     0.4030962288379669
-    ],
-    "ms": 1854
-   },
-   "model": {
-    "keypoint_frames": 30,
-    "top5": [
-     "fine",
-     "woman",
-     "all",
-     "mother",
-     "no"
-    ],
-    "top1_hit": false,
-    "top5_hit": false
-   }
-  },
-  {
-   "video": "13325",
-   "gloss": "corn",
-   "frames": 30,
-   "before": {
-    "labels": [
-     "hello",
-     "ok"
-    ],
-    "top1": false,
-    "top5": false,
-    "tgcn": null,
-    "ms": 2032
-   },
-   "after": {
-    "labels": [
-     "basketball",
-     "hello",
-     "ok"
-    ],
-    "top1": false,
-    "top5": false,
-    "tgcn": [
-     "basketball",
-     0.9795626401901245
-    ],
-    "ms": 2033
-   },
-   "model": {
-    "keypoint_frames": 30,
-    "top5": [
-     "basketball",
-     "many",
-     "decide",
-     "kiss",
-     "play"
-    ],
-    "top1_hit": false,
-    "top5_hit": false
-   }
-  },
-  {
-   "video": "13334",
-   "gloss": "corn",
-   "frames": 30,
-   "before": {
-    "labels": [
-     "help"
-    ],
-    "top1": false,
-    "top5": false,
-    "tgcn": null,
-    "ms": 2111
-   },
-   "after": {
-    "labels": [
-     "pizza",
-     "help"
-    ],
-    "top1": false,
-    "top5": false,
-    "tgcn": [
-     "pizza",
-     0.7927272319793701
-    ],
-    "ms": 2134
-   },
-   "model": {
-    "keypoint_frames": 30,
-    "top5": [
-     "pizza",
-     "brown",
-     "candy",
-     "apple",
-     "orange"
-    ],
-    "top1_hit": false,
-    "top5_hit": false
-   }
-  },
-  {
-   "video": "13635",
-   "gloss": "cousin",
-   "frames": 30,
-   "before": {
-    "labels": [
-     "hello"
-    ],
-    "top1": false,
-    "top5": false,
-    "tgcn": null,
-    "ms": 1568
-   },
-   "after": {
-    "labels": [
-     "bed",
-     "hello"
-    ],
-    "top1": false,
-    "top5": false,
-    "tgcn": [
-     "bed",
-     0.7036133408546448
-    ],
-    "ms": 1573
-   },
-   "model": {
-    "keypoint_frames": 29,
-    "top5": [
-     "bed",
-     "forget",
-     "tall",
-     "mother",
-     "eat"
-    ],
-    "top1_hit": false,
-    "top5_hit": false
-   }
-  },
-  {
-   "video": "13710",
-   "gloss": "cow",
-   "frames": 30,
-   "before": {
-    "labels": [
-     "phone",
-     "ok"
-    ],
-    "top1": false,
-    "top5": false,
-    "tgcn": null,
-    "ms": 1738
-   },
-   "after": {
-    "labels": [
-     "mother",
-     "phone",
-     "ok"
-    ],
-    "top1": false,
-    "top5": false,
-    "tgcn": [
-     "mother",
-     0.9495470523834229
-    ],
-    "ms": 1747
-   },
-   "model": {
-    "keypoint_frames": 29,
-    "top5": [
-     "mother",
-     "tall",
-     "bed",
-     "cousin",
-     "computer"
-    ],
-    "top1_hit": false,
-    "top5_hit": false
-   }
-  },
-  {
-   "video": "14673",
-   "gloss": "dark",
-   "frames": 30,
-   "before": {
-    "labels": [
-     "hello",
-     "hello"
-    ],
-    "top1": false,
-    "top5": false,
-    "tgcn": null,
-    "ms": 2285
-   },
-   "after": {
-    "labels": [
-     "hello",
-     "hello",
-     "basketball"
-    ],
-    "top1": false,
-    "top5": false,
-    "tgcn": [
-     "basketball",
-     0.7769423723220825
-    ],
-    "ms": 2276
-   },
-   "model": {
-    "keypoint_frames": 30,
-    "top5": [
-     "basketball",
-     "dark",
-     "decide",
-     "later",
-     "paint"
-    ],
-    "top1_hit": false,
-    "top5_hit": true
-   }
-  },
-  {
-   "video": "14685",
-   "gloss": "dark",
-   "frames": 30,
-   "before": {
-    "labels": [
-     "hello"
-    ],
-    "top1": false,
-    "top5": false,
-    "tgcn": null,
-    "ms": 1854
-   },
-   "after": {
-    "labels": [
-     "kiss",
-     "hello"
-    ],
-    "top1": false,
-    "top5": false,
-    "tgcn": [
-     "kiss",
-     0.7857211232185364
-    ],
-    "ms": 1856
-   },
-   "model": {
-    "keypoint_frames": 29,
-    "top5": [
-     "kiss",
-     "bed",
-     "meet",
-     "dark",
-     "book"
-    ],
-    "top1_hit": false,
-    "top5_hit": true
-   }
-  },
-  {
-   "video": "14883",
-   "gloss": "deaf",
-   "frames": 30,
-   "before": {
-    "labels": [
-     "you"
-    ],
-    "top1": false,
-    "top5": false,
-    "tgcn": null,
-    "ms": 1887
-   },
-   "after": {
-    "labels": [
-     "you",
-     "mother"
-    ],
-    "top1": false,
-    "top5": false,
-    "tgcn": [
-     "mother",
-     0.8850423097610474
-    ],
-    "ms": 1886
-   },
-   "model": {
-    "keypoint_frames": 30,
-    "top5": [
-     "mother",
-     "brown",
-     "cool",
-     "candy",
-     "tall"
-    ],
-    "top1_hit": false,
-    "top5_hit": false
-   }
-  },
-  {
-   "video": "14888",
-   "gloss": "deaf",
-   "frames": 30,
-   "before": {
-    "labels": [
-     "you"
-    ],
-    "top1": false,
-    "top5": false,
-    "tgcn": null,
-    "ms": 1566
-   },
-   "after": {
-    "labels": [
-     "you",
-     "cool"
-    ],
-    "top1": false,
-    "top5": false,
-    "tgcn": [
-     "cool",
-     0.3250524699687958
-    ],
-    "ms": 1564
-   },
-   "model": {
-    "keypoint_frames": 29,
-    "top5": [
-     "cool",
-     "brown",
-     "tall",
-     "mother",
-     "candy"
-    ],
-    "top1_hit": false,
-    "top5_hit": false
-   }
-  },
-  {
-   "video": "17020",
-   "gloss": "doctor",
-   "frames": 30,
-   "before": {
-    "labels": [
-     "hello"
-    ],
-    "top1": false,
-    "top5": false,
-    "tgcn": null,
-    "ms": 2290
-   },
-   "after": {
-    "labels": [
-     "doctor",
-     "hello"
-    ],
-    "top1": true,
-    "top5": true,
-    "tgcn": [
-     "doctor",
-     0.8910619020462036
-    ],
-    "ms": 2394
-   },
-   "model": {
-    "keypoint_frames": 30,
-    "top5": [
-     "doctor",
-     "birthday",
-     "school",
-     "table",
-     "medicine"
-    ],
-    "top1_hit": true,
-    "top5_hit": true
-   }
-  },
-  {
-   "video": "17097",
-   "gloss": "dog",
-   "frames": 30,
-   "before": {
-    "labels": [
-     "hello",
-     "help",
-     "love"
-    ],
-    "top1": false,
-    "top5": false,
-    "tgcn": null,
-    "ms": 1472
-   },
-   "after": {
-    "labels": [
-     "book",
-     "hello",
-     "help",
-     "love"
-    ],
-    "top1": false,
-    "top5": false,
-    "tgcn": [
-     "book",
-     0.4669554829597473
-    ],
-    "ms": 1471
-   },
-   "model": {
-    "keypoint_frames": 29,
-    "top5": [
-     "book",
-     "cousin",
-     "candy",
-     "meet",
-     "kiss"
-    ],
-    "top1_hit": false,
-    "top5_hit": false
-   }
-  },
-  {
-   "video": "17713",
-   "gloss": "drink",
-   "frames": 30,
-   "before": {
-    "labels": [
-     "hello"
-    ],
-    "top1": false,
-    "top5": false,
-    "tgcn": null,
-    "ms": 1810
-   },
-   "after": {
-    "labels": [
-     "hello",
-     "book"
-    ],
-    "top1": false,
-    "top5": false,
-    "tgcn": [
-     "book",
-     0.48452436923980713
-    ],
-    "ms": 1811
-   },
-   "model": {
-    "keypoint_frames": 29,
-    "top5": [
-     "book",
-     "bed",
-     "tall",
-     "meet",
-     "blue"
-    ],
-    "top1_hit": false,
-    "top5_hit": false
-   }
-  },
-  {
-   "video": "21890",
-   "gloss": "fine",
-   "frames": 30,
-   "before": {
-    "labels": [
-     "ok"
-    ],
-    "top1": false,
-    "top5": false,
-    "tgcn": null,
-    "ms": 2040
-   },
-   "after": {
-    "labels": [
-     "secretary",
-     "ok"
-    ],
-    "top1": false,
-    "top5": false,
-    "tgcn": [
-     "secretary",
-     0.7186813950538635
-    ],
-    "ms": 2039
-   },
-   "model": {
-    "keypoint_frames": 29,
-    "top5": [
-     "meet",
-     "secretary",
-     "letter",
-     "computer",
-     "city"
-    ],
-    "top1_hit": false,
-    "top5_hit": false
-   }
-  },
-  {
-   "video": "21944",
-   "gloss": "finish",
-   "frames": 30,
-   "before": {
-    "labels": [
-     "hello"
-    ],
-    "top1": false,
-    "top5": false,
-    "tgcn": null,
-    "ms": 1983
-   },
-   "after": {
-    "labels": [
-     "mother",
-     "hello"
-    ],
-    "top1": false,
-    "top5": false,
-    "tgcn": [
-     "mother",
-     0.8267019987106323
-    ],
-    "ms": 1989
-   },
-   "model": {
-    "keypoint_frames": 30,
-    "top5": [
-     "mother",
-     "dog",
-     "later",
-     "pizza",
-     "fish"
-    ],
-    "top1_hit": false,
-    "top5_hit": false
-   }
-  },
-  {
-   "video": "22117",
-   "gloss": "fish",
-   "frames": 30,
-   "before": {
-    "labels": [
-     "ok",
-     "hello"
-    ],
-    "top1": false,
-    "top5": false,
-    "tgcn": null,
-    "ms": 1753
-   },
-   "after": {
-    "labels": [
-     "mother",
-     "ok",
-     "hello"
-    ],
-    "top1": false,
-    "top5": false,
-    "tgcn": [
-     "mother",
-     0.9555079936981201
-    ],
-    "ms": 1755
-   },
-   "model": {
-    "keypoint_frames": 29,
-    "top5": [
-     "mother",
-     "pink",
-     "book",
-     "cool",
-     "tall"
-    ],
-    "top1_hit": false,
-    "top5_hit": false
-   }
-  },
-  {
-   "video": "22954",
-   "gloss": "forget",
-   "frames": 30,
-   "before": {
-    "labels": [
-     "hello"
-    ],
-    "top1": false,
-    "top5": false,
-    "tgcn": null,
-    "ms": 1820
-   },
-   "after": {
-    "labels": [
-     "hello",
-     "cousin"
-    ],
-    "top1": false,
-    "top5": false,
-    "tgcn": [
-     "cousin",
-     0.5145613551139832
-    ],
-    "ms": 1824
-   },
-   "model": {
-    "keypoint_frames": 30,
-    "top5": [
-     "cousin",
-     "forget",
-     "mother",
-     "eat",
-     "tall"
-    ],
-    "top1_hit": false,
-    "top5_hit": true
-   }
-  },
-  {
-   "video": "23767",
-   "gloss": "full",
-   "frames": 30,
-   "before": {
-    "labels": [
-     "hello",
-     "ok",
-     "hello"
-    ],
-    "top1": false,
-    "top5": false,
-    "tgcn": null,
-    "ms": 2303
-   },
-   "after": {
-    "labels": [
-     "hello",
-     "ok",
-     "hello",
-     "bed"
-    ],
-    "top1": false,
-    "top5": false,
-    "tgcn": [
-     "bed",
-     0.5561280250549316
-    ],
-    "ms": 2304
-   },
-   "model": {
-    "keypoint_frames": 30,
-    "top5": [
-     "bed",
-     "family",
-     "finish",
-     "city",
-     "blue"
-    ],
-    "top1_hit": false,
-    "top5_hit": false
-   }
-  },
-  {
-   "video": "24636",
-   "gloss": "give",
-   "frames": 30,
-   "before": {
-    "labels": [
-     "ok",
-     "ok"
-    ],
-    "top1": false,
-    "top5": false,
-    "tgcn": null,
-    "ms": 1734
-   },
-   "after": {
-    "labels": [
-     "book",
-     "ok",
-     "ok"
-    ],
-    "top1": false,
-    "top5": false,
-    "tgcn": [
-     "book",
-     0.8941062092781067
-    ],
-    "ms": 1733
-   },
-   "model": {
-    "keypoint_frames": 30,
-    "top5": [
-     "book",
-     "candy",
-     "kiss",
-     "cool",
-     "city"
-    ],
-    "top1_hit": false,
-    "top5_hit": false
-   }
-  },
-  {
-   "video": "24649",
-   "gloss": "give",
-   "frames": 30,
-   "before": {
-    "labels": [
-     "hello",
-     "five_alt"
-    ],
-    "top1": false,
-    "top5": false,
-    "tgcn": null,
-    "ms": 2271
-   },
-   "after": {
-    "labels": [
-     "how",
-     "hello",
-     "five_alt"
-    ],
-    "top1": false,
-    "top5": false,
-    "tgcn": [
-     "how",
-     0.5239169597625732
-    ],
-    "ms": 2272
-   },
-   "model": {
-    "keypoint_frames": 30,
-    "top5": [
-     "cook",
-     "how",
-     "school",
-     "medicine",
-     "book"
-    ],
-    "top1_hit": false,
-    "top5_hit": false
-   }
-  },
-  {
-   "video": "24960",
-   "gloss": "go",
-   "frames": 30,
-   "before": {
-    "labels": [
-     "help",
-     "ok"
-    ],
-    "top1": false,
-    "top5": false,
-    "tgcn": null,
-    "ms": 1761
-   },
-   "after": {
-    "labels": [
-     "candy",
-     "help",
-     "ok"
-    ],
-    "top1": false,
-    "top5": false,
-    "tgcn": [
-     "candy",
-     0.6087441444396973
-    ],
-    "ms": 1767
-   },
-   "model": {
-    "keypoint_frames": 30,
-    "top5": [
-     "candy",
-     "dog",
-     "tall",
-     "book",
-     "meet"
-    ],
-    "top1_hit": false,
-    "top5_hit": false
-   }
-  },
-  {
-   "video": "27209",
-   "gloss": "help",
-   "frames": 30,
-   "before": {
-    "labels": [
-     "ok"
-    ],
-    "top1": false,
-    "top5": false,
-    "tgcn": null,
-    "ms": 2107
-   },
-   "after": {
-    "labels": [
-     "ok",
-     "graduate"
-    ],
-    "top1": false,
-    "top5": false,
-    "tgcn": [
-     "graduate",
-     0.8555561304092407
-    ],
-    "ms": 2250
-   },
-   "model": {
-    "keypoint_frames": 29,
-    "top5": [
-     "graduate",
-     "help",
-     "secretary",
-     "book",
-     "letter"
-    ],
-    "top1_hit": false,
-    "top5_hit": true
-   }
-  },
-  {
-   "video": "27213",
-   "gloss": "help",
-   "frames": 30,
-   "before": {
-    "labels": [
-     "ok"
-    ],
-    "top1": false,
-    "top5": false,
-    "tgcn": null,
-    "ms": 2130
-   },
-   "after": {
-    "labels": [
-     "ok",
-     "fish"
-    ],
-    "top1": false,
-    "top5": false,
-    "tgcn": [
-     "fish",
-     0.7397434711456299
-    ],
-    "ms": 2113
-   },
-   "model": {
-    "keypoint_frames": 30,
-    "top5": [
-     "fish",
-     "change",
-     "all",
-     "book",
-     "help"
-    ],
-    "top1_hit": false,
-    "top5_hit": true
-   }
-  },
-  {
-   "video": "28201",
-   "gloss": "how",
-   "frames": 30,
-   "before": {
-    "labels": [
-     "love",
-     "ok"
-    ],
-    "top1": false,
-    "top5": false,
-    "tgcn": null,
-    "ms": 1826
-   },
-   "after": {
-    "labels": [
-     "book",
-     "love",
-     "ok"
-    ],
-    "top1": false,
-    "top5": false,
-    "tgcn": [
-     "book",
-     0.9580432176589966
-    ],
-    "ms": 1838
-   },
-   "model": {
-    "keypoint_frames": 30,
-    "top5": [
-     "book",
-     "city",
-     "family",
-     "meet",
-     "how"
-    ],
-    "top1_hit": false,
-    "top5_hit": true
-   }
-  },
-  {
-   "video": "31749",
-   "gloss": "kiss",
-   "frames": 30,
-   "before": {
-    "labels": [
-     "hello"
-    ],
-    "top1": false,
-    "top5": false,
-    "tgcn": null,
-    "ms": 2235
-   },
-   "after": {
-    "labels": [
-     "tall",
-     "hello"
-    ],
-    "top1": false,
-    "top5": false,
-    "tgcn": [
-     "tall",
-     0.8359888195991516
-    ],
-    "ms": 2239
-   },
-   "model": {
-    "keypoint_frames": 30,
-    "top5": [
-     "tall",
-     "bed",
-     "dark",
-     "city",
-     "basketball"
-    ],
-    "top1_hit": false,
-    "top5_hit": false
-   }
-  },
-  {
-   "video": "31750",
-   "gloss": "kiss",
-   "frames": 30,
-   "before": {
-    "labels": [
-     "hello"
-    ],
-    "top1": false,
-    "top5": false,
-    "tgcn": null,
-    "ms": 2048
-   },
-   "after": {
-    "labels": [
-     "cool",
-     "hello"
-    ],
-    "top1": false,
-    "top5": false,
-    "tgcn": [
-     "cool",
-     0.7685282230377197
-    ],
-    "ms": 2045
-   },
-   "model": {
-    "keypoint_frames": 30,
-    "top5": [
-     "cool",
-     "kiss",
-     "many",
-     "basketball",
-     "apple"
-    ],
-    "top1_hit": false,
-    "top5_hit": true
-   }
-  },
-  {
-   "video": "32157",
-   "gloss": "language",
-   "frames": 30,
-   "before": {
-    "labels": [
-     "hello"
-    ],
-    "top1": false,
+    "top3": false,
     "top5": false,
     "tgcn": null,
     "ms": 2180
    },
    "after": {
     "labels": [
-     "short",
+     "help",
+     "you",
+     "help",
+     "thursday"
+    ],
+    "top1": false,
+    "top3": false,
+    "top5": false,
+    "tgcn": [
+     "thursday",
+     0.7234800457954407
+    ],
+    "ms": 2195
+   },
+   "model": {
+    "keypoint_frames": 50,
+    "top5": [
+     "thursday",
+     "hearing",
+     "graduate",
+     "tell",
+     "right"
+    ],
+    "top1_hit": false,
+    "top3_hit": false,
+    "top5_hit": false
+   }
+  },
+  {
+   "video": "08925",
+   "gloss": "candy",
+   "frames": 50,
+   "before": {
+    "labels": [
+     "help"
+    ],
+    "top1": false,
+    "top3": false,
+    "top5": false,
+    "tgcn": null,
+    "ms": 2756
+   },
+   "after": {
+    "labels": [
+     "hearing",
+     "help"
+    ],
+    "top1": false,
+    "top3": false,
+    "top5": false,
+    "tgcn": [
+     "hearing",
+     0.5137981176376343
+    ],
+    "ms": 2771
+   },
+   "model": {
+    "keypoint_frames": 50,
+    "top5": [
+     "hearing",
+     "tell",
+     "who",
+     "candy",
+     "deaf"
+    ],
+    "top1_hit": false,
+    "top3_hit": false,
+    "top5_hit": true
+   }
+  },
+  {
+   "video": "09950",
+   "gloss": "change",
+   "frames": 50,
+   "before": {
+    "labels": [
+     "ok",
+     "you"
+    ],
+    "top1": false,
+    "top3": false,
+    "top5": false,
+    "tgcn": null,
+    "ms": 2832
+   },
+   "after": {
+    "labels": [
+     "ok",
+     "you",
+     "change"
+    ],
+    "top1": false,
+    "top3": true,
+    "top5": true,
+    "tgcn": [
+     "change",
+     0.6117753982543945
+    ],
+    "ms": 2751
+   },
+   "model": {
+    "keypoint_frames": 50,
+    "top5": [
+     "change",
+     "how",
+     "shirt",
+     "all",
+     "decide"
+    ],
+    "top1_hit": true,
+    "top3_hit": true,
+    "top5_hit": true
+   }
+  },
+  {
+   "video": "10159",
+   "gloss": "cheat",
+   "frames": 50,
+   "before": {
+    "labels": [
+     "help"
+    ],
+    "top1": false,
+    "top3": false,
+    "top5": false,
+    "tgcn": null,
+    "ms": 3281
+   },
+   "after": {
+    "labels": [
+     "cheat",
+     "help"
+    ],
+    "top1": true,
+    "top3": true,
+    "top5": true,
+    "tgcn": [
+     "cheat",
+     0.9545968770980835
+    ],
+    "ms": 3275
+   },
+   "model": {
+    "keypoint_frames": 50,
+    "top5": [
+     "cheat",
+     "dance",
+     "same",
+     "full",
+     "table"
+    ],
+    "top1_hit": true,
+    "top3_hit": true,
+    "top5_hit": true
+   }
+  },
+  {
+   "video": "11311",
+   "gloss": "clothes",
+   "frames": 50,
+   "before": {
+    "labels": [
+     "no",
+     "ok",
      "hello"
     ],
     "top1": false,
+    "top3": false,
     "top5": false,
-    "tgcn": [
-     "short",
-     0.3802371919155121
+    "tgcn": null,
+    "ms": 2838
+   },
+   "after": {
+    "labels": [
+     "no",
+     "ok",
+     "hello",
+     "clothes"
     ],
-    "ms": 2168
+    "top1": false,
+    "top3": false,
+    "top5": true,
+    "tgcn": [
+     "clothes",
+     0.6146097183227539
+    ],
+    "ms": 2848
    },
    "model": {
-    "keypoint_frames": 30,
+    "keypoint_frames": 49,
     "top5": [
-     "short",
+     "clothes",
      "decide",
-     "kiss",
-     "computer",
-     "many"
+     "shirt",
+     "finish",
+     "short"
+    ],
+    "top1_hit": true,
+    "top3_hit": true,
+    "top5_hit": true
+   }
+  },
+  {
+   "video": "11772",
+   "gloss": "color",
+   "frames": 50,
+   "before": {
+    "labels": [
+     "hello",
+     "ok"
+    ],
+    "top1": false,
+    "top3": false,
+    "top5": false,
+    "tgcn": null,
+    "ms": 3145
+   },
+   "after": {
+    "labels": [
+     "hello",
+     "ok",
+     "secretary"
+    ],
+    "top1": false,
+    "top3": false,
+    "top5": false,
+    "tgcn": [
+     "secretary",
+     0.5130686163902283
+    ],
+    "ms": 3118
+   },
+   "model": {
+    "keypoint_frames": 50,
+    "top5": [
+     "secretary",
+     "hot",
+     "accident",
+     "wrong",
+     "birthday"
     ],
     "top1_hit": false,
+    "top3_hit": false,
     "top5_hit": false
+   }
+  },
+  {
+   "video": "12320",
+   "gloss": "computer",
+   "frames": 50,
+   "before": {
+    "labels": [
+     "hello",
+     "letter_y",
+     "hello"
+    ],
+    "top1": false,
+    "top3": false,
+    "top5": false,
+    "tgcn": null,
+    "ms": 2884
+   },
+   "after": {
+    "labels": [
+     "hello",
+     "letter_y",
+     "hello",
+     "computer"
+    ],
+    "top1": false,
+    "top3": false,
+    "top5": true,
+    "tgcn": [
+     "computer",
+     0.876179575920105
+    ],
+    "ms": 2851
+   },
+   "model": {
+    "keypoint_frames": 49,
+    "top5": [
+     "computer",
+     "finish",
+     "basketball",
+     "city",
+     "decide"
+    ],
+    "top1_hit": true,
+    "top3_hit": true,
+    "top5_hit": true
+   }
+  },
+  {
+   "video": "13196",
+   "gloss": "cool",
+   "frames": 50,
+   "before": {
+    "labels": [
+     "ok",
+     "help"
+    ],
+    "top1": false,
+    "top3": false,
+    "top5": false,
+    "tgcn": null,
+    "ms": 2846
+   },
+   "after": {
+    "labels": [
+     "ok",
+     "help",
+     "candy"
+    ],
+    "top1": false,
+    "top3": false,
+    "top5": false,
+    "tgcn": [
+     "candy",
+     0.23846013844013214
+    ],
+    "ms": 2755
+   },
+   "model": {
+    "keypoint_frames": 50,
+    "top5": [
+     "cool",
+     "candy",
+     "pink",
+     "yes",
+     "hearing"
+    ],
+    "top1_hit": true,
+    "top3_hit": true,
+    "top5_hit": true
+   }
+  },
+  {
+   "video": "13198",
+   "gloss": "cool",
+   "frames": 50,
+   "before": {
+    "labels": [
+     "hello",
+     "hello",
+     "ok",
+     "love"
+    ],
+    "top1": false,
+    "top3": false,
+    "top5": false,
+    "tgcn": null,
+    "ms": 2867
+   },
+   "after": {
+    "labels": [
+     "woman",
+     "hello",
+     "hello",
+     "ok",
+     "love"
+    ],
+    "top1": false,
+    "top3": false,
+    "top5": false,
+    "tgcn": [
+     "woman",
+     0.42068564891815186
+    ],
+    "ms": 2868
+   },
+   "model": {
+    "keypoint_frames": 50,
+    "top5": [
+     "woman",
+     "medicine",
+     "fine",
+     "pink",
+     "deaf"
+    ],
+    "top1_hit": false,
+    "top3_hit": false,
+    "top5_hit": false
+   }
+  },
+  {
+   "video": "13325",
+   "gloss": "corn",
+   "frames": 50,
+   "before": {
+    "labels": [
+     "hello",
+     "ok"
+    ],
+    "top1": false,
+    "top3": false,
+    "top5": false,
+    "tgcn": null,
+    "ms": 3130
+   },
+   "after": {
+    "labels": [
+     "hello",
+     "ok",
+     "decide"
+    ],
+    "top1": false,
+    "top3": false,
+    "top5": false,
+    "tgcn": [
+     "decide",
+     0.19856961071491241
+    ],
+    "ms": 3132
+   },
+   "model": {
+    "keypoint_frames": 50,
+    "top5": [
+     "decide",
+     "kiss",
+     "go",
+     "cool",
+     "basketball"
+    ],
+    "top1_hit": false,
+    "top3_hit": false,
+    "top5_hit": false
+   }
+  },
+  {
+   "video": "13334",
+   "gloss": "corn",
+   "frames": 50,
+   "before": {
+    "labels": [
+     "help"
+    ],
+    "top1": false,
+    "top3": false,
+    "top5": false,
+    "tgcn": null,
+    "ms": 3269
+   },
+   "after": {
+    "labels": [
+     "hearing",
+     "help"
+    ],
+    "top1": false,
+    "top3": false,
+    "top5": false,
+    "tgcn": [
+     "hearing",
+     0.4485306739807129
+    ],
+    "ms": 3256
+   },
+   "model": {
+    "keypoint_frames": 50,
+    "top5": [
+     "hearing",
+     "corn",
+     "black",
+     "thanksgiving",
+     "purple"
+    ],
+    "top1_hit": false,
+    "top3_hit": true,
+    "top5_hit": true
+   }
+  },
+  {
+   "video": "13635",
+   "gloss": "cousin",
+   "frames": 50,
+   "before": {
+    "labels": [
+     "hello"
+    ],
+    "top1": false,
+    "top3": false,
+    "top5": false,
+    "tgcn": null,
+    "ms": 2565
+   },
+   "after": {
+    "labels": [
+     "cousin",
+     "hello"
+    ],
+    "top1": true,
+    "top3": true,
+    "top5": true,
+    "tgcn": [
+     "cousin",
+     0.9272834062576294
+    ],
+    "ms": 2492
+   },
+   "model": {
+    "keypoint_frames": 49,
+    "top5": [
+     "cousin",
+     "shirt",
+     "blue",
+     "tall",
+     "hat"
+    ],
+    "top1_hit": true,
+    "top3_hit": true,
+    "top5_hit": true
+   }
+  },
+  {
+   "video": "13710",
+   "gloss": "cow",
+   "frames": 50,
+   "before": {
+    "labels": [
+     "phone",
+     "ok",
+     "hello"
+    ],
+    "top1": false,
+    "top3": false,
+    "top5": false,
+    "tgcn": null,
+    "ms": 2693
+   },
+   "after": {
+    "labels": [
+     "phone",
+     "ok",
+     "hello",
+     "cousin"
+    ],
+    "top1": false,
+    "top3": false,
+    "top5": false,
+    "tgcn": [
+     "cousin",
+     0.4895935654640198
+    ],
+    "ms": 2749
+   },
+   "model": {
+    "keypoint_frames": 49,
+    "top5": [
+     "cousin",
+     "drink",
+     "cool",
+     "cow",
+     "orange"
+    ],
+    "top1_hit": false,
+    "top3_hit": false,
+    "top5_hit": true
+   }
+  },
+  {
+   "video": "14673",
+   "gloss": "dark",
+   "frames": 50,
+   "before": {
+    "labels": [
+     "hello",
+     "phone",
+     "hello"
+    ],
+    "top1": false,
+    "top3": false,
+    "top5": false,
+    "tgcn": null,
+    "ms": 3673
+   },
+   "after": {
+    "labels": [
+     "hello",
+     "phone",
+     "hello",
+     "basketball"
+    ],
+    "top1": false,
+    "top3": false,
+    "top5": false,
+    "tgcn": [
+     "basketball",
+     0.2874123156070709
+    ],
+    "ms": 3601
+   },
+   "model": {
+    "keypoint_frames": 50,
+    "top5": [
+     "basketball",
+     "dark",
+     "decide",
+     "later",
+     "finish"
+    ],
+    "top1_hit": false,
+    "top3_hit": true,
+    "top5_hit": true
+   }
+  },
+  {
+   "video": "14685",
+   "gloss": "dark",
+   "frames": 50,
+   "before": {
+    "labels": [
+     "hello",
+     "ok"
+    ],
+    "top1": false,
+    "top3": false,
+    "top5": false,
+    "tgcn": null,
+    "ms": 2886
+   },
+   "after": {
+    "labels": [
+     "dark",
+     "hello",
+     "ok"
+    ],
+    "top1": true,
+    "top3": true,
+    "top5": true,
+    "tgcn": [
+     "dark",
+     0.4490044414997101
+    ],
+    "ms": 2899
+   },
+   "model": {
+    "keypoint_frames": 49,
+    "top5": [
+     "dark",
+     "hat",
+     "family",
+     "computer",
+     "cow"
+    ],
+    "top1_hit": true,
+    "top3_hit": true,
+    "top5_hit": true
+   }
+  },
+  {
+   "video": "14883",
+   "gloss": "deaf",
+   "frames": 50,
+   "before": {
+    "labels": [
+     "you"
+    ],
+    "top1": false,
+    "top3": false,
+    "top5": false,
+    "tgcn": null,
+    "ms": 3012
+   },
+   "after": {
+    "labels": [
+     "you",
+     "deaf"
+    ],
+    "top1": false,
+    "top3": true,
+    "top5": true,
+    "tgcn": [
+     "deaf",
+     0.9209612011909485
+    ],
+    "ms": 2950
+   },
+   "model": {
+    "keypoint_frames": 50,
+    "top5": [
+     "deaf",
+     "pizza",
+     "drink",
+     "candy",
+     "who"
+    ],
+    "top1_hit": true,
+    "top3_hit": true,
+    "top5_hit": true
+   }
+  },
+  {
+   "video": "14888",
+   "gloss": "deaf",
+   "frames": 50,
+   "before": {
+    "labels": [
+     "you"
+    ],
+    "top1": false,
+    "top3": false,
+    "top5": false,
+    "tgcn": null,
+    "ms": 2453
+   },
+   "after": {
+    "labels": [
+     "you",
+     "candy"
+    ],
+    "top1": false,
+    "top3": false,
+    "top5": false,
+    "tgcn": [
+     "candy",
+     0.4686014950275421
+    ],
+    "ms": 2499
+   },
+   "model": {
+    "keypoint_frames": 49,
+    "top5": [
+     "candy",
+     "corn",
+     "hearing",
+     "brown",
+     "time"
+    ],
+    "top1_hit": false,
+    "top3_hit": false,
+    "top5_hit": false
+   }
+  },
+  {
+   "video": "17020",
+   "gloss": "doctor",
+   "frames": 50,
+   "before": {
+    "labels": [
+     "letter_k",
+     "letter_d",
+     "hello",
+     "letter_d"
+    ],
+    "top1": false,
+    "top3": false,
+    "top5": false,
+    "tgcn": null,
+    "ms": 3560
+   },
+   "after": {
+    "labels": [
+     "medicine",
+     "letter_k",
+     "letter_d",
+     "hello",
+     "letter_d"
+    ],
+    "top1": false,
+    "top3": false,
+    "top5": false,
+    "tgcn": [
+     "medicine",
+     0.7170158624649048
+    ],
+    "ms": 3660
+   },
+   "model": {
+    "keypoint_frames": 50,
+    "top5": [
+     "medicine",
+     "paper",
+     "fine",
+     "change",
+     "time"
+    ],
+    "top1_hit": false,
+    "top3_hit": false,
+    "top5_hit": false
+   }
+  },
+  {
+   "video": "17097",
+   "gloss": "dog",
+   "frames": 50,
+   "before": {
+    "labels": [
+     "hello",
+     "help"
+    ],
+    "top1": false,
+    "top3": false,
+    "top5": false,
+    "tgcn": null,
+    "ms": 2353
+   },
+   "after": {
+    "labels": [
+     "africa",
+     "hello",
+     "help"
+    ],
+    "top1": false,
+    "top3": false,
+    "top5": false,
+    "tgcn": [
+     "africa",
+     0.5866641402244568
+    ],
+    "ms": 2341
+   },
+   "model": {
+    "keypoint_frames": 49,
+    "top5": [
+     "africa",
+     "tell",
+     "bowling",
+     "dog",
+     "later"
+    ],
+    "top1_hit": false,
+    "top3_hit": false,
+    "top5_hit": true
+   }
+  },
+  {
+   "video": "17713",
+   "gloss": "drink",
+   "frames": 50,
+   "before": {
+    "labels": [
+     "ok",
+     "hello",
+     "ok"
+    ],
+    "top1": false,
+    "top3": false,
+    "top5": false,
+    "tgcn": null,
+    "ms": 2837
+   },
+   "after": {
+    "labels": [
+     "ok",
+     "hello",
+     "ok",
+     "drink"
+    ],
+    "top1": false,
+    "top3": false,
+    "top5": true,
+    "tgcn": [
+     "drink",
+     0.5211905241012573
+    ],
+    "ms": 2847
+   },
+   "model": {
+    "keypoint_frames": 49,
+    "top5": [
+     "drink",
+     "full",
+     "white",
+     "black",
+     "hot"
+    ],
+    "top1_hit": true,
+    "top3_hit": true,
+    "top5_hit": true
+   }
+  },
+  {
+   "video": "21890",
+   "gloss": "fine",
+   "frames": 50,
+   "before": {
+    "labels": [
+     "ok",
+     "no"
+    ],
+    "top1": false,
+    "top3": false,
+    "top5": false,
+    "tgcn": null,
+    "ms": 3292
+   },
+   "after": {
+    "labels": [
+     "ok",
+     "no",
+     "man"
+    ],
+    "top1": false,
+    "top3": false,
+    "top5": false,
+    "tgcn": [
+     "man",
+     0.2701420485973358
+    ],
+    "ms": 3432
+   },
+   "model": {
+    "keypoint_frames": 49,
+    "top5": [
+     "man",
+     "what",
+     "short",
+     "thin",
+     "last"
+    ],
+    "top1_hit": false,
+    "top3_hit": false,
+    "top5_hit": false
+   }
+  },
+  {
+   "video": "21944",
+   "gloss": "finish",
+   "frames": 50,
+   "before": {
+    "labels": [
+     "hello",
+     "letter_y",
+     "hello"
+    ],
+    "top1": false,
+    "top3": false,
+    "top5": false,
+    "tgcn": null,
+    "ms": 3694
+   },
+   "after": {
+    "labels": [
+     "hello",
+     "letter_y",
+     "hello",
+     "pizza"
+    ],
+    "top1": false,
+    "top3": false,
+    "top5": false,
+    "tgcn": [
+     "pizza",
+     0.2926786243915558
+    ],
+    "ms": 3437
+   },
+   "model": {
+    "keypoint_frames": 50,
+    "top5": [
+     "pizza",
+     "dog",
+     "tell",
+     "pink",
+     "africa"
+    ],
+    "top1_hit": false,
+    "top3_hit": false,
+    "top5_hit": false
+   }
+  },
+  {
+   "video": "22117",
+   "gloss": "fish",
+   "frames": 50,
+   "before": {
+    "labels": [
+     "ok",
+     "hello"
+    ],
+    "top1": false,
+    "top3": false,
+    "top5": false,
+    "tgcn": null,
+    "ms": 2963
+   },
+   "after": {
+    "labels": [
+     "ok",
+     "hello",
+     "fish"
+    ],
+    "top1": false,
+    "top3": true,
+    "top5": true,
+    "tgcn": [
+     "fish",
+     0.7552250027656555
+    ],
+    "ms": 3226
+   },
+   "model": {
+    "keypoint_frames": 49,
+    "top5": [
+     "fish",
+     "pizza",
+     "hat",
+     "enjoy",
+     "full"
+    ],
+    "top1_hit": true,
+    "top3_hit": true,
+    "top5_hit": true
+   }
+  },
+  {
+   "video": "22954",
+   "gloss": "forget",
+   "frames": 50,
+   "before": {
+    "labels": [
+     "hello",
+     "you"
+    ],
+    "top1": false,
+    "top3": false,
+    "top5": false,
+    "tgcn": null,
+    "ms": 3149
+   },
+   "after": {
+    "labels": [
+     "hello",
+     "you",
+     "forget"
+    ],
+    "top1": false,
+    "top3": true,
+    "top5": true,
+    "tgcn": [
+     "forget",
+     0.4803338646888733
+    ],
+    "ms": 3060
+   },
+   "model": {
+    "keypoint_frames": 50,
+    "top5": [
+     "forget",
+     "white",
+     "black",
+     "candy",
+     "drink"
+    ],
+    "top1_hit": true,
+    "top3_hit": true,
+    "top5_hit": true
+   }
+  },
+  {
+   "video": "23767",
+   "gloss": "full",
+   "frames": 50,
+   "before": {
+    "labels": [
+     "hello",
+     "ok",
+     "hello",
+     "ok",
+     "hello"
+    ],
+    "top1": false,
+    "top3": false,
+    "top5": false,
+    "tgcn": null,
+    "ms": 3721
+   },
+   "after": {
+    "labels": [
+     "hello",
+     "ok",
+     "hello",
+     "ok",
+     "hello"
+    ],
+    "top1": false,
+    "top3": false,
+    "top5": false,
+    "tgcn": [
+     "pull",
+     0.09001816064119339
+    ],
+    "ms": 3661
+   },
+   "model": {
+    "keypoint_frames": 50,
+    "top5": [
+     "many",
+     "fine",
+     "what",
+     "pull",
+     "mother"
+    ],
+    "top1_hit": false,
+    "top3_hit": false,
+    "top5_hit": false
+   }
+  },
+  {
+   "video": "24636",
+   "gloss": "give",
+   "frames": 50,
+   "before": {
+    "labels": [
+     "ok",
+     "hello",
+     "ok"
+    ],
+    "top1": false,
+    "top3": false,
+    "top5": false,
+    "tgcn": null,
+    "ms": 2725
+   },
+   "after": {
+    "labels": [
+     "ok",
+     "hello",
+     "ok",
+     "bowling"
+    ],
+    "top1": false,
+    "top3": false,
+    "top5": false,
+    "tgcn": [
+     "bowling",
+     0.2289203405380249
+    ],
+    "ms": 2734
+   },
+   "model": {
+    "keypoint_frames": 50,
+    "top5": [
+     "need",
+     "bowling",
+     "hot",
+     "orange",
+     "cousin"
+    ],
+    "top1_hit": false,
+    "top3_hit": false,
+    "top5_hit": false
+   }
+  },
+  {
+   "video": "24649",
+   "gloss": "give",
+   "frames": 50,
+   "before": {
+    "labels": [
+     "hello",
+     "letter_d",
+     "five_alt"
+    ],
+    "top1": false,
+    "top3": false,
+    "top5": false,
+    "tgcn": null,
+    "ms": 3643
+   },
+   "after": {
+    "labels": [
+     "hello",
+     "letter_d",
+     "five_alt",
+     "give"
+    ],
+    "top1": false,
+    "top3": false,
+    "top5": true,
+    "tgcn": [
+     "give",
+     0.1539759337902069
+    ],
+    "ms": 4005
+   },
+   "model": {
+    "keypoint_frames": 50,
+    "top5": [
+     "give",
+     "cook",
+     "enjoy",
+     "clothes",
+     "want"
+    ],
+    "top1_hit": true,
+    "top3_hit": true,
+    "top5_hit": true
+   }
+  },
+  {
+   "video": "24960",
+   "gloss": "go",
+   "frames": 50,
+   "before": {
+    "labels": [
+     "help",
+     "you",
+     "help",
+     "ok"
+    ],
+    "top1": false,
+    "top3": false,
+    "top5": false,
+    "tgcn": null,
+    "ms": 3119
+   },
+   "after": {
+    "labels": [
+     "go",
+     "help",
+     "you",
+     "help",
+     "ok"
+    ],
+    "top1": true,
+    "top3": true,
+    "top5": true,
+    "tgcn": [
+     "go",
+     0.9751554727554321
+    ],
+    "ms": 3077
+   },
+   "model": {
+    "keypoint_frames": 50,
+    "top5": [
+     "go",
+     "hot",
+     "tell",
+     "last",
+     "thin"
+    ],
+    "top1_hit": true,
+    "top3_hit": true,
+    "top5_hit": true
+   }
+  },
+  {
+   "video": "27209",
+   "gloss": "help",
+   "frames": 50,
+   "before": {
+    "labels": [
+     "ok",
+     "hello"
+    ],
+    "top1": false,
+    "top3": false,
+    "top5": false,
+    "tgcn": null,
+    "ms": 3841
+   },
+   "after": {
+    "labels": [
+     "ok",
+     "hello",
+     "help"
+    ],
+    "top1": false,
+    "top3": true,
+    "top5": true,
+    "tgcn": [
+     "help",
+     0.7167848944664001
+    ],
+    "ms": 3629
+   },
+   "model": {
+    "keypoint_frames": 49,
+    "top5": [
+     "help",
+     "accident",
+     "how",
+     "wrong",
+     "who"
+    ],
+    "top1_hit": true,
+    "top3_hit": true,
+    "top5_hit": true
+   }
+  },
+  {
+   "video": "27213",
+   "gloss": "help",
+   "frames": 50,
+   "before": {
+    "labels": [
+     "ok"
+    ],
+    "top1": false,
+    "top3": false,
+    "top5": false,
+    "tgcn": null,
+    "ms": 3519
+   },
+   "after": {
+    "labels": [
+     "ok",
+     "help"
+    ],
+    "top1": false,
+    "top3": true,
+    "top5": true,
+    "tgcn": [
+     "help",
+     0.6272717714309692
+    ],
+    "ms": 3679
+   },
+   "model": {
+    "keypoint_frames": 50,
+    "top5": [
+     "help",
+     "graduate",
+     "dog",
+     "meet",
+     "thin"
+    ],
+    "top1_hit": true,
+    "top3_hit": true,
+    "top5_hit": true
+   }
+  },
+  {
+   "video": "28201",
+   "gloss": "how",
+   "frames": 50,
+   "before": {
+    "labels": [
+     "love",
+     "ok",
+     "help",
+     "ok"
+    ],
+    "top1": false,
+    "top3": false,
+    "top5": false,
+    "tgcn": null,
+    "ms": 3236
+   },
+   "after": {
+    "labels": [
+     "love",
+     "ok",
+     "help",
+     "ok",
+     "how"
+    ],
+    "top1": false,
+    "top3": false,
+    "top5": true,
+    "tgcn": [
+     "how",
+     0.7827180027961731
+    ],
+    "ms": 3171
+   },
+   "model": {
+    "keypoint_frames": 50,
+    "top5": [
+     "how",
+     "all",
+     "last",
+     "accident",
+     "book"
+    ],
+    "top1_hit": true,
+    "top3_hit": true,
+    "top5_hit": true
+   }
+  },
+  {
+   "video": "31749",
+   "gloss": "kiss",
+   "frames": 50,
+   "before": {
+    "labels": [
+     "ok",
+     "hello"
+    ],
+    "top1": false,
+    "top3": false,
+    "top5": false,
+    "tgcn": null,
+    "ms": 3849
+   },
+   "after": {
+    "labels": [
+     "ok",
+     "hello",
+     "kiss"
+    ],
+    "top1": false,
+    "top3": true,
+    "top5": true,
+    "tgcn": [
+     "kiss",
+     0.32694754004478455
+    ],
+    "ms": 3757
+   },
+   "model": {
+    "keypoint_frames": 50,
+    "top5": [
+     "kiss",
+     "tall",
+     "school",
+     "computer",
+     "give"
+    ],
+    "top1_hit": true,
+    "top3_hit": true,
+    "top5_hit": true
+   }
+  },
+  {
+   "video": "31750",
+   "gloss": "kiss",
+   "frames": 50,
+   "before": {
+    "labels": [
+     "hello"
+    ],
+    "top1": false,
+    "top3": false,
+    "top5": false,
+    "tgcn": null,
+    "ms": 3361
+   },
+   "after": {
+    "labels": [
+     "hello",
+     "thin"
+    ],
+    "top1": false,
+    "top3": false,
+    "top5": false,
+    "tgcn": [
+     "thin",
+     0.24086742103099823
+    ],
+    "ms": 3364
+   },
+   "model": {
+    "keypoint_frames": 50,
+    "top5": [
+     "thin",
+     "apple",
+     "help",
+     "cool",
+     "paint"
+    ],
+    "top1_hit": false,
+    "top3_hit": false,
+    "top5_hit": false
+   }
+  },
+  {
+   "video": "32157",
+   "gloss": "language",
+   "frames": 50,
+   "before": {
+    "labels": [
+     "hello"
+    ],
+    "top1": false,
+    "top3": false,
+    "top5": false,
+    "tgcn": null,
+    "ms": 3986
+   },
+   "after": {
+    "labels": [
+     "language",
+     "hello"
+    ],
+    "top1": true,
+    "top3": true,
+    "top5": true,
+    "tgcn": [
+     "language",
+     0.5523884296417236
+    ],
+    "ms": 3887
+   },
+   "model": {
+    "keypoint_frames": 50,
+    "top5": [
+     "language",
+     "what",
+     "letter",
+     "finish",
+     "pull"
+    ],
+    "top1_hit": true,
+    "top3_hit": true,
+    "top5_hit": true
    }
   },
   {
    "video": "32167",
    "gloss": "language",
-   "frames": 30,
+   "frames": 50,
    "before": {
     "labels": [
-     "help",
      "ok"
     ],
     "top1": false,
+    "top3": false,
     "top5": false,
     "tgcn": null,
-    "ms": 1786
+    "ms": 2927
    },
    "after": {
     "labels": [
-     "help",
      "ok",
-     "basketball"
+     "language"
     ],
     "top1": false,
-    "top5": false,
+    "top3": true,
+    "top5": true,
     "tgcn": [
-     "basketball",
-     0.7500287890434265
+     "language",
+     0.6694625616073608
     ],
-    "ms": 1788
+    "ms": 3070
    },
    "model": {
-    "keypoint_frames": 29,
+    "keypoint_frames": 49,
     "top5": [
-     "basketball",
      "language",
-     "finish",
-     "many",
-     "kiss"
+     "play",
+     "what",
+     "tell",
+     "pizza"
     ],
-    "top1_hit": false,
+    "top1_hit": true,
+    "top3_hit": true,
     "top5_hit": true
    }
   },
   {
    "video": "32246",
    "gloss": "last",
-   "frames": 30,
+   "frames": 50,
    "before": {
     "labels": [
-     "phone"
+     "phone",
+     "ok"
     ],
     "top1": false,
+    "top3": false,
     "top5": false,
     "tgcn": null,
-    "ms": 1892
+    "ms": 3093
    },
    "after": {
     "labels": [
-     "secretary",
-     "phone"
+     "last",
+     "phone",
+     "ok"
     ],
-    "top1": false,
-    "top5": false,
+    "top1": true,
+    "top3": true,
+    "top5": true,
     "tgcn": [
-     "secretary",
-     0.8445563912391663
+     "last",
+     0.7173354625701904
     ],
-    "ms": 1880
+    "ms": 3083
    },
    "model": {
-    "keypoint_frames": 30,
+    "keypoint_frames": 50,
     "top5": [
-     "secretary",
-     "many",
-     "thanksgiving",
-     "kiss",
+     "last",
+     "short",
+     "year",
+     "shirt",
      "letter"
     ],
-    "top1_hit": false,
-    "top5_hit": false
+    "top1_hit": true,
+    "top3_hit": true,
+    "top5_hit": true
    }
   },
   {
    "video": "32253",
    "gloss": "last",
-   "frames": 30,
+   "frames": 50,
    "before": {
     "labels": [
+     "hello",
+     "ok",
      "hello",
      "ok"
     ],
     "top1": false,
+    "top3": false,
     "top5": false,
     "tgcn": null,
-    "ms": 1730
+    "ms": 2976
    },
    "after": {
     "labels": [
      "hello",
      "ok",
-     "cousin"
+     "hello",
+     "ok",
+     "before"
     ],
     "top1": false,
+    "top3": false,
     "top5": false,
     "tgcn": [
-     "cousin",
-     0.47964152693748474
+     "before",
+     0.8899102210998535
     ],
-    "ms": 1732
+    "ms": 2932
    },
    "model": {
-    "keypoint_frames": 30,
+    "keypoint_frames": 50,
     "top5": [
-     "cousin",
+     "before",
+     "last",
      "forget",
-     "eat",
-     "tall",
-     "blue"
+     "shirt",
+     "wrong"
     ],
     "top1_hit": false,
-    "top5_hit": false
+    "top3_hit": true,
+    "top5_hit": true
    }
   },
   {
    "video": "32950",
    "gloss": "letter",
-   "frames": 30,
+   "frames": 50,
    "before": {
     "labels": [
      "ok"
     ],
     "top1": false,
+    "top3": false,
     "top5": false,
     "tgcn": null,
-    "ms": 1630
+    "ms": 2705
    },
    "after": {
     "labels": [
-     "ok"
+     "ok",
+     "letter"
     ],
     "top1": false,
-    "top5": false,
-    "tgcn": null,
-    "ms": 1756
+    "top3": true,
+    "top5": true,
+    "tgcn": [
+     "letter",
+     0.4429721534252167
+    ],
+    "ms": 2790
    },
    "model": {
-    "keypoint_frames": 29,
+    "keypoint_frames": 49,
     "top5": [
-     "go",
+     "letter",
      "decide",
-     "no",
-     "kiss",
-     "candy"
+     "secretary",
+     "finish",
+     "walk"
     ],
-    "top1_hit": false,
-    "top5_hit": false
+    "top1_hit": true,
+    "top3_hit": true,
+    "top5_hit": true
    }
   },
   {
    "video": "33286",
    "gloss": "like",
-   "frames": 30,
+   "frames": 50,
    "before": {
     "labels": [
      "phone"
     ],
     "top1": false,
+    "top3": false,
     "top5": false,
     "tgcn": null,
-    "ms": 1664
+    "ms": 2645
    },
    "after": {
     "labels": [
-     "mother",
+     "yes",
      "phone"
     ],
     "top1": false,
+    "top3": false,
     "top5": false,
     "tgcn": [
-     "mother",
-     0.4344339370727539
+     "yes",
+     0.5221336483955383
     ],
-    "ms": 1647
+    "ms": 2649
    },
    "model": {
-    "keypoint_frames": 29,
+    "keypoint_frames": 49,
     "top5": [
-     "tall",
-     "mother",
-     "bed",
-     "finish",
-     "computer"
+     "yes",
+     "same",
+     "africa",
+     "drink",
+     "short"
     ],
     "top1_hit": false,
+    "top3_hit": false,
     "top5_hit": false
    }
   },
   {
    "video": "35513",
    "gloss": "meet",
-   "frames": 30,
+   "frames": 50,
    "before": {
     "labels": [
-     "you"
+     "you",
+     "help",
+     "you",
+     "ok"
     ],
     "top1": false,
+    "top3": false,
     "top5": false,
     "tgcn": null,
-    "ms": 1894
+    "ms": 3303
    },
    "after": {
     "labels": [
-     "basketball",
-     "you"
+     "you",
+     "help",
+     "you",
+     "ok",
+     "meet"
     ],
     "top1": false,
-    "top5": false,
+    "top3": false,
+    "top5": true,
     "tgcn": [
-     "basketball",
-     0.9851845502853394
+     "meet",
+     0.8232711553573608
     ],
-    "ms": 2011
+    "ms": 3180
    },
    "model": {
-    "keypoint_frames": 29,
+    "keypoint_frames": 49,
     "top5": [
-     "basketball",
-     "many",
-     "tall",
-     "kiss",
-     "play"
+     "meet",
+     "go",
+     "book",
+     "change",
+     "accident"
     ],
-    "top1_hit": false,
-    "top5_hit": false
+    "top1_hit": true,
+    "top3_hit": true,
+    "top5_hit": true
    }
   },
   {
    "video": "38525",
    "gloss": "no",
-   "frames": 30,
+   "frames": 50,
    "before": {
     "labels": [
      "hello",
@@ -2196,9 +2476,10 @@
      "hello"
     ],
     "top1": false,
+    "top3": false,
     "top5": false,
     "tgcn": null,
-    "ms": 1801
+    "ms": 3223
    },
    "after": {
     "labels": [
@@ -2209,685 +2490,757 @@
      "hello"
     ],
     "top1": false,
+    "top3": false,
     "top5": false,
     "tgcn": [
-     "mother",
-     0.4248341917991638
+     "no",
+     0.4432939887046814
     ],
-    "ms": 1805
+    "ms": 2951
    },
    "model": {
-    "keypoint_frames": 30,
+    "keypoint_frames": 50,
     "top5": [
-     "mother",
-     "cool",
-     "blue",
-     "tall",
-     "candy"
+     "no",
+     "pizza",
+     "orange",
+     "kiss",
+     "decide"
     ],
-    "top1_hit": false,
-    "top5_hit": false
+    "top1_hit": true,
+    "top3_hit": true,
+    "top5_hit": true
    }
   },
   {
    "video": "38991",
    "gloss": "now",
-   "frames": 30,
+   "frames": 50,
    "before": {
     "labels": [
      "ok",
-     "ok"
+     "hello"
     ],
     "top1": false,
+    "top3": false,
     "top5": false,
     "tgcn": null,
-    "ms": 1589
+    "ms": 2706
    },
    "after": {
     "labels": [
-     "book",
+     "what",
      "ok",
-     "ok"
+     "hello"
     ],
     "top1": false,
+    "top3": false,
     "top5": false,
     "tgcn": [
-     "book",
-     0.5001229643821716
+     "what",
+     0.8879663944244385
     ],
-    "ms": 1589
+    "ms": 2704
    },
    "model": {
-    "keypoint_frames": 30,
+    "keypoint_frames": 50,
     "top5": [
-     "book",
-     "family",
+     "what",
+     "want",
      "many",
-     "kiss",
-     "cool"
+     "can",
+     "black"
     ],
     "top1_hit": false,
+    "top3_hit": false,
     "top5_hit": false
    }
   },
   {
    "video": "42960",
    "gloss": "pizza",
-   "frames": 30,
+   "frames": 50,
    "before": {
     "labels": [
      "letter_d",
      "yes"
     ],
     "top1": false,
+    "top3": false,
     "top5": false,
     "tgcn": null,
-    "ms": 1861
+    "ms": 3107
    },
    "after": {
     "labels": [
      "letter_d",
      "yes",
-     "mother"
+     "pizza"
     ],
     "top1": false,
-    "top5": false,
+    "top3": true,
+    "top5": true,
     "tgcn": [
-     "mother",
-     0.32681944966316223
+     "pizza",
+     0.716873049736023
     ],
-    "ms": 1863
+    "ms": 3349
    },
    "model": {
-    "keypoint_frames": 30,
+    "keypoint_frames": 50,
     "top5": [
-     "mother",
      "pizza",
      "no",
-     "woman",
-     "tall"
+     "later",
+     "help",
+     "deaf"
     ],
-    "top1_hit": false,
+    "top1_hit": true,
+    "top3_hit": true,
     "top5_hit": true
    }
   },
   {
    "video": "43171",
    "gloss": "play",
-   "frames": 30,
+   "frames": 50,
    "before": {
     "labels": [
      "yes",
      "ok",
+     "you",
      "yes",
      "ok"
     ],
     "top1": false,
+    "top3": false,
     "top5": false,
     "tgcn": null,
-    "ms": 2068
+    "ms": 3462
    },
    "after": {
     "labels": [
      "yes",
      "ok",
+     "you",
      "yes",
-     "ok",
-     "basketball"
+     "ok"
     ],
     "top1": false,
+    "top3": false,
     "top5": false,
     "tgcn": [
-     "basketball",
-     0.8983957767486572
+     "play",
+     0.7394216060638428
     ],
-    "ms": 2107
+    "ms": 3531
    },
    "model": {
-    "keypoint_frames": 29,
+    "keypoint_frames": 49,
     "top5": [
-     "basketball",
-     "later",
-     "computer",
-     "tall",
-     "many"
+     "play",
+     "language",
+     "but",
+     "walk",
+     "jacket"
     ],
-    "top1_hit": false,
-    "top5_hit": false
+    "top1_hit": true,
+    "top3_hit": true,
+    "top5_hit": true
    }
   },
   {
    "video": "48115",
    "gloss": "right",
-   "frames": 30,
+   "frames": 50,
    "before": {
     "labels": [
+     "help",
+     "ok",
+     "help",
+     "ok",
      "help"
     ],
     "top1": false,
+    "top3": false,
     "top5": false,
     "tgcn": null,
-    "ms": 2356
+    "ms": 3887
    },
    "after": {
     "labels": [
-     "fish",
-     "help"
+     "fine",
+     "help",
+     "ok",
+     "help",
+     "ok"
     ],
     "top1": false,
+    "top3": false,
     "top5": false,
     "tgcn": [
-     "fish",
-     0.515760600566864
+     "fine",
+     0.36100709438323975
     ],
-    "ms": 2300
+    "ms": 3865
    },
    "model": {
-    "keypoint_frames": 30,
+    "keypoint_frames": 50,
     "top5": [
-     "thin",
-     "fish",
-     "basketball",
-     "bed",
-     "last"
+     "fine",
+     "bowling",
+     "dog",
+     "woman",
+     "pull"
     ],
     "top1_hit": false,
+    "top3_hit": false,
     "top5_hit": false
    }
   },
   {
    "video": "48126",
    "gloss": "right",
-   "frames": 30,
+   "frames": 50,
    "before": {
     "labels": [
+     "letter_d",
      "you",
-     "ok"
+     "letter_d",
+     "ok",
+     "hello"
     ],
     "top1": false,
+    "top3": false,
     "top5": false,
     "tgcn": null,
-    "ms": 1748
+    "ms": 2961
    },
    "after": {
     "labels": [
-     "blue",
+     "letter_d",
      "you",
-     "ok"
+     "letter_d",
+     "ok",
+     "hello"
     ],
     "top1": false,
+    "top3": false,
     "top5": false,
     "tgcn": [
-     "blue",
-     0.8713151812553406
+     "right",
+     0.4793584644794464
     ],
-    "ms": 1746
+    "ms": 3051
    },
    "model": {
-    "keypoint_frames": 29,
+    "keypoint_frames": 49,
     "top5": [
+     "right",
+     "short",
      "blue",
-     "candy",
-     "cool",
-     "cousin",
-     "bed"
+     "pizza",
+     "secretary"
     ],
-    "top1_hit": false,
-    "top5_hit": false
+    "top1_hit": true,
+    "top3_hit": true,
+    "top5_hit": true
    }
   },
   {
    "video": "49173",
    "gloss": "same",
-   "frames": 30,
+   "frames": 50,
    "before": {
     "labels": [
+     "hello",
      "hello"
     ],
     "top1": false,
+    "top3": false,
     "top5": false,
     "tgcn": null,
-    "ms": 1694
+    "ms": 2851
    },
    "after": {
     "labels": [
-     "mother",
+     "yes",
+     "hello",
      "hello"
     ],
     "top1": false,
+    "top3": false,
     "top5": false,
     "tgcn": [
-     "mother",
-     0.4267212748527527
+     "yes",
+     0.49832358956336975
     ],
-    "ms": 1844
+    "ms": 3084
    },
    "model": {
-    "keypoint_frames": 30,
+    "keypoint_frames": 50,
     "top5": [
-     "mother",
-     "bed",
-     "tall",
-     "computer",
-     "brown"
+     "yes",
+     "cow",
+     "same",
+     "drink",
+     "bird"
     ],
     "top1_hit": false,
-    "top5_hit": false
+    "top3_hit": true,
+    "top5_hit": true
    }
   },
   {
    "video": "50041",
    "gloss": "secretary",
-   "frames": 30,
+   "frames": 50,
    "before": {
     "labels": [
      "hello",
-     "ok",
-     "hello",
      "letter_d",
-     "hello"
+     "hello",
+     "ok"
     ],
     "top1": false,
+    "top3": false,
     "top5": false,
     "tgcn": null,
-    "ms": 2037
+    "ms": 3307
    },
    "after": {
     "labels": [
-     "secretary",
+     "hello",
+     "letter_d",
      "hello",
      "ok",
-     "hello",
-     "letter_d"
+     "secretary"
     ],
-    "top1": true,
+    "top1": false,
+    "top3": false,
     "top5": true,
     "tgcn": [
      "secretary",
-     0.8431705236434937
+     0.2196035087108612
     ],
-    "ms": 2058
+    "ms": 3588
    },
    "model": {
-    "keypoint_frames": 29,
+    "keypoint_frames": 49,
     "top5": [
      "secretary",
-     "book",
+     "graduate",
+     "fine",
      "thanksgiving",
-     "medicine",
-     "paper"
+     "what"
     ],
     "top1_hit": true,
+    "top3_hit": true,
     "top5_hit": true
    }
   },
   {
    "video": "51066",
    "gloss": "shirt",
-   "frames": 30,
+   "frames": 50,
    "before": {
     "labels": [
      "ok",
      "help"
     ],
     "top1": false,
+    "top3": false,
     "top5": false,
     "tgcn": null,
-    "ms": 1776
+    "ms": 2924
    },
    "after": {
     "labels": [
      "ok",
      "help",
-     "tall"
+     "white"
     ],
     "top1": false,
+    "top3": false,
     "top5": false,
     "tgcn": [
-     "tall",
-     0.3203495442867279
+     "white",
+     0.3554621934890747
     ],
-    "ms": 1771
+    "ms": 2830
    },
    "model": {
-    "keypoint_frames": 30,
+    "keypoint_frames": 50,
     "top5": [
-     "tall",
      "white",
-     "fine",
-     "book",
-     "pink"
+     "shirt",
+     "like",
+     "tell",
+     "need"
     ],
     "top1_hit": false,
-    "top5_hit": false
+    "top3_hit": true,
+    "top5_hit": true
    }
   },
   {
    "video": "51068",
    "gloss": "shirt",
-   "frames": 30,
+   "frames": 50,
    "before": {
     "labels": [
      "hello"
     ],
     "top1": false,
+    "top3": false,
     "top5": false,
     "tgcn": null,
-    "ms": 1771
+    "ms": 2870
    },
    "after": {
     "labels": [
-     "tall",
+     "shirt",
      "hello"
     ],
-    "top1": false,
-    "top5": false,
+    "top1": true,
+    "top3": true,
+    "top5": true,
     "tgcn": [
-     "tall",
-     0.5866992473602295
+     "shirt",
+     0.9099214673042297
     ],
-    "ms": 1774
+    "ms": 2822
    },
    "model": {
-    "keypoint_frames": 30,
+    "keypoint_frames": 50,
     "top5": [
-     "tall",
-     "city",
-     "before",
-     "cousin",
-     "pizza"
+     "shirt",
+     "blue",
+     "give",
+     "white",
+     "like"
     ],
-    "top1_hit": false,
-    "top5_hit": false
+    "top1_hit": true,
+    "top3_hit": true,
+    "top5_hit": true
    }
   },
   {
    "video": "51233",
    "gloss": "short",
-   "frames": 30,
+   "frames": 50,
    "before": {
     "labels": [
      "hello",
      "yes",
-     "ok"
+     "ok",
+     "yes"
     ],
     "top1": false,
+    "top3": false,
     "top5": false,
     "tgcn": null,
-    "ms": 1771
+    "ms": 3000
    },
    "after": {
     "labels": [
      "hello",
      "yes",
-     "ok"
+     "ok",
+     "yes",
+     "short"
     ],
     "top1": false,
-    "top5": false,
-    "tgcn": null,
-    "ms": 1780
+    "top3": false,
+    "top5": true,
+    "tgcn": [
+     "short",
+     0.7637083530426025
+    ],
+    "ms": 2918
    },
    "model": {
-    "keypoint_frames": 30,
+    "keypoint_frames": 50,
     "top5": [
-     "mother",
-     "later",
-     "tall",
-     "brown",
-     "man"
+     "short",
+     "pizza",
+     "cow",
+     "man",
+     "decide"
     ],
-    "top1_hit": false,
-    "top5_hit": false
+    "top1_hit": true,
+    "top3_hit": true,
+    "top5_hit": true
    }
   },
   {
    "video": "55375",
    "gloss": "study",
-   "frames": 30,
+   "frames": 50,
    "before": {
     "labels": [
      "hello",
      "ok"
     ],
     "top1": false,
+    "top3": false,
     "top5": false,
     "tgcn": null,
-    "ms": 1851
+    "ms": 2951
    },
    "after": {
     "labels": [
+     "study",
      "hello",
-     "ok",
-     "letter"
+     "ok"
     ],
-    "top1": false,
-    "top5": false,
+    "top1": true,
+    "top3": true,
+    "top5": true,
     "tgcn": [
-     "letter",
-     0.337689608335495
+     "study",
+     0.5426173210144043
     ],
-    "ms": 1838
+    "ms": 3130
    },
    "model": {
-    "keypoint_frames": 29,
+    "keypoint_frames": 49,
     "top5": [
-     "letter",
-     "man",
-     "thanksgiving",
-     "short",
-     "thursday"
+     "study",
+     "dance",
+     "black",
+     "doctor",
+     "bird"
     ],
-    "top1_hit": false,
-    "top5_hit": false
+    "top1_hit": true,
+    "top3_hit": true,
+    "top5_hit": true
    }
   },
   {
    "video": "56843",
    "gloss": "tall",
-   "frames": 30,
+   "frames": 50,
    "before": {
     "labels": [
-     "hello",
-     "ok"
+     "hello"
     ],
     "top1": false,
+    "top3": false,
     "top5": false,
     "tgcn": null,
-    "ms": 1609
+    "ms": 2952
    },
    "after": {
     "labels": [
-     "tall",
      "hello",
-     "ok"
+     "tall"
     ],
-    "top1": true,
+    "top1": false,
+    "top3": true,
     "top5": true,
     "tgcn": [
      "tall",
-     0.981914758682251
+     0.3151733875274658
     ],
-    "ms": 1634
+    "ms": 2959
    },
    "model": {
-    "keypoint_frames": 29,
+    "keypoint_frames": 49,
     "top5": [
      "tall",
      "cousin",
-     "forget",
-     "bed",
-     "blue"
+     "hat",
+     "computer",
+     "forget"
     ],
     "top1_hit": true,
+    "top3_hit": true,
     "top5_hit": true
    }
   },
   {
    "video": "57278",
    "gloss": "tell",
-   "frames": 30,
+   "frames": 50,
    "before": {
     "labels": [
+     "ok",
      "help",
      "ok"
     ],
     "top1": false,
+    "top3": false,
     "top5": false,
     "tgcn": null,
-    "ms": 1660
+    "ms": 2982
    },
    "after": {
     "labels": [
+     "ok",
      "help",
      "ok",
-     "pink"
+     "tell"
     ],
     "top1": false,
-    "top5": false,
+    "top3": false,
+    "top5": true,
     "tgcn": [
-     "pink",
-     0.5072419047355652
+     "tell",
+     0.8793156743049622
     ],
-    "ms": 1660
+    "ms": 2924
    },
    "model": {
-    "keypoint_frames": 29,
+    "keypoint_frames": 49,
     "top5": [
-     "pink",
      "tell",
-     "mother",
      "candy",
-     "who"
+     "pink",
+     "wrong",
+     "color"
     ],
-    "top1_hit": false,
+    "top1_hit": true,
+    "top3_hit": true,
     "top5_hit": true
    }
   },
   {
    "video": "57640",
    "gloss": "thanksgiving",
-   "frames": 30,
+   "frames": 50,
    "before": {
     "labels": [
      "help"
     ],
     "top1": false,
+    "top3": false,
     "top5": false,
     "tgcn": null,
-    "ms": 1798
+    "ms": 3143
    },
    "after": {
     "labels": [
-     "tell",
+     "thanksgiving",
      "help"
     ],
-    "top1": false,
-    "top5": false,
+    "top1": true,
+    "top3": true,
+    "top5": true,
     "tgcn": [
-     "tell",
-     0.8785529136657715
+     "thanksgiving",
+     0.9607903957366943
     ],
-    "ms": 1772
+    "ms": 3011
    },
    "model": {
-    "keypoint_frames": 30,
+    "keypoint_frames": 50,
     "top5": [
-     "tell",
-     "who",
-     "thin",
-     "candy",
-     "man"
+     "thanksgiving",
+     "man",
+     "short",
+     "bird",
+     "corn"
     ],
-    "top1_hit": false,
-    "top5_hit": false
+    "top1_hit": true,
+    "top3_hit": true,
+    "top5_hit": true
    }
   },
   {
    "video": "57941",
    "gloss": "thin",
-   "frames": 30,
+   "frames": 50,
    "before": {
     "labels": [
      "hello",
-     "hello"
+     "ok"
     ],
     "top1": false,
+    "top3": false,
     "top5": false,
     "tgcn": null,
-    "ms": 1968
+    "ms": 3218
    },
    "after": {
     "labels": [
      "hello",
-     "hello",
-     "pizza"
+     "ok",
+     "woman"
     ],
     "top1": false,
+    "top3": false,
     "top5": false,
     "tgcn": [
-     "pizza",
-     0.43592455983161926
+     "woman",
+     0.5820824503898621
     ],
-    "ms": 1935
+    "ms": 3536
    },
    "model": {
-    "keypoint_frames": 30,
+    "keypoint_frames": 50,
     "top5": [
-     "pizza",
-     "brown",
-     "eat",
      "woman",
-     "mother"
+     "shirt",
+     "white",
+     "orange",
+     "hot"
     ],
     "top1_hit": false,
+    "top3_hit": false,
     "top5_hit": false
    }
   },
   {
    "video": "57943",
    "gloss": "thin",
-   "frames": 30,
+   "frames": 50,
    "before": {
     "labels": [
      "you",
-     "phone"
+     "phone",
+     "ok"
     ],
     "top1": false,
+    "top3": false,
     "top5": false,
     "tgcn": null,
-    "ms": 1543
+    "ms": 2585
    },
    "after": {
     "labels": [
-     "kiss",
+     "thin",
      "you",
-     "phone"
+     "phone",
+     "ok"
     ],
-    "top1": false,
-    "top5": false,
+    "top1": true,
+    "top3": true,
+    "top5": true,
     "tgcn": [
-     "kiss",
-     0.46372899413108826
+     "thin",
+     0.603672206401825
     ],
-    "ms": 1549
+    "ms": 2535
    },
    "model": {
-    "keypoint_frames": 29,
+    "keypoint_frames": 49,
     "top5": [
-     "kiss",
-     "many",
-     "book",
-     "cool",
-     "color"
+     "thin",
+     "wrong",
+     "accident",
+     "meet",
+     "book"
     ],
-    "top1_hit": false,
-    "top5_hit": false
+    "top1_hit": true,
+    "top3_hit": true,
+    "top5_hit": true
    }
   },
   {
    "video": "58502",
    "gloss": "time",
-   "frames": 30,
+   "frames": 50,
    "before": {
     "labels": [
      "ok",
@@ -2895,42 +3248,45 @@
      "help"
     ],
     "top1": false,
+    "top3": false,
     "top5": false,
     "tgcn": null,
-    "ms": 2292
+    "ms": 4094
    },
    "after": {
     "labels": [
      "ok",
      "you",
      "help",
-     "right"
+     "time"
     ],
     "top1": false,
-    "top5": false,
+    "top3": false,
+    "top5": true,
     "tgcn": [
-     "right",
-     0.48074644804000854
+     "time",
+     0.6106411814689636
     ],
-    "ms": 2281
+    "ms": 3961
    },
    "model": {
-    "keypoint_frames": 30,
+    "keypoint_frames": 50,
     "top5": [
-     "right",
-     "work",
-     "hearing",
      "time",
-     "need"
+     "son",
+     "work",
+     "computer",
+     "go"
     ],
-    "top1_hit": false,
+    "top1_hit": true,
+    "top3_hit": true,
     "top5_hit": true
    }
   },
   {
    "video": "62160",
    "gloss": "walk",
-   "frames": 30,
+   "frames": 50,
    "before": {
     "labels": [
      "no",
@@ -2938,241 +3294,269 @@
      "hello"
     ],
     "top1": false,
+    "top3": false,
     "top5": false,
     "tgcn": null,
-    "ms": 2157
+    "ms": 3617
    },
    "after": {
     "labels": [
      "no",
      "ok",
      "hello",
-     "short"
+     "year"
     ],
     "top1": false,
+    "top3": false,
     "top5": false,
     "tgcn": [
-     "short",
-     0.9320967793464661
+     "year",
+     0.26940420269966125
     ],
-    "ms": 2157
+    "ms": 3468
    },
    "model": {
-    "keypoint_frames": 30,
+    "keypoint_frames": 50,
     "top5": [
+     "year",
      "short",
-     "go",
-     "decide",
-     "secretary",
-     "no"
+     "walk",
+     "dance",
+     "clothes"
     ],
     "top1_hit": false,
-    "top5_hit": false
+    "top3_hit": true,
+    "top5_hit": true
    }
   },
   {
    "video": "62247",
    "gloss": "want",
-   "frames": 30,
+   "frames": 50,
    "before": {
     "labels": [
+     "ok",
      "hello",
      "yes"
     ],
     "top1": false,
+    "top3": false,
     "top5": false,
     "tgcn": null,
-    "ms": 2125
+    "ms": 3581
    },
    "after": {
     "labels": [
+     "ok",
      "hello",
      "yes",
-     "family"
+     "what"
     ],
     "top1": false,
+    "top3": false,
     "top5": false,
     "tgcn": [
-     "family",
-     0.507534921169281
+     "what",
+     0.5061745047569275
     ],
-    "ms": 2051
+    "ms": 3716
    },
    "model": {
-    "keypoint_frames": 30,
+    "keypoint_frames": 50,
     "top5": [
+     "what",
      "many",
-     "family",
      "want",
-     "finish",
-     "basketball"
+     "book",
+     "meet"
     ],
     "top1_hit": false,
+    "top3_hit": true,
     "top5_hit": true
    }
   },
   {
    "video": "62967",
    "gloss": "what",
-   "frames": 30,
+   "frames": 50,
    "before": {
     "labels": [
      "hello"
     ],
     "top1": false,
+    "top3": false,
     "top5": false,
     "tgcn": null,
-    "ms": 2105
+    "ms": 3509
    },
    "after": {
     "labels": [
-     "thanksgiving",
-     "hello"
+     "hello",
+     "before"
     ],
     "top1": false,
+    "top3": false,
     "top5": false,
     "tgcn": [
-     "thanksgiving",
-     0.8947383761405945
+     "before",
+     0.21818360686302185
     ],
-    "ms": 2110
+    "ms": 3541
    },
    "model": {
-    "keypoint_frames": 30,
+    "keypoint_frames": 50,
     "top5": [
-     "thanksgiving",
-     "cousin",
-     "medicine",
-     "book",
-     "all"
+     "before",
+     "what",
+     "secretary",
+     "help",
+     "book"
     ],
     "top1_hit": false,
-    "top5_hit": false
+    "top3_hit": true,
+    "top5_hit": true
    }
   },
   {
    "video": "62975",
    "gloss": "what",
-   "frames": 30,
+   "frames": 50,
    "before": {
     "labels": [
+     "love",
      "help",
+     "hello",
      "help"
     ],
     "top1": false,
+    "top3": false,
     "top5": false,
     "tgcn": null,
-    "ms": 2288
+    "ms": 3925
    },
    "after": {
     "labels": [
-     "now",
+     "love",
      "help",
-     "help"
+     "hello",
+     "help",
+     "dog"
     ],
     "top1": false,
+    "top3": false,
     "top5": false,
     "tgcn": [
-     "now",
-     0.6884793043136597
+     "dog",
+     0.26531562209129333
     ],
-    "ms": 2287
+    "ms": 3904
    },
    "model": {
-    "keypoint_frames": 30,
+    "keypoint_frames": 50,
     "top5": [
-     "last",
-     "now",
+     "dog",
+     "many",
      "want",
-     "before",
-     "many"
+     "what",
+     "last"
     ],
     "top1_hit": false,
-    "top5_hit": false
+    "top3_hit": false,
+    "top5_hit": true
    }
   },
   {
    "video": "62987",
    "gloss": "what",
-   "frames": 30,
+   "frames": 50,
    "before": {
     "labels": [
-     "hello"
+     "hello",
+     "ok"
     ],
     "top1": false,
+    "top3": false,
     "top5": false,
     "tgcn": null,
-    "ms": 1657
+    "ms": 2977
    },
    "after": {
     "labels": [
-     "family",
-     "hello"
+     "hello",
+     "ok",
+     "many"
     ],
     "top1": false,
+    "top3": false,
     "top5": false,
     "tgcn": [
-     "family",
-     0.5485677123069763
+     "many",
+     0.13532982766628265
     ],
-    "ms": 1657
+    "ms": 3041
    },
    "model": {
-    "keypoint_frames": 29,
+    "keypoint_frames": 49,
     "top5": [
-     "family",
      "many",
-     "kiss",
-     "book",
-     "bed"
+     "what",
+     "dog",
+     "now",
+     "blue"
     ],
     "top1_hit": false,
-    "top5_hit": false
+    "top3_hit": true,
+    "top5_hit": true
    }
   },
   {
    "video": "63201",
    "gloss": "white",
-   "frames": 30,
+   "frames": 50,
    "before": {
     "labels": [
+     "ok",
      "hello"
     ],
     "top1": false,
+    "top3": false,
     "top5": false,
     "tgcn": null,
-    "ms": 1586
+    "ms": 2685
    },
    "after": {
     "labels": [
-     "blue",
-     "hello"
+     "ok",
+     "hello",
+     "white"
     ],
     "top1": false,
-    "top5": false,
+    "top3": true,
+    "top5": true,
     "tgcn": [
-     "blue",
-     0.38805103302001953
+     "white",
+     0.4453621506690979
     ],
-    "ms": 1547
+    "ms": 2663
    },
    "model": {
-    "keypoint_frames": 30,
+    "keypoint_frames": 50,
     "top5": [
+     "white",
+     "shirt",
+     "thin",
      "blue",
-     "tall",
-     "dog",
-     "candy",
-     "book"
+     "thursday"
     ],
-    "top1_hit": false,
-    "top5_hit": false
+    "top1_hit": true,
+    "top3_hit": true,
+    "top5_hit": true
    }
   },
   {
    "video": "63226",
    "gloss": "who",
-   "frames": 30,
+   "frames": 50,
    "before": {
     "labels": [
      "hello",
@@ -3180,526 +3564,587 @@
      "ok"
     ],
     "top1": false,
+    "top3": false,
     "top5": false,
     "tgcn": null,
-    "ms": 1628
+    "ms": 2597
    },
    "after": {
     "labels": [
-     "tall",
+     "who",
      "hello",
      "help",
      "ok"
     ],
-    "top1": false,
-    "top5": false,
+    "top1": true,
+    "top3": true,
+    "top5": true,
     "tgcn": [
-     "tall",
-     0.5119255781173706
+     "who",
+     0.5242530107498169
     ],
-    "ms": 1631
+    "ms": 2591
    },
    "model": {
-    "keypoint_frames": 30,
+    "keypoint_frames": 50,
     "top5": [
-     "tall",
-     "mother",
-     "candy",
-     "dog",
-     "blue"
+     "who",
+     "orange",
+     "drink",
+     "eat",
+     "woman"
     ],
-    "top1_hit": false,
-    "top5_hit": false
+    "top1_hit": true,
+    "top3_hit": true,
+    "top5_hit": true
    }
   },
   {
    "video": "63664",
    "gloss": "woman",
-   "frames": 30,
+   "frames": 50,
    "before": {
     "labels": [
      "hello"
     ],
     "top1": false,
+    "top3": false,
     "top5": false,
     "tgcn": null,
-    "ms": 1419
+    "ms": 2502
    },
    "after": {
     "labels": [
-     "hello"
+     "hello",
+     "cool"
     ],
     "top1": false,
+    "top3": false,
     "top5": false,
-    "tgcn": null,
-    "ms": 1404
+    "tgcn": [
+     "cool",
+     0.12379291653633118
+    ],
+    "ms": 3025
    },
    "model": {
-    "keypoint_frames": 30,
+    "keypoint_frames": 50,
     "top5": [
-     "blue",
-     "candy",
-     "book",
-     "tall",
-     "meet"
+     "cool",
+     "woman",
+     "bowling",
+     "mother",
+     "white"
     ],
     "top1_hit": false,
-    "top5_hit": false
+    "top3_hit": true,
+    "top5_hit": true
    }
   },
   {
    "video": "63789",
    "gloss": "work",
-   "frames": 30,
+   "frames": 50,
    "before": {
     "labels": [
      "yes",
+     "ok",
      "you",
+     "ok",
      "yes"
     ],
     "top1": false,
+    "top3": false,
     "top5": false,
     "tgcn": null,
-    "ms": 1630
+    "ms": 3333
    },
    "after": {
     "labels": [
+     "work",
      "yes",
+     "ok",
      "you",
-     "yes",
-     "book"
+     "ok"
     ],
-    "top1": false,
-    "top5": false,
+    "top1": true,
+    "top3": true,
+    "top5": true,
     "tgcn": [
-     "book",
-     0.43258124589920044
+     "work",
+     0.6707039475440979
     ],
-    "ms": 1774
+    "ms": 3000
    },
    "model": {
-    "keypoint_frames": 30,
+    "keypoint_frames": 50,
     "top5": [
-     "book",
-     "blue",
-     "bed",
-     "cool",
-     "candy"
+     "work",
+     "tall",
+     "school",
+     "doctor",
+     "full"
     ],
-    "top1_hit": false,
-    "top5_hit": false
+    "top1_hit": true,
+    "top3_hit": true,
+    "top5_hit": true
    }
   },
   {
    "video": "64097",
    "gloss": "wrong",
-   "frames": 30,
+   "frames": 50,
    "before": {
     "labels": [
      "phone",
      "ok"
     ],
     "top1": false,
+    "top3": false,
     "top5": false,
     "tgcn": null,
-    "ms": 1597
+    "ms": 2765
    },
    "after": {
     "labels": [
      "phone",
      "ok",
-     "tall"
+     "wrong"
     ],
     "top1": false,
-    "top5": false,
+    "top3": true,
+    "top5": true,
     "tgcn": [
-     "tall",
-     0.8379921317100525
+     "wrong",
+     0.715208113193512
     ],
-    "ms": 1602
+    "ms": 2883
    },
    "model": {
-    "keypoint_frames": 29,
+    "keypoint_frames": 49,
     "top5": [
-     "tall",
-     "mother",
-     "bed",
-     "book",
-     "cousin"
+     "wrong",
+     "accident",
+     "thin",
+     "eat",
+     "before"
     ],
-    "top1_hit": false,
-    "top5_hit": false
+    "top1_hit": true,
+    "top3_hit": true,
+    "top5_hit": true
    }
   },
   {
    "video": "64209",
    "gloss": "year",
-   "frames": 30,
+   "frames": 50,
    "before": {
     "labels": [
      "ok"
     ],
     "top1": false,
+    "top3": false,
     "top5": false,
     "tgcn": null,
-    "ms": 1670
+    "ms": 2904
    },
    "after": {
     "labels": [
-     "thanksgiving",
-     "ok"
+     "ok",
+     "change"
     ],
     "top1": false,
+    "top3": false,
     "top5": false,
     "tgcn": [
-     "thanksgiving",
-     0.4756161868572235
+     "change",
+     0.2783617079257965
     ],
-    "ms": 1706
+    "ms": 2883
    },
    "model": {
-    "keypoint_frames": 30,
+    "keypoint_frames": 50,
     "top5": [
-     "thanksgiving",
-     "candy",
-     "book",
-     "kiss",
-     "meet"
+     "change",
+     "full",
+     "bowling",
+     "black",
+     "cheat"
     ],
     "top1_hit": false,
+    "top3_hit": false,
     "top5_hit": false
    }
   },
   {
    "video": "64210",
    "gloss": "year",
-   "frames": 30,
+   "frames": 50,
    "before": {
     "labels": [
      "ok"
     ],
     "top1": false,
+    "top3": false,
     "top5": false,
     "tgcn": null,
-    "ms": 2191
+    "ms": 3771
    },
    "after": {
     "labels": [
-     "secretary",
+     "pull",
      "ok"
     ],
     "top1": false,
+    "top3": false,
     "top5": false,
     "tgcn": [
-     "secretary",
-     0.6865209341049194
+     "pull",
+     0.6401445865631104
     ],
-    "ms": 2085
+    "ms": 3486
    },
    "model": {
-    "keypoint_frames": 30,
+    "keypoint_frames": 50,
     "top5": [
-     "secretary",
-     "tall",
-     "dog",
-     "basketball",
-     "bed"
+     "pull",
+     "change",
+     "wrong",
+     "year",
+     "doctor"
     ],
     "top1_hit": false,
-    "top5_hit": false
+    "top3_hit": false,
+    "top5_hit": true
    }
   },
   {
    "video": "64293",
    "gloss": "yes",
-   "frames": 30,
+   "frames": 50,
    "before": {
     "labels": [
      "yes",
      "no"
     ],
     "top1": true,
+    "top3": true,
     "top5": true,
     "tgcn": null,
-    "ms": 1794
+    "ms": 3040
    },
    "after": {
     "labels": [
      "yes",
-     "no",
-     "later"
+     "no"
     ],
     "top1": true,
+    "top3": true,
     "top5": true,
     "tgcn": [
-     "later",
-     0.9002949595451355
+     "yes",
+     0.909838855266571
     ],
-    "ms": 1764
+    "ms": 3015
    },
    "model": {
-    "keypoint_frames": 30,
+    "keypoint_frames": 50,
     "top5": [
-     "later",
-     "mother",
-     "meet",
-     "who",
-     "africa"
+     "yes",
+     "thin",
+     "can",
+     "decide",
+     "cow"
     ],
-    "top1_hit": false,
-    "top5_hit": false
+    "top1_hit": true,
+    "top3_hit": true,
+    "top5_hit": true
    }
   },
   {
    "video": "65300",
    "gloss": "candy",
-   "frames": 30,
+   "frames": 50,
    "before": {
     "labels": [
+     "ok",
+     "letter_d",
      "ok"
     ],
     "top1": false,
+    "top3": false,
     "top5": false,
     "tgcn": null,
-    "ms": 1865
+    "ms": 3162
    },
    "after": {
     "labels": [
      "ok",
-     "mother"
+     "letter_d",
+     "ok",
+     "candy"
     ],
     "top1": false,
-    "top5": false,
+    "top3": false,
+    "top5": true,
     "tgcn": [
-     "mother",
-     0.7853217720985413
+     "candy",
+     0.4676749110221863
     ],
-    "ms": 1858
+    "ms": 3148
    },
    "model": {
-    "keypoint_frames": 30,
+    "keypoint_frames": 50,
     "top5": [
-     "mother",
-     "cool",
      "candy",
-     "blue",
-     "tall"
+     "pink",
+     "wrong",
+     "enjoy",
+     "before"
     ],
-    "top1_hit": false,
+    "top1_hit": true,
+    "top3_hit": true,
     "top5_hit": true
    }
   },
   {
    "video": "65415",
    "gloss": "cousin",
-   "frames": 30,
+   "frames": 50,
    "before": {
     "labels": [
      "hello",
-     "love"
+     "ok"
     ],
     "top1": false,
+    "top3": false,
     "top5": false,
     "tgcn": null,
-    "ms": 1521
+    "ms": 2591
    },
    "after": {
     "labels": [
-     "mother",
+     "cousin",
      "hello",
-     "love"
+     "ok"
     ],
-    "top1": false,
-    "top5": false,
+    "top1": true,
+    "top3": true,
+    "top5": true,
     "tgcn": [
-     "mother",
-     0.4842255413532257
+     "cousin",
+     0.6592290997505188
     ],
-    "ms": 1555
+    "ms": 2570
    },
    "model": {
-    "keypoint_frames": 30,
+    "keypoint_frames": 50,
     "top5": [
-     "mother",
-     "tall",
      "cousin",
-     "bed",
-     "computer"
+     "tall",
+     "drink",
+     "cool",
+     "city"
     ],
-    "top1_hit": false,
+    "top1_hit": true,
+    "top3_hit": true,
     "top5_hit": true
    }
   },
   {
    "video": "65506",
    "gloss": "dog",
-   "frames": 30,
+   "frames": 50,
    "before": {
     "labels": [
-     "letter_d",
-     "help"
+     "hello",
+     "help",
+     "ok"
     ],
     "top1": false,
+    "top3": false,
     "top5": false,
     "tgcn": null,
-    "ms": 1583
+    "ms": 2654
    },
    "after": {
     "labels": [
-     "letter_d",
-     "help"
+     "dog",
+     "hello",
+     "help",
+     "ok"
     ],
-    "top1": false,
-    "top5": false,
-    "tgcn": null,
-    "ms": 1603
+    "top1": true,
+    "top3": true,
+    "top5": true,
+    "tgcn": [
+     "dog",
+     0.3894844949245453
+    ],
+    "ms": 2834
    },
    "model": {
-    "keypoint_frames": 30,
+    "keypoint_frames": 50,
     "top5": [
-     "bed",
-     "tall",
-     "blue",
-     "candy",
-     "meet"
+     "dog",
+     "africa",
+     "mother",
+     "deaf",
+     "right"
     ],
-    "top1_hit": false,
-    "top5_hit": false
+    "top1_hit": true,
+    "top3_hit": true,
+    "top5_hit": true
    }
   },
   {
    "video": "65761",
    "gloss": "forget",
-   "frames": 30,
+   "frames": 50,
    "before": {
     "labels": [
      "ok"
     ],
     "top1": false,
+    "top3": false,
     "top5": false,
     "tgcn": null,
-    "ms": 1664
+    "ms": 2758
    },
    "after": {
     "labels": [
      "ok",
-     "tall"
-    ],
-    "top1": false,
-    "top5": false,
-    "tgcn": [
-     "tall",
-     0.488830029964447
-    ],
-    "ms": 1694
-   },
-   "model": {
-    "keypoint_frames": 30,
-    "top5": [
-     "tall",
-     "eat",
-     "meet",
-     "mother",
      "forget"
     ],
-    "top1_hit": false,
+    "top1": false,
+    "top3": true,
+    "top5": true,
+    "tgcn": [
+     "forget",
+     0.685571551322937
+    ],
+    "ms": 2740
+   },
+   "model": {
+    "keypoint_frames": 50,
+    "top5": [
+     "forget",
+     "black",
+     "wrong",
+     "accident",
+     "shirt"
+    ],
+    "top1_hit": true,
+    "top3_hit": true,
     "top5_hit": true
    }
   },
   {
    "video": "65884",
    "gloss": "hearing",
-   "frames": 30,
+   "frames": 50,
    "before": {
     "labels": [
      "ok",
      "help",
-     "ok"
-    ],
-    "top1": false,
-    "top5": false,
-    "tgcn": null,
-    "ms": 1529
-   },
-   "after": {
-    "labels": [
-     "candy",
      "ok",
      "help",
      "ok"
     ],
     "top1": false,
+    "top3": false,
+    "top5": false,
+    "tgcn": null,
+    "ms": 2609
+   },
+   "after": {
+    "labels": [
+     "ok",
+     "help",
+     "ok",
+     "help",
+     "ok"
+    ],
+    "top1": false,
+    "top3": false,
     "top5": false,
     "tgcn": [
-     "candy",
-     0.5076686143875122
+     "thin",
+     0.17414668202400208
     ],
-    "ms": 1531
+    "ms": 2618
    },
    "model": {
-    "keypoint_frames": 30,
+    "keypoint_frames": 50,
     "top5": [
-     "candy",
+     "thin",
+     "who",
+     "thursday",
      "cool",
-     "book",
-     "meet",
-     "pink"
+     "white"
     ],
     "top1_hit": false,
+    "top3_hit": false,
     "top5_hit": false
    }
   },
   {
    "video": "66111",
    "gloss": "medicine",
-   "frames": 30,
+   "frames": 50,
    "before": {
     "labels": [
+     "hello",
      "hello"
     ],
     "top1": false,
+    "top3": false,
     "top5": false,
     "tgcn": null,
-    "ms": 1992
+    "ms": 3282
    },
    "after": {
     "labels": [
-     "city",
+     "medicine",
+     "hello",
      "hello"
     ],
-    "top1": false,
-    "top5": false,
+    "top1": true,
+    "top3": true,
+    "top5": true,
     "tgcn": [
-     "city",
-     0.8530980944633484
+     "medicine",
+     0.5662519931793213
     ],
-    "ms": 1889
+    "ms": 3196
    },
    "model": {
-    "keypoint_frames": 30,
+    "keypoint_frames": 50,
     "top5": [
-     "city",
-     "book",
-     "family",
-     "secretary",
-     "bed"
+     "medicine",
+     "graduate",
+     "cook",
+     "paper",
+     "secretary"
     ],
-    "top1_hit": false,
-    "top5_hit": false
+    "top1_hit": true,
+    "top3_hit": true,
+    "top5_hit": true
    }
   },
   {
    "video": "69225",
    "gloss": "basketball",
-   "frames": 30,
+   "frames": 50,
    "before": {
     "labels": [
      "hello"
     ],
     "top1": false,
+    "top3": false,
     "top5": false,
     "tgcn": null,
-    "ms": 2024
+    "ms": 3449
    },
    "after": {
     "labels": [
@@ -3707,71 +4152,78 @@
      "basketball"
     ],
     "top1": false,
+    "top3": true,
     "top5": true,
     "tgcn": [
      "basketball",
-     0.8734872341156006
+     0.9307960867881775
     ],
-    "ms": 2021
+    "ms": 3443
    },
    "model": {
-    "keypoint_frames": 30,
+    "keypoint_frames": 50,
     "top5": [
      "basketball",
-     "tall",
-     "computer",
      "finish",
-     "mother"
+     "kiss",
+     "decide",
+     "paint"
     ],
     "top1_hit": true,
+    "top3_hit": true,
     "top5_hit": true
    }
   },
   {
    "video": "69252",
    "gloss": "brown",
-   "frames": 30,
+   "frames": 50,
    "before": {
     "labels": [
      "hello",
-     "four"
+     "four",
+     "hello"
     ],
     "top1": false,
+    "top3": false,
     "top5": false,
     "tgcn": null,
-    "ms": 1800
+    "ms": 3020
    },
    "after": {
     "labels": [
-     "blue",
+     "brown",
      "hello",
-     "four"
+     "four",
+     "hello"
     ],
-    "top1": false,
-    "top5": false,
+    "top1": true,
+    "top3": true,
+    "top5": true,
     "tgcn": [
-     "blue",
-     0.6562875509262085
+     "brown",
+     0.7729871869087219
     ],
-    "ms": 1794
+    "ms": 3079
    },
    "model": {
-    "keypoint_frames": 30,
+    "keypoint_frames": 50,
     "top5": [
-     "blue",
      "brown",
+     "fine",
+     "paper",
      "mother",
-     "bed",
-     "cool"
+     "africa"
     ],
-    "top1_hit": false,
+    "top1_hit": true,
+    "top3_hit": true,
     "top5_hit": true
    }
   },
   {
    "video": "69257",
    "gloss": "can",
-   "frames": 30,
+   "frames": 50,
    "before": {
     "labels": [
      "yes",
@@ -3780,9 +4232,10 @@
      "ok"
     ],
     "top1": false,
+    "top3": false,
     "top5": false,
     "tgcn": null,
-    "ms": 2072
+    "ms": 3448
    },
    "after": {
     "labels": [
@@ -3790,296 +4243,345 @@
      "ok",
      "no",
      "ok",
-     "decide"
+     "can"
     ],
     "top1": false,
-    "top5": false,
+    "top3": false,
+    "top5": true,
     "tgcn": [
-     "decide",
-     0.5072008967399597
+     "can",
+     0.7284404635429382
     ],
-    "ms": 2091
+    "ms": 3447
    },
    "model": {
-    "keypoint_frames": 30,
+    "keypoint_frames": 50,
     "top5": [
-     "decide",
-     "computer",
+     "can",
+     "clothes",
+     "walk",
      "language",
-     "play",
-     "finish"
+     "same"
     ],
-    "top1_hit": false,
-    "top5_hit": false
+    "top1_hit": true,
+    "top3_hit": true,
+    "top5_hit": true
    }
   },
   {
    "video": "69269",
    "gloss": "city",
-   "frames": 30,
+   "frames": 50,
    "before": {
     "labels": [
      "hello"
     ],
     "top1": false,
+    "top3": false,
     "top5": false,
     "tgcn": null,
-    "ms": 2132
+    "ms": 3875
    },
    "after": {
     "labels": [
      "hello",
-     "family"
+     "city"
     ],
     "top1": false,
-    "top5": false,
+    "top3": true,
+    "top5": true,
     "tgcn": [
-     "family",
-     0.5936010479927063
+     "city",
+     0.337572306394577
     ],
-    "ms": 2135
+    "ms": 3840
    },
    "model": {
-    "keypoint_frames": 30,
+    "keypoint_frames": 50,
     "top5": [
-     "dark",
-     "family",
      "city",
-     "book",
-     "meet"
+     "birthday",
+     "dark",
+     "school",
+     "give"
     ],
-    "top1_hit": false,
+    "top1_hit": true,
+    "top3_hit": true,
     "top5_hit": true
    }
   },
   {
    "video": "69370",
    "gloss": "how",
-   "frames": 30,
+   "frames": 50,
    "before": {
     "labels": [
-     "ok"
+     "ok",
+     "hello"
     ],
     "top1": false,
+    "top3": false,
     "top5": false,
     "tgcn": null,
-    "ms": 2257
+    "ms": 3914
    },
    "after": {
     "labels": [
-     "book",
-     "ok"
+     "ok",
+     "hello",
+     "how"
     ],
     "top1": false,
-    "top5": false,
+    "top3": true,
+    "top5": true,
     "tgcn": [
-     "book",
-     0.9968627691268921
+     "how",
+     0.8820483684539795
     ],
-    "ms": 2261
+    "ms": 3886
    },
    "model": {
-    "keypoint_frames": 30,
+    "keypoint_frames": 50,
     "top5": [
-     "book",
-     "change",
      "how",
-     "meet",
-     "fish"
+     "accident",
+     "play",
+     "jacket",
+     "help"
     ],
-    "top1_hit": false,
+    "top1_hit": true,
+    "top3_hit": true,
     "top5_hit": true
    }
   },
   {
    "video": "69389",
    "gloss": "like",
-   "frames": 30,
+   "frames": 50,
    "before": {
     "labels": [
      "hello"
     ],
     "top1": false,
+    "top3": false,
     "top5": false,
     "tgcn": null,
-    "ms": 1736
+    "ms": 2967
    },
    "after": {
     "labels": [
-     "pink",
+     "like",
      "hello"
     ],
-    "top1": false,
-    "top5": false,
+    "top1": true,
+    "top3": true,
+    "top5": true,
     "tgcn": [
-     "pink",
-     0.6097489595413208
+     "like",
+     0.8894855976104736
     ],
-    "ms": 1744
+    "ms": 2932
    },
    "model": {
-    "keypoint_frames": 30,
+    "keypoint_frames": 50,
     "top5": [
-     "pink",
-     "tell",
-     "fine",
+     "like",
      "woman",
-     "thursday"
+     "white",
+     "shirt",
+     "birthday"
     ],
-    "top1_hit": false,
-    "top5_hit": false
+    "top1_hit": true,
+    "top3_hit": true,
+    "top5_hit": true
    }
   },
   {
    "video": "69431",
    "gloss": "pizza",
-   "frames": 30,
+   "frames": 50,
    "before": {
     "labels": [
-     "hello"
+     "hello",
+     "ok",
+     "hello",
+     "love"
     ],
     "top1": false,
+    "top3": false,
     "top5": false,
     "tgcn": null,
-    "ms": 1661
+    "ms": 2855
    },
    "after": {
     "labels": [
-     "hello"
+     "color",
+     "hello",
+     "ok",
+     "hello",
+     "love"
     ],
     "top1": false,
+    "top3": false,
     "top5": false,
-    "tgcn": null,
-    "ms": 1666
+    "tgcn": [
+     "color",
+     0.8620269298553467
+    ],
+    "ms": 2779
    },
    "model": {
-    "keypoint_frames": 30,
+    "keypoint_frames": 50,
     "top5": [
-     "bed",
-     "wrong",
      "color",
-     "eat",
-     "cousin"
+     "pink",
+     "wrong",
+     "before",
+     "thin"
     ],
     "top1_hit": false,
+    "top3_hit": false,
     "top5_hit": false
    }
   },
   {
    "video": "69433",
    "gloss": "play",
-   "frames": 30,
+   "frames": 50,
    "before": {
     "labels": [
+     "ok",
+     "phone",
      "ok"
     ],
     "top1": false,
+    "top3": false,
     "top5": false,
     "tgcn": null,
-    "ms": 2005
+    "ms": 3504
    },
    "after": {
     "labels": [
      "ok",
-     "basketball"
+     "phone",
+     "ok",
+     "play"
     ],
     "top1": false,
-    "top5": false,
+    "top3": false,
+    "top5": true,
     "tgcn": [
-     "basketball",
-     0.4085458517074585
+     "play",
+     0.91314297914505
     ],
-    "ms": 2107
+    "ms": 3466
    },
    "model": {
-    "keypoint_frames": 30,
+    "keypoint_frames": 50,
     "top5": [
-     "basketball",
-     "fish",
-     "accident",
      "play",
-     "many"
+     "jacket",
+     "fish",
+     "walk",
+     "study"
     ],
-    "top1_hit": false,
+    "top1_hit": true,
+    "top3_hit": true,
     "top5_hit": true
    }
   },
   {
    "video": "69439",
    "gloss": "pull",
-   "frames": 30,
+   "frames": 50,
    "before": {
     "labels": [
      "hello",
+     "ok",
+     "letter_d",
      "ok"
     ],
     "top1": false,
+    "top3": false,
     "top5": false,
     "tgcn": null,
-    "ms": 2202
+    "ms": 3671
    },
    "after": {
     "labels": [
      "hello",
-     "ok"
+     "ok",
+     "letter_d",
+     "ok",
+     "before"
     ],
     "top1": false,
+    "top3": false,
     "top5": false,
-    "tgcn": null,
-    "ms": 2243
+    "tgcn": [
+     "before",
+     0.15822391211986542
+    ],
+    "ms": 3715
    },
    "model": {
-    "keypoint_frames": 30,
+    "keypoint_frames": 50,
     "top5": [
-     "birthday",
-     "cool",
-     "thanksgiving",
-     "graduate",
-     "thursday"
+     "before",
+     "mother",
+     "city",
+     "eat",
+     "give"
     ],
     "top1_hit": false,
+    "top3_hit": false,
     "top5_hit": false
    }
   },
   {
    "video": "69440",
    "gloss": "purple",
-   "frames": 30,
+   "frames": 50,
    "before": {
     "labels": [
      "hello",
+     "letter_d",
      "letter_d"
     ],
     "top1": false,
+    "top3": false,
     "top5": false,
     "tgcn": null,
-    "ms": 1664
+    "ms": 2732
    },
    "after": {
     "labels": [
-     "dog",
+     "purple",
      "hello",
+     "letter_d",
      "letter_d"
     ],
-    "top1": false,
-    "top5": false,
+    "top1": true,
+    "top3": true,
+    "top5": true,
     "tgcn": [
-     "dog",
-     0.6764325499534607
+     "purple",
+     0.46135950088500977
     ],
-    "ms": 1658
+    "ms": 2820
    },
    "model": {
-    "keypoint_frames": 30,
+    "keypoint_frames": 50,
     "top5": [
-     "dog",
-     "blue",
-     "tall",
-     "finish",
-     "language"
+     "purple",
+     "need",
+     "short",
+     "give",
+     "like"
     ],
-    "top1_hit": false,
-    "top5_hit": false
+    "top1_hit": true,
+    "top3_hit": true,
+    "top5_hit": true
    }
   }
  ]

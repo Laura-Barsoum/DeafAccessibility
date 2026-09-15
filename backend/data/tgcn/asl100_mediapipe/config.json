@@ -1,0 +1,10 @@
+{
+ "variant": "asl100",
+ "layout": "openpose_swapped",
+ "coords": "body",
+ "class_order": "alphabetical",
+ "init": "random",
+ "threshold": 0.05,
+ "trained_by": "backend/scripts/report_experiments/sign_train_tgcn.py",
+ "training_data": "WLASL100 train clips obtainable from the Voxel51 mirror (WLASL, C-UDA licence)"
+}

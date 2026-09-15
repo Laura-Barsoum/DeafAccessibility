@@ -39,6 +39,7 @@ WACV 2020. https://arxiv.org/abs/1910.11006
 from __future__ import annotations
 
 import base64
+import json
 import logging
 import math
 import os
@@ -186,9 +187,10 @@ def build_TGCN(num_class: int, hidden_feature: int, num_stage: int,
 
 # How the 55 keypoints are laid out, their coordinate range and the class
 # order. The checkpoints were trained on OpenPose keypoints and the release
-# does not state these, so they were settled on 17 WLASL clips outside the
-# test split (scripts/report_experiments/sign_wlasl100.py --select).
-KEYPOINT_LAYOUT = "openpose"
+# does not state these, so they were settled on 14 WLASL clips outside the
+# test split (scripts/report_experiments/sign_wlasl100.py --select). Settings
+# saved beside a checkpoint override them.
+KEYPOINT_LAYOUT = "openpose_swapped"
 KEYPOINT_COORDS = "signed"
 CLASS_ORDER = "alphabetical"
 
@@ -256,10 +258,25 @@ def extract_55_keypoints(holistic_result, layout: Optional[str] = None) -> Optio
 
 
 def to_model_coords(keypoint_seq: List[np.ndarray], coords: Optional[str] = None) -> List[np.ndarray]:
-    """[0, 1] image coordinates as the model expects them: unchanged ("unit")
-    or mapped to [-1, 1] as WLASL maps OpenPose pixels ("signed")."""
-    if (coords or KEYPOINT_COORDS) == "signed":
+    """[0, 1] image coordinates as the model expects them: unchanged ("unit"),
+    mapped to [-1, 1] as WLASL maps OpenPose pixels ("signed"), or centred on
+    the signer's neck and scaled by shoulder width over the clip ("body"), with
+    undetected points left at 0."""
+    coords = coords or KEYPOINT_COORDS
+    if coords == "signed":
         return [2.0 * p - 1.0 for p in keypoint_seq]
+    if coords == "body" and keypoint_seq:
+        arr = np.stack(keypoint_seq).astype(np.float32)            # (T, 55, 2), layout "openpose"
+        present = np.any(arr != 0, axis=2)
+        with_pose = present[:, 1] & present[:, 2] & present[:, 5]  # neck and both shoulders
+        if with_pose.any():
+            centre = arr[with_pose, 1].mean(axis=0)
+            scale = float(np.linalg.norm(arr[with_pose, 2] - arr[with_pose, 5], axis=1).mean())
+        else:
+            centre, scale = np.array([0.5, 0.5], np.float32), 0.25
+        out = (arr - centre) / (2.0 * max(scale, 1e-3))
+        out[~present] = 0.0
+        return list(out.astype(np.float32))
     return list(keypoint_seq)
 
 
@@ -322,6 +339,10 @@ class TGCNSignRecognizer:
         self.variant = variant
         self.model = None
         self.vocab: List[str] = []
+        self.config: dict = {}
+        self.layout = KEYPOINT_LAYOUT
+        self.coords = KEYPOINT_COORDS
+        self.threshold = 0.30          # lowest confidence at which the cascade shows a TGCN sign
         self._loaded = False
         self._load_failed = False
 
@@ -378,7 +399,11 @@ class TGCNSignRecognizer:
             model.eval()
             self.model = model
 
-            # Try to load a vocab file alongside the checkpoint
+            # Settings and vocabulary saved alongside the checkpoint
+            self.config = self._load_config(ckpt_path)
+            self.layout = self.config.get("layout", KEYPOINT_LAYOUT)
+            self.coords = self.config.get("coords", KEYPOINT_COORDS)
+            self.threshold = float(self.config.get("threshold", self.threshold))
             self.vocab = self._load_vocab(ckpt_path)
             log.info("TGCN loaded: variant=%s, classes=%d, vocab=%d entries",
                      self.variant, cfg["num_class"], len(self.vocab))
@@ -396,10 +421,12 @@ class TGCNSignRecognizer:
         if local and os.path.exists(local):
             log.info("TGCN: using local checkpoint %s", local)
             return local
-        bundled = self.LOCAL_DIR / self.variant / "pytorch_model.bin"
-        if bundled.exists():
-            log.info("TGCN: using local checkpoint %s", bundled)
-            return str(bundled)
+        # Weights trained on MediaPipe keypoints (sign_train_tgcn.py) come first.
+        for sub in (f"{self.variant}_mediapipe", self.variant):
+            bundled = self.LOCAL_DIR / sub / "pytorch_model.bin"
+            if bundled.exists():
+                log.info("TGCN: using local checkpoint %s", bundled)
+                return str(bundled)
 
         # 2. HuggingFace download
         try:
@@ -439,6 +466,16 @@ class TGCNSignRecognizer:
         )
         return None
 
+    def _load_config(self, ckpt_path: str) -> dict:
+        """Settings saved beside a checkpoint trained by sign_train_tgcn.py
+        (coordinates, class order, display threshold); empty for others."""
+        f = Path(ckpt_path).parent / "config.json"
+        try:
+            return json.loads(f.read_text()) if f.exists() else {}
+        except Exception as e:
+            log.warning("TGCN: unreadable %s (%s); using defaults", f, e)
+            return {}
+
     def _load_vocab(self, ckpt_path: str) -> List[str]:
         """Look for a sibling vocabulary file: classes.txt or vocab.json."""
         ckpt_dir = Path(ckpt_path).parent
@@ -449,7 +486,7 @@ class TGCNSignRecognizer:
         # Fall back to the WLASL-100 glosses for asl100, in the selected order
         if self.variant == "asl100":
             order = list(WLASL100_DEFAULT_ORDER)
-            return sorted(order) if CLASS_ORDER == "alphabetical" else order
+            return sorted(order) if self.config.get("class_order", CLASS_ORDER) == "alphabetical" else order
         # Otherwise generate placeholder labels
         n = self.VARIANT_CONFIG[self.variant]["num_class"]
         return [f"wlasl_{i:04d}" for i in range(n)]
@@ -475,7 +512,7 @@ class TGCNSignRecognizer:
 
         try:
             import torch
-            x = _resample_frames(to_model_coords(keypoint_seq), target_frames=50)   # (55, 100)
+            x = _resample_frames(to_model_coords(keypoint_seq, self.coords), target_frames=50)   # (55, 100)
             x = torch.from_numpy(x).unsqueeze(0)                    # (1, 55, 100)
             with torch.no_grad():
                 logits = self.model(x).squeeze(0)

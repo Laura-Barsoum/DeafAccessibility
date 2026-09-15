@@ -17,7 +17,7 @@ The checkpoint's documentation leaves three things open: how MediaPipe's
 landmarks map onto the 55 OpenPose keypoints it was trained on (the app's old
 layout, OpenPose order, or OpenPose order with the hands swapped), whether
 coordinates are in [0, 1] or [-1, 1], and the class order. `--select` settles
-all three on the 17 older local WLASL clips, none of which is in the test split,
+all three on the 14 older local WLASL100 clips, none of which is in the test split,
 before any test clip is scored. The model's own top-1 and top-5 on the test clips are reported alongside
 the pipeline's. Writes eval_results/sign_wlasl100.json (or sign_wlasl100_select.json).
 """
@@ -33,14 +33,15 @@ sys.path.insert(0, BACKEND)
 os.chdir(BACKEND)
 os.environ.setdefault("HF_HUB_OFFLINE", "1")
 os.environ.setdefault("TRANSFORMERS_OFFLINE", "1")
-CKPT = os.path.join(BACKEND, "data", "tgcn", "asl100", "pytorch_model.bin")
-os.environ["ACCESSIBILITY_TGCN_LOCAL_PATH"] = CKPT
-os.environ["ACCESSIBILITY_ENABLE_TGCN"] = "1"      # the application leaves the tier off by default
-
 ap = argparse.ArgumentParser()
 ap.add_argument("--select", action="store_true", help="only settle coordinate range and class order on the dev clips")
 ap.add_argument("--frames", type=int, default=30)
+ap.add_argument("--trained", action="store_true",
+                help="score the weights trained on MediaPipe keypoints (sign_train_tgcn.py) instead of the published ones")
 ARGS = ap.parse_args()
+CKPT = os.path.join(BACKEND, "data", "tgcn", "asl100_mediapipe" if ARGS.trained else "asl100", "pytorch_model.bin")
+os.environ["ACCESSIBILITY_TGCN_LOCAL_PATH"] = CKPT
+os.environ["ACCESSIBILITY_ENABLE_TGCN"] = "1"      # the application leaves the tier off by default
 
 import torch  # noqa: E402
 from modules import tgcn_sign_model as tg  # noqa: E402
@@ -136,11 +137,18 @@ if ARGS.select:
     print("dev clips:", len(DEV_IDS), "| load:", LOAD, "| scores:", scores, "| chosen:", best, flush=True)
     sys.exit(0)
 
-sel = json.load(open(os.path.join(SP, "sign_wlasl100_select.json")))
-LAYOUT, COORDS, ORDER = sel["chosen"].split("/")
-assert (tg.KEYPOINT_LAYOUT, tg.KEYPOINT_COORDS, tg.CLASS_ORDER) == (LAYOUT, COORDS, ORDER), \
-    "the application's TGCN settings differ from the dev-selected variant"
-print("using the dev-selected variant", sel["chosen"], flush=True)
+if ARGS.trained:
+    CFG = json.load(open(os.path.join(os.path.dirname(CKPT), "config.json")))
+    LAYOUT, COORDS, ORDER = CFG["layout"], CFG["coords"], CFG["class_order"]
+    assert (REC.coords, REC.threshold) == (COORDS, CFG["threshold"]), "the recogniser ignored the saved settings"
+    VARIANT = f"{LAYOUT}/{COORDS}/{ORDER} (trained, threshold {CFG['threshold']})"
+else:
+    sel = json.load(open(os.path.join(SP, "sign_wlasl100_select.json")))
+    LAYOUT, COORDS, ORDER = sel["chosen"].split("/")
+    assert (tg.KEYPOINT_LAYOUT, tg.KEYPOINT_COORDS, tg.CLASS_ORDER) == (LAYOUT, COORDS, ORDER), \
+        "the application's TGCN settings differ from the dev-selected variant"
+    VARIANT = sel["chosen"]
+print("using", VARIANT, flush=True)
 
 records, t0 = [], time.time()
 slr_off = SignLanguageRecognizer()
@@ -158,11 +166,12 @@ for k, vid in enumerate(TEST_IDS):
         t = time.perf_counter()
         seq, diag = slr.classify_all_frames_combined(b64, window_size=8, stride=3)
         labels = [s["label"].lower() for s in seq]
-        row[name] = dict(labels=labels[:5], top1=labels[:1] == [gloss], top5=gloss in labels[:5],
+        row[name] = dict(labels=labels[:5], top1=labels[:1] == [gloss], top3=gloss in labels[:3], top5=gloss in labels[:5],
                          tgcn=diag.get("tgcn_top_prediction"), ms=round((time.perf_counter() - t) * 1000))
     kps = keypoints(landmarks(frames), LAYOUT)
     top5 = model_topk(kps, COORDS, ORDER)
-    row["model"] = dict(keypoint_frames=len(kps), top5=top5, top1_hit=top5[:1] == [gloss], top5_hit=gloss in top5)
+    row["model"] = dict(keypoint_frames=len(kps), top5=top5, top1_hit=top5[:1] == [gloss], top3_hit=gloss in top5[:3],
+                        top5_hit=gloss in top5)
     records.append(row)
     if k % 10 == 0:
         print(f"{k}/{len(TEST_IDS)} clips, {time.time() - t0:.0f}s", flush=True)
@@ -175,16 +184,17 @@ def summary(key, hit):
 
 
 out = dict(
-    method=__doc__, checkpoint="huggingface.co/sharonn18/tgcn-wlasl checkpoints/asl100", checkpoint_load=LOAD,
-    variant=sel["chosen"], test_clips=len(TEST_IDS), official_test_clips=258,
-    before=dict(top1=summary("before", "top1"), top5=summary("before", "top5")),
-    after=dict(top1=summary("after", "top1"), top5=summary("after", "top5")),
-    model=dict(top1=summary("model", "top1_hit"), top5=summary("model", "top5_hit")),
+    method=__doc__, checkpoint=("data/tgcn/asl100_mediapipe, trained by sign_train_tgcn.py" if ARGS.trained
+                                else "huggingface.co/sharonn18/tgcn-wlasl checkpoints/asl100"), checkpoint_load=LOAD,
+    variant=VARIANT, test_clips=len(TEST_IDS), official_test_clips=258,
+    before=dict(top1=summary("before", "top1"), top3=summary("before", "top3"), top5=summary("before", "top5")),
+    after=dict(top1=summary("after", "top1"), top3=summary("after", "top3"), top5=summary("after", "top5")),
+    model=dict(top1=summary("model", "top1_hit"), top3=summary("model", "top3_hit"), top5=summary("model", "top5_hit")),
     median_ms=dict(before=float(np.median([r["before"]["ms"] for r in records])),
                    after=float(np.median([r["after"]["ms"] for r in records]))),
     records=records,
 )
-json.dump(out, open(os.path.join(SP, "sign_wlasl100.json"), "w"), indent=1)
+json.dump(out, open(os.path.join(SP, "sign_wlasl100_trained.json" if ARGS.trained else "sign_wlasl100.json"), "w"), indent=1)
 for key in ("before", "after", "model"):
     print(key, {m: f"{v['n']}/{v['of']} ({v['rate']:.1%})" for m, v in out[key].items()})
 print("DONE sign", flush=True)

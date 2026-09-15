@@ -183,11 +183,16 @@ class _HandsHolisticAdapter:
 # rules all continue to work unchanged.
 
 class _TasksLandmarkPoint:
-    """A single (x, y, z) landmark — mirrors the legacy NormalizedLandmark."""
+    """A single (x, y, z) landmark — mirrors the legacy NormalizedLandmark.
+
+    The Tasks API leaves `visibility` as None for hand landmarks. float(None)
+    used to raise inside _TasksHolistic.process, whose try/except then dropped
+    both hands on every frame, so every hand-based sign tier ran without hands.
+    """
     __slots__ = ("x", "y", "z", "visibility")
-    def __init__(self, x: float, y: float, z: float, visibility: float = 1.0):
-        self.x = float(x); self.y = float(y); self.z = float(z)
-        self.visibility = float(visibility)
+    def __init__(self, x: float, y: float, z: float, visibility: Optional[float] = 1.0):
+        self.x = float(x or 0.0); self.y = float(y or 0.0); self.z = float(z or 0.0)
+        self.visibility = 1.0 if visibility is None else float(visibility)
 
 
 class _TasksLandmarkList:
@@ -219,6 +224,20 @@ def _wrap_landmarks(landmarks_list) -> Optional[_TasksLandmarkList]:
         for lm in landmarks_list
     ]
     return _TasksLandmarkList(pts)
+
+
+def tgcn_enabled() -> bool:
+    """Whether the TGCN tier runs. ACCESSIBILITY_ENABLE_TGCN=1 or 0 decides
+    explicitly; otherwise it runs only when weights trained on MediaPipe
+    keypoints (sign_train_tgcn.py) are present, since they, unlike the
+    published OpenPose-trained weights, were validated on the keypoints this
+    application extracts, with a display threshold chosen on validation clips."""
+    flag = os.environ.get("ACCESSIBILITY_ENABLE_TGCN", "").strip().lower()
+    if flag in ("1", "true", "yes"):
+        return True
+    if flag in ("0", "false", "no"):
+        return False
+    return (TGCNSignRecognizer.LOCAL_DIR / "asl100_mediapipe" / "pytorch_model.bin").exists()
 
 
 class _TasksHolisticResult:
@@ -640,11 +659,7 @@ class SignLanguageRecognizer:
         """Lazy-load the WLASL TGCN. Silently disables itself if unavailable."""
         if self._tgcn is not None:
             return
-        # Off unless asked for (ACCESSIBILITY_ENABLE_TGCN=1). With the published
-        # asl100 weights on MediaPipe keypoints the tier scored at chance on 100
-        # WLASL100 test clips (model top-5 6 of 100; sign_wlasl100.py), and a
-        # confident wrong gloss is worse than none.
-        if os.environ.get("ACCESSIBILITY_ENABLE_TGCN", "").lower() not in ("1", "true", "yes"):
+        if not tgcn_enabled():
             self._tgcn = TGCNSignRecognizer(variant="asl100")
             self._tgcn._load_failed = True
             return
@@ -1368,7 +1383,7 @@ class SignLanguageRecognizer:
                 n_hand_frames_geom += 1
 
             # Tier 0: TGCN keypoints (extracted from the same Holistic result)
-            tgcn_keypoints.append(extract_55_keypoints(raw))
+            tgcn_keypoints.append(extract_55_keypoints(raw, self._tgcn.layout if self._tgcn else None))
 
         # ── Tier 0: TGCN — whole-clip word-level prediction ─────────────
         # Runs ONCE over all valid keypoints; gives a single top-1 sign for
@@ -1378,7 +1393,7 @@ class SignLanguageRecognizer:
             valid_kp = [k for k in tgcn_keypoints if k is not None]
             if len(valid_kp) >= 8:
                 preds = self._tgcn.predict(valid_kp, top_k=3)
-                if preds and preds[0][1] >= 0.30:
+                if preds and preds[0][1] >= self._tgcn.threshold:
                     tgcn_top = preds[0]
                     log.info("TGCN top-3: %s", preds)
 

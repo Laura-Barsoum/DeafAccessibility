@@ -11,8 +11,10 @@ that folder's README says which script produces which table or figure.
 
 ## Models in the running system
 
-Eight pre-trained perception models and one language model. No model is
-trained from scratch.
+Eight pre-trained perception models and one language model, plus a sign
+network (the TGCN) trained here on WLASL100 keypoints extracted by the
+application, because the published weights, learned from OpenPose keypoints,
+reached only 8% top-1 on them.
 
 | Channel | Model | Role |
 |---|---|---|
@@ -21,7 +23,7 @@ trained from scratch.
 | Personal sounds | AST embeddings with a prototypical-network rule calibrated on browser-coded audio | Few-shot enrolled sounds |
 | Scene | BLIP base | Scene description, one tick in four |
 | Hazards | YOLOv11n | Visual hazard detection |
-| Sign | MediaPipe Tasks landmark and gesture models, geometric rules, fingerspelling | Constrained sign vocabulary |
+| Sign | TGCN trained on MediaPipe keypoints from WLASL100, MediaPipe gesture model, geometric rules, fingerspelling | 100-sign vocabulary |
 | Emotion | DeepFace (face) and wav2vec 2.0 (voice), confidence-weighted | Tone tags |
 | Language | `openai/gpt-oss-20b` via Groq, with a fallback chain | Gloss polishing and alert composition |
 
@@ -37,7 +39,7 @@ trained from scratch.
 | Personal sounds | AST embedding, prototypical rule, settings chosen on browser-coded audio | YamNet and spectral embeddings; cosine threshold; settings chosen on clean clips with three sounds enrolled | With fallback features the cosine rule fired on 78% of never-enrolled clips; with YamNet, calibrated test F1 0.344 against 0.200 for cosine (difference 0.081 to 0.202, 95% bootstrap interval over the 30 trials). On clean clips AST raised test recall from 0.32 to 0.83 (paired gain 0.44 to 0.58), but those settings matched one enrolled alarm on every fusion-scene tick; re-chosen on Opus-coded 2.8 s ticks with one and three sounds enrolled, test recall is 0.64 at 4.9% false alarms with one sound, where the earlier settings raised 65.6% | Measured | `fewshot_results.json`, `fewshot_tune.json`, `fewshot_embeddings.json`, `fewshot_deployment.json` |
 | Scene | BLIP base | CLIP retrieval | Open-ended captions need a generator; an uncached caption takes 225 ms, so BLIP runs one tick in four | Published and measured | `latency_results.json` |
 | Hazards | YOLOv11n | Detectron2; EfficientDet | Single-stage detector built for CPU; 22 ms for three frames | Published and measured | `latency_results.json` |
-| Sign | MediaPipe Tasks landmarks and rules; TGCN tier off by default | Published TGCN weights; I3D; legacy Holistic API | Published asl100 TGCN weights scored at chance on MediaPipe keypoints (6 of 100 WLASL100 test clips within the top five); I3D is more accurate on WLASL (32.48% against 23.65% top-1, Li et al. 2020) but needs RGB video; the Holistic API was removed from MediaPipe | Measured and published | `sign_wlasl100.json` |
+| Sign | TGCN trained on MediaPipe keypoints, with landmarks and rules | Published TGCN weights; I3D; legacy Holistic API | Chosen on 163 validation clips (random start, body-normalised keypoints, 60.1% top-1); on 100 test clips 60% top-1 and 78% top-5, against 8% and 31% for the published weights once hands were detected; I3D needs RGB video; the Holistic API was removed from MediaPipe | Measured and published | `sign_tgcn_train.json`, `sign_wlasl100.json`, `sign_wlasl100_trained.json` |
 | Emotion | DeepFace and wav2vec 2.0, confidence-weighted | Either channel alone | FER-2013 private test (3,589 faces): accuracy 54.7% (95% interval 53.1% to 56.3%), macro-F1 0.51, happy F1 0.76, fear F1 0.37; the neutral-bias recalibration left accuracy almost unchanged (54.9% without it); neutral bias also seen on live smiles | Measured and observed | `emotion_fer2013.json` |
 | Diarization | Off by default | pyannote on every tick | First load of about 1 GB stalled every tick | Measured | none |
 | Language model | `gpt-oss-20b` | Llama 3.3 70B; `gpt-oss-120b`; Qwen3.8-27B; `compound-mini` | 144 calls: 20b median 0.32 s, 120b 0.42 s, both preserved the meaning in 36 of 36 calls; `compound-mini` 0 of 36 (HTTP 400); Llama 3.3 decommissioned by the provider | Measured | `llm_bench.json` |
@@ -75,9 +77,10 @@ Results are in `backend/eval_results/` (`fusion_eval.json`,
   not on recordings from users' homes. With one sound enrolled and clips passed
   through the browser codec, the adopted matcher recalls 0.64 at a 4.9%
   false-alarm rate, so it still misses about one play in three.
-- Sign recognition did not meet its goal: 1% top-1 on 100 of the 258 official
-  WLASL100 test clips. Published TGCN weights were found, but on MediaPipe
-  keypoints they score at chance, so that tier is off by default
+- Sign recognition covers only the 100 WLASL100 signs: 60% top-1 on 100 of the
+  258 official test clips, but 21% through the full cascade, which puts the
+  model's word first only when it beats the hand-shape rules. It was trained
+  and tested on WLASL's signers, not on webcam signing by Deaf users
   (`docs/WLASL_EVAL_RESULTS.md`).
 - Language-model latency depends on a hosted provider, which can withdraw
   models, as happened to Llama 3.3 during the project.
