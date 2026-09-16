@@ -11,8 +11,8 @@ It transcribes speech, classifies environmental sounds, recognises sounds the
 user has personally enrolled, detects visual hazards, describes the scene,
 reads emotional tone, and recognises 100 common signs. Detections
 converge on a shared event bus that ranks them into four priority bands and
-escalates genuinely urgent events with a sustained visual flash and a haptic
-pulse.
+escalates genuinely urgent events with a sustained visual flash (vibration is
+coded for phone browsers, but this prototype is served to the laptop only).
 
 The only model trained here is the small sign network, trained on the app's own
 MediaPipe keypoints because the published weights, learned from OpenPose
