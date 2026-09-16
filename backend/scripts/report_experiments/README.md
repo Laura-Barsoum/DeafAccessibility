@@ -21,6 +21,7 @@ exact results the report quotes. Run from `backend/` with the project venv.
 | `whisper_ablation.py`, `whisper_ablation_distil.py` | WER by model and decoding configuration | 5.2, Table 5.1, Figure 5.1b |
 | `llm_benchmark.py` | 144-call language-model benchmark (needs `GROQ_API_KEY`) | 5.2, Figure 5.1c |
 | `latency_on_recorded_media.py` | Per-stage and end-to-end tick latency | 5.3, Figures 3.2 and 5.3 |
+| `first_tick_probe.py` | Per-stage timing of the first live-caption ticks after the application's own warm-up (silence and grey frames) | 5.3, Figure 5.3 |
 | `fusion_scenes.py` | Fusion on scripted scenes with known events: duplicate headlines, first-headline correctness, merge removals. `--scene-set heldout` uses different clips and sentences, written and measured before fusion was changed; `--out` names the result file | 5.4, Table 5.4, Figure 5.4 |
 | `emotion_fer2013.py` | Facial emotion per-label precision, recall and F1 on the FER-2013 private test split, with and without the shipped recalibration | 5.2, Table 5.1, Figure 5.1d |
 | `capture_hazard_diary.py` | Screenshots of the hazard channel and the Diary and Summary tabs, with a temporary diary and profiles | Figure 4.6 |

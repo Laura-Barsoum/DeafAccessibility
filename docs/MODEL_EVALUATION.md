@@ -56,7 +56,10 @@ A second, held-out set with different clips and sentences was written and
 measured before fusion was changed. The "after" runs include the fusion changes
 (merging related labels and a caption with its alerts, AST speech labels
 demoted, transcripts ignored when AST's speech probability is below 0.18) and
-AST personal-sound embeddings.
+AST personal-sound embeddings. The scores are with live captions off: with them
+on, the default, captions and their name and keyword alerts bypass fusion and
+its speech gate. The gate was set on all 2,000 ESC-50 clips, which include every
+clip in both scene sets.
 
 | Measure | Original, before | Original, after | Held-out, before | Held-out, after |
 |---|---|---|---|---|

@@ -84,8 +84,10 @@ feedback.
   scenes (39% of slots before, none after). On a held-out scene set written
   before the change, the most urgent event led 84% of ticks (77% before). The
   remaining failures are sounds AST never labels as urgent, and on the original
-  set 12 transcripts of sirens and crying still passed the speech gate. See
-  `backend/eval_results/fusion_eval*.json`.
+  set 12 transcripts of sirens and crying still passed the speech gate. These
+  scores are with live captions off; with them on, the default, captions and
+  their name and keyword alerts bypass fusion and its speech gate, so a phantom
+  caption can still appear. See `backend/eval_results/fusion_eval*.json`.
 - **No lip reading.** `lip_reader.py` computes a transcript *reliability score*
   from mouth movement. It does not run AV-HuBERT or any audio-visual speech
   model.
@@ -186,7 +188,7 @@ cd backend && source venv/bin/activate
 python -m pytest tests/ -q
 ```
 
-164 unit and integration tests. Unit tests cover pure logic (fusion ranking,
+171 unit and integration tests. Unit tests cover pure logic (fusion ranking,
 priority mapping, prototypical matching, the feedback loop, fingerspelling,
 name matching, the language-model fallback chain). Integration tests exercise
 the HTTP layer, including graceful degradation when audio or frames are absent.
@@ -213,6 +215,7 @@ python scripts/report_experiments/sign_keypoints.py             # MediaPipe keyp
 python scripts/report_experiments/sign_train_tgcn.py            # train the sign model; then sign_wlasl100.py --trained
 python scripts/report_experiments/fusion_scenes.py              # fusion on scripted scenes with known events
 python scripts/report_experiments/fusion_scenes.py --scene-set heldout --out fusion_eval_heldout_after.json
+python scripts/report_experiments/first_tick_probe.py           # per-stage timing of the first ticks after start-up
 ```
 
 The per-channel scripts directly in `backend/scripts/` (`eval_*.py`) came
