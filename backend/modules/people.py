@@ -34,7 +34,7 @@ from typing import Any, Dict, List, Optional, Tuple
 
 import numpy as np
 
-from .events import Event, Priority
+from .events import Event, Priority, contains_word
 
 log = logging.getLogger("accessibility.people")
 
@@ -368,13 +368,12 @@ class PeopleRegistry:
 
     @staticmethod
     def _name_in_text(needle: str, haystack: str) -> bool:
-        """Whole-word match — avoid 'Sam' matching inside 'same'."""
+        """Whole-word, case-insensitive match on the first name (Whisper often
+        drops surnames), so 'Sam' does not match inside 'same'. Shares
+        events.contains_word with fusion's safety words."""
         if not needle or not haystack:
             return False
-        # First name only — Whisper often drops surnames.
-        first = needle.split()[0]
-        # Word-boundary match.
-        return re.search(rf"\b{re.escape(first)}\b", haystack) is not None
+        return contains_word(needle.split()[0], haystack)
 
 
 # ── Singleton ───────────────────────────────────────────────────────

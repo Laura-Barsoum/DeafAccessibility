@@ -20,7 +20,7 @@ import logging
 import time
 from typing import Any, Dict, List, Optional
 
-from .events import Event, Priority, is_speech_label, merge_events
+from .events import Event, Priority, contains_word, is_speech_label, merge_events
 
 log = logging.getLogger("accessibility.fusion")
 
@@ -67,7 +67,7 @@ class Fusion:
         #    speech in the same audio, in which case the words were invented.
         if text and heard:
             base_priority = Priority.IMPORTANT
-            if any(t in text.lower() for t in SAFETY_WORDS):
+            if any(contains_word(w, text) for w in SAFETY_WORDS):
                 base_priority = Priority.CRITICAL
             speaker = None
             if face_attribution and face_attribution.get("speaker_attribution"):

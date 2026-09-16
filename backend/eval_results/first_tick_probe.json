@@ -1,0 +1,123 @@
+{
+ "method": "[Final report: Section 5.3, Figure 5.3]\n\nWhy the first live-caption tick of the latency benchmark took far longer than the\nrest. The benchmark imported the server without its start-up warm-up; the\napplication's own warm-up (server._prewarm) sends one tick of silence and grey\nframes, which may leave models that only run on a face, a hand or speech unloaded.\n\nThis script starts the server state as the application does, runs _prewarm, then\nsends five live-caption ticks built exactly as latency_on_recorded_media.py builds\nthem (macOS `say` speech cut to 2.8 s and Opus-coded, three WLASL frames at 320x240),\ntiming every stage of each tick. Profiles are the real ones, as in the benchmark;\nthe diary goes to a temporary file. Writes eval_results/first_tick_probe.json.\n",
+ "warm_up_s": 11.2,
+ "ticks": [
+  {
+   "tick": 1,
+   "wall_s": 5.113,
+   "people_enrolled": 1,
+   "stages_s": {
+    "BLIP": 3.285,
+    "AST": 2.214,
+    "voice emotion": 1.167,
+    "face identification": 0.226,
+    "ffmpeg": 0.182,
+    "sign landmarks": 0.158,
+    "facial emotion": 0.093,
+    "face tracking": 0.056,
+    "YOLO": 0.05,
+    "diary": 0.001,
+    "fusion": 0.0,
+    "personaliser": 0.0,
+    "summary buffer": 0.0,
+    "sign classification": 0.0,
+    "lip reliability": 0.0
+   },
+   "hazards": 1,
+   "emotion": "angry"
+  },
+  {
+   "tick": 2,
+   "wall_s": 0.689,
+   "people_enrolled": 1,
+   "stages_s": {
+    "AST": 0.283,
+    "sign landmarks": 0.125,
+    "face identification": 0.11,
+    "facial emotion": 0.068,
+    "voice emotion": 0.061,
+    "YOLO": 0.052,
+    "ffmpeg": 0.04,
+    "face tracking": 0.032,
+    "diary": 0.001,
+    "fusion": 0.0,
+    "personaliser": 0.0,
+    "sign classification": 0.0,
+    "summary buffer": 0.0,
+    "lip reliability": 0.0
+   },
+   "hazards": 1,
+   "emotion": "angry"
+  },
+  {
+   "tick": 3,
+   "wall_s": 0.802,
+   "people_enrolled": 1,
+   "stages_s": {
+    "AST": 0.409,
+    "sign landmarks": 0.124,
+    "face identification": 0.108,
+    "facial emotion": 0.069,
+    "voice emotion": 0.058,
+    "YOLO": 0.039,
+    "ffmpeg": 0.032,
+    "face tracking": 0.026,
+    "diary": 0.001,
+    "fusion": 0.0,
+    "personaliser": 0.0,
+    "sign classification": 0.0,
+    "summary buffer": 0.0,
+    "lip reliability": 0.0
+   },
+   "hazards": 1,
+   "emotion": "angry"
+  },
+  {
+   "tick": 4,
+   "wall_s": 0.79,
+   "people_enrolled": 1,
+   "stages_s": {
+    "BLIP": 0.401,
+    "AST": 0.385,
+    "sign landmarks": 0.124,
+    "face identification": 0.105,
+    "YOLO": 0.068,
+    "facial emotion": 0.068,
+    "voice emotion": 0.059,
+    "face tracking": 0.034,
+    "ffmpeg": 0.032,
+    "diary": 0.001,
+    "sign classification": 0.0,
+    "fusion": 0.0,
+    "personaliser": 0.0,
+    "summary buffer": 0.0,
+    "lip reliability": 0.0
+   },
+   "hazards": 1,
+   "emotion": "angry"
+  },
+  {
+   "tick": 5,
+   "wall_s": 0.794,
+   "people_enrolled": 1,
+   "stages_s": {
+    "AST": 0.398,
+    "sign landmarks": 0.124,
+    "face identification": 0.108,
+    "facial emotion": 0.067,
+    "voice emotion": 0.063,
+    "YOLO": 0.034,
+    "ffmpeg": 0.032,
+    "face tracking": 0.023,
+    "diary": 0.001,
+    "fusion": 0.0,
+    "personaliser": 0.0,
+    "sign classification": 0.0,
+    "summary buffer": 0.0,
+    "lip reliability": 0.0
+   },
+   "hazards": 1,
+   "emotion": "angry"
+  }
+ ]
+}

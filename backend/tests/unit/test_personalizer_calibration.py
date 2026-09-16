@@ -74,6 +74,18 @@ class CalibrationByEmbeddingTests(unittest.TestCase):
         self.assertEqual(embedder.calls, calls)
         self.assertEqual([e.label for e in events], ["Kettle (personal)"])
 
+    def test_rejecting_an_alert_stops_that_play_matching(self):
+        """Behaviour, not stored values: the tightened gate is applied at match time."""
+        p, _embedder, _play = self.make(AST_DIM)
+        events = p.match_prototypical(b"play")
+        self.assertEqual(len(events), 1)
+        for _ in range(5):
+            if not events:
+                break
+            p.feedback(events[0].extra["match_id"], is_positive=False)
+            events = p.match_prototypical(b"play")
+        self.assertEqual(events, [])
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -179,6 +179,15 @@ def is_speech_label(label: str) -> bool:
     return any(w in (label or "").lower() for w in SPEECH_LABEL_WORDS)
 
 
+def contains_word(word: str, text: str) -> bool:
+    """True when `word` occurs in `text` as a whole word, ignoring case, so
+    "help" matches "Help!" but not "helpful", and "fire" not "firefighter".
+    Used for the user's name, the keyword watch-list and fusion's safety words."""
+    if not word or not text:
+        return False
+    return re.search(rf"\b{re.escape(word.strip())}\b", text, re.IGNORECASE) is not None
+
+
 def same_sound_event(a: str, b: str) -> bool:
     """True when two sound labels most likely describe one event: one is a
     kind of the other in the AudioSet ontology ("Dog" and "Bark"), or they
