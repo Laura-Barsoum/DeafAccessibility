@@ -172,9 +172,10 @@ classifying sounds.
 2. **Personal Sounds tab.** Type a name, record three examples of a household
    sound, then *Enrol Sound*. Back on Live, trigger that sound: it fires with a
    confidence score and confirm/reject buttons. Confirming refines the stored
-   prototype; rejecting raises that sound's threshold.
+   prototype and loosens its match gate; rejecting tightens the gate, never
+   below the distance of the farthest enrolment clip.
 3. **People tab.** Set your own name so the system flashes when it is spoken.
-   Optionally enrol a person's face and voice; when recognised, the Live view
+   Optionally enrol a person's face; when recognised, the Live view
    shows them and captions are attributed to them.
 4. **Sign panel.** Click *Start signing*, sign a short phrase, then stop. The
    glosses are polished into a sentence and spoken aloud.
@@ -188,7 +189,7 @@ cd backend && source venv/bin/activate
 python -m pytest tests/ -q
 ```
 
-171 unit and integration tests. Unit tests cover pure logic (fusion ranking,
+174 unit and integration tests. Unit tests cover pure logic (fusion ranking,
 priority mapping, prototypical matching, the feedback loop, fingerspelling,
 name matching, the language-model fallback chain). Integration tests exercise
 the HTTP layer, including graceful degradation when audio or frames are absent.

@@ -951,24 +951,13 @@ def people_list():
 
 @app.route("/people/enrol", methods=["POST"])
 def people_enrol():
-    """Body: {
-        "name": "Sarah",
-        "frames_b64": [<jpeg-b64>, ...],   # face frames (optional)
-        "audio_clips_b64": [<wav-b64>, ...] # voice clips (optional)
-    }
-    """
+    """Body: {"name": "Sarah", "frames_b64": [<jpeg-b64>, ...]}. Face frames
+    only: voice is not recorded, since nothing matched voice embeddings."""
     from modules.people import get_people
     data = request.get_json(force=True) or {}
     name = (data.get("name") or "").strip()
     frames = data.get("frames_b64") or []
-    audio_clips_b64 = data.get("audio_clips_b64") or []
-    audio_bytes_list = []
-    for c in audio_clips_b64:
-        try:
-            audio_bytes_list.append(base64.b64decode(c))
-        except Exception:
-            continue
-    res = get_people().enrol(name, frames, audio_bytes_list)
+    res = get_people().enrol(name, frames)
     return jsonify(res), (200 if res.get("ok") else 400)
 
 

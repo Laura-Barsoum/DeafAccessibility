@@ -106,12 +106,22 @@ class PersonalizerFeedbackTests(unittest.TestCase):
         self.assertIn("proto_gate", r)
         self.assertLess(after, before if before is not None else pm.PROTO_GATE_FLOOR + 1e-9)
 
-    def test_repeated_rejection_never_makes_a_sound_unmatchable(self):
-        self.p.profile["sounds"]["test_doorbell"]["proto_gate"] = 0.10
+    def test_repeated_rejection_stops_at_the_farthest_enrolment_clip(self):
+        s = self.p.profile["sounds"]["test_doorbell"]
+        s.update(radius=0.06, max_distance=0.09, proto_gate=0.10)
         for _ in range(60):
             events = self.p.match(b"x" * 32000, threshold=0.0)
             self.p.feedback(events[0].to_dict()["extra"]["match_id"], is_positive=False)
-        self.assertGreaterEqual(self.p.profile["sounds"]["test_doorbell"]["proto_gate"], 0.02)
+        self.assertGreaterEqual(s["proto_gate"], 0.09)
+
+    def test_confirmation_loosens_the_gate_up_to_its_default(self):
+        s = self.p.profile["sounds"]["test_doorbell"]
+        s.update(radius=0.03, max_distance=0.05, proto_gate=0.06)
+        default_gate = max(0.03 * pm.PROTO_RADIUS_K, pm.PROTO_GATE_FLOOR)
+        for _ in range(20):
+            events = self.p.match(b"x" * 32000, threshold=0.0)
+            self.p.feedback(events[0].to_dict()["extra"]["match_id"], is_positive=True)
+        self.assertAlmostEqual(s["proto_gate"], default_gate)
 
     def test_negative_feedback_caps_at_0_95(self):
         # Hammer it 20 times — must never exceed 0.95

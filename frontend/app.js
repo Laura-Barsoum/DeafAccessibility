@@ -1400,10 +1400,9 @@ function getPriorityLabel(p) {
   return 'Inform';
 }
 
-// --- People (face + voice + name-call alert) ---
+// --- People (face + name-call alert) ---
 // Buffers for in-progress enrolment; cleared after submit.
 let _peopleEnrolFaceFrames = [];      // base64 JPEG strings
-let _peopleEnrolVoiceClips = [];      // base64 WAV strings
 
 function setupPeopleControls() {
   const nameSaveBtn = document.getElementById('self-name-save');
@@ -1414,11 +1413,9 @@ function setupPeopleControls() {
   }
 
   const faceBtn = document.getElementById('people-enrol-face');
-  const voiceBtn = document.getElementById('people-enrol-voice');
   const submit = document.getElementById('people-enrol-submit');
   const clear = document.getElementById('people-enrol-clear');
   if (faceBtn) faceBtn.addEventListener('click', recordPersonFace);
-  if (voiceBtn) voiceBtn.addEventListener('click', recordPersonVoice);
   if (submit) submit.addEventListener('click', submitPersonEnrolment);
   if (clear) clear.addEventListener('click', clearPersonEnrolment);
 }
@@ -1470,37 +1467,10 @@ async function recordPersonFace() {
   btn.textContent = '📷 Record face (3 s)';
 }
 
-async function recordPersonVoice() {
-  const btn = document.getElementById('people-enrol-voice');
-  const counter = document.getElementById('people-voice-count');
-  btn.disabled = true;
-  btn.textContent = '● Recording…';
-  try {
-    const stream = await navigator.mediaDevices.getUserMedia({audio: true});
-    const recorder = new MediaRecorder(stream);
-    const chunks = [];
-    recorder.ondataavailable = e => { if (e.data.size > 0) chunks.push(e.data); };
-    recorder.start();
-    await new Promise(r => setTimeout(r, 3000));
-    recorder.stop();
-    await new Promise(r => recorder.onstop = r);
-    stream.getTracks().forEach(t => t.stop());
-    const blob = new Blob(chunks, {type: 'audio/webm'});
-    const b64 = await blobToBase64(blob);
-    _peopleEnrolVoiceClips.push(b64);
-    counter.textContent = `${_peopleEnrolVoiceClips.length} voice clips`;
-    refreshPeopleSubmitState();
-  } catch (e) {
-    alert('Microphone failed: ' + e.message);
-  }
-  btn.disabled = false;
-  btn.textContent = '🎙 Record voice (3 s)';
-}
-
 function refreshPeopleSubmitState() {
   const submit = document.getElementById('people-enrol-submit');
   const name = (document.getElementById('people-enrol-name').value || '').trim();
-  const hasSample = _peopleEnrolFaceFrames.length > 0 || _peopleEnrolVoiceClips.length > 0;
+  const hasSample = _peopleEnrolFaceFrames.length > 0;
   submit.disabled = !(name && hasSample);
 }
 
@@ -1517,7 +1487,6 @@ async function submitPersonEnrolment() {
       body: JSON.stringify({
         name,
         frames_b64: _peopleEnrolFaceFrames,
-        audio_clips_b64: _peopleEnrolVoiceClips,
       })
     });
     const data = await r.json();
@@ -1532,10 +1501,8 @@ async function submitPersonEnrolment() {
 
 function clearPersonEnrolment() {
   _peopleEnrolFaceFrames = [];
-  _peopleEnrolVoiceClips = [];
   document.getElementById('people-enrol-name').value = '';
   document.getElementById('people-face-count').textContent = '0 face frames';
-  document.getElementById('people-voice-count').textContent = '0 voice clips';
   refreshPeopleSubmitState();
 }
 
@@ -1549,9 +1516,8 @@ async function fetchPeople() {
     (data.people || []).forEach(p => {
       const li = document.createElement('li');
       const face = p.n_face_examples ? `👤 ${p.n_face_examples}` : '👤 —';
-      const voice = p.n_voice_examples ? `🎙 ${p.n_voice_examples}` : '🎙 —';
       li.innerHTML = `
-        <span><strong>${escapeHtml(p.name)}</strong> &nbsp; ${face} &nbsp; ${voice}</span>
+        <span><strong>${escapeHtml(p.name)}</strong> &nbsp; ${face}</span>
         <button class="ghost" data-name="${escapeHtml(p.name)}">×</button>
       `;
       li.querySelector('button').addEventListener('click', async () => {

@@ -86,6 +86,23 @@ class CalibrationByEmbeddingTests(unittest.TestCase):
             events = p.match_prototypical(b"play")
         self.assertEqual(events, [])
 
+    def test_rejections_never_stop_the_enrolment_clips_matching(self):
+        """The gate never falls below the farthest enrolment clip."""
+        p, _embedder, _play = self.make(AST_DIM)
+        for _ in range(25):
+            events = p.match_prototypical(b"e0")
+            self.assertEqual(len(events), 1)
+            p.feedback(events[0].extra["match_id"], is_positive=False)
+        for clip in (b"e0", b"e1", b"e2"):
+            self.assertEqual(len(p.match_prototypical(clip)), 1, clip)
+
+    def test_confirming_loosens_a_tightened_gate(self):
+        p, _embedder, _play = self.make(AST_DIM)
+        p.feedback(p.match_prototypical(b"play")[0].extra["match_id"], is_positive=False)
+        tightened = p.profile["sounds"]["Kettle"]["proto_gate"]
+        p.feedback(p.match_prototypical(b"e0")[0].extra["match_id"], is_positive=True)
+        self.assertGreater(p.profile["sounds"]["Kettle"]["proto_gate"], tightened)
+
 
 if __name__ == "__main__":
     unittest.main()

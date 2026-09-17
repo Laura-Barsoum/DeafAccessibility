@@ -1,5 +1,5 @@
 """
-people.py — Few-shot person enrolment (face + voice + name).
+people.py — Few-shot person enrolment (face + name).
 
 Lets the Deaf user register the people who matter (family, flatmates,
 manager) so the live pipeline can label captions and trigger an alert
@@ -9,14 +9,14 @@ Each person profile stores:
     - name (display name, also used for name-call detection in STT)
     - face_embedding: mean 4096-d DeepFace VGG-Face embedding over the
       enrolment frames
-    - voice_embedding: mean mel-spectrogram embedding (128-d) — a simple
-      but reasonably-discriminative voice fingerprint without pulling in
-      a heavyweight speaker-id model
-    - n_face_examples / n_voice_examples
+    - n_face_examples
+
+Voice is not recorded: nothing matched voice embeddings, so storing them kept
+other people's voice data for no purpose.
 
 We also persist ONE special key "_self" — the *user's* own name. When
 that name appears in any speech transcript, the system emits a CRITICAL
-event so the frontend can flash + vibrate.
+event so the frontend can flash the screen.
 
 Storage: JSON at backend/data/people/profile.json
 Face thumbnails: backend/data/people/<name>.jpg (debug only)
@@ -51,7 +51,6 @@ PROFILE_PATH = os.path.join(PROFILE_DIR, "profile.json")
 # similarity is logged on every attempt so this can be tuned against real data.
 FACE_THRESHOLD = 0.35
 FACE_THRESHOLD_ENV = "ACCESSIBILITY_FACE_THRESHOLD"
-VOICE_THRESHOLD = 0.80  # cosine threshold for voice match (mel-spec)
 
 # Default safety keywords that trigger a CRITICAL alert when spoken aloud.
 # The user can edit this list via the /keywords endpoint.
@@ -124,91 +123,34 @@ class PeopleRegistry:
             log.debug("face embedding failed: %s", e)
             return None
 
-    def _voice_embedding(self, audio_bytes: bytes) -> Optional[np.ndarray]:
-        """Mean log-mel spectrogram (128 bins) as a simple voice
-        fingerprint. Discriminative enough for ~5-person home use
-        without pulling a 300MB speaker-id model."""
-        try:
-            import librosa
-            with tempfile.NamedTemporaryFile(suffix=".wav", delete=False) as tmp:
-                tmp.write(audio_bytes)
-                path = tmp.name
-            try:
-                y, sr = librosa.load(path, sr=16000, mono=True)
-            finally:
-                try: os.unlink(path)
-                except Exception: pass
-            if len(y) < sr // 4:  # < 250 ms — too short
-                return None
-            mel = librosa.feature.melspectrogram(
-                y=y, sr=sr, n_mels=128, n_fft=1024, hop_length=512,
-            )
-            logmel = librosa.power_to_db(mel + 1e-10).mean(axis=1)
-            # L2-normalise
-            norm = np.linalg.norm(logmel) + 1e-9
-            return (logmel / norm).astype(np.float32)
-        except Exception as e:
-            log.debug("voice embedding failed: %s", e)
-            return None
-
     # ── Enrolment ───────────────────────────────────────────────────
-    def enrol(
-        self,
-        name: str,
-        frames_b64: Optional[List[str]] = None,
-        audio_clips_bytes: Optional[List[bytes]] = None,
-    ) -> Dict[str, Any]:
-        """Enrol or update a person. At least one modality (face or voice)
-        must contribute at least one embedding. Returns a result dict."""
+    def enrol(self, name: str, frames_b64: Optional[List[str]] = None) -> Dict[str, Any]:
+        """Enrol or update a person from face frames. Voice is not recorded,
+        because nothing matched voice embeddings. Returns a result dict."""
         name = _normalize(name)
         if not name:
             return {"ok": False, "error": "name required"}
         if name.startswith("_"):
             return {"ok": False, "error": "reserved name"}
 
-        # Face embeddings
         face_embs: List[np.ndarray] = []
         for f in (frames_b64 or []):
             emb = self._face_embedding(f)
             if emb is not None:
                 face_embs.append(emb)
-
-        # Voice embeddings
-        voice_embs: List[np.ndarray] = []
-        for clip in (audio_clips_bytes or []):
-            emb = self._voice_embedding(clip)
-            if emb is not None:
-                voice_embs.append(emb)
-
-        if not face_embs and not voice_embs:
-            return {"ok": False, "error": "no usable face or voice samples extracted"}
+        if not face_embs:
+            return {"ok": False, "error": "no usable face samples extracted"}
 
         # Merge with any existing profile (allows incremental enrolment)
         existing = self.profile["people"].get(name, {})
-        if face_embs:
-            mean_face = np.mean(np.stack(face_embs), axis=0)
-            existing["face_embedding"] = mean_face.tolist()
-            existing["n_face_examples"] = (
-                existing.get("n_face_examples", 0) + len(face_embs)
-            )
-        if voice_embs:
-            mean_voice = np.mean(np.stack(voice_embs), axis=0)
-            existing["voice_embedding"] = mean_voice.tolist()
-            existing["n_voice_examples"] = (
-                existing.get("n_voice_examples", 0) + len(voice_embs)
-            )
+        mean_face = np.mean(np.stack(face_embs), axis=0)
+        existing["face_embedding"] = mean_face.tolist()
+        existing["n_face_examples"] = existing.get("n_face_examples", 0) + len(face_embs)
         existing["name"] = name
         self.profile["people"][name] = existing
         self._save()
-
-        return {
-            "ok": True,
-            "name": name,
-            "n_face": len(face_embs),
-            "n_voice": len(voice_embs),
-            "total_face": existing.get("n_face_examples", 0),
-            "total_voice": existing.get("n_voice_examples", 0),
-        }
+        return {"ok": True, "name": name, "n_face": len(face_embs),
+                "total_face": existing.get("n_face_examples", 0)}
 
     def remove(self, name: str) -> bool:
         name = _normalize(name)
@@ -224,7 +166,6 @@ class PeopleRegistry:
             out.append({
                 "name": n,
                 "n_face_examples": info.get("n_face_examples", 0),
-                "n_voice_examples": info.get("n_voice_examples", 0),
             })
         return out
 
@@ -272,22 +213,6 @@ class PeopleRegistry:
         log.info("face id: best '%s' similarity=%.3f below threshold %.2f "
                  "(lower with %s if this is a genuine match)",
                  best_name, best_sim, thr, FACE_THRESHOLD_ENV)
-        return None
-
-    def identify_voice(self, audio_bytes: bytes) -> Optional[Tuple[str, float]]:
-        emb = self._voice_embedding(audio_bytes)
-        if emb is None:
-            return None
-        best_name, best_sim = None, -1.0
-        for n, info in self.profile["people"].items():
-            ref = info.get("voice_embedding")
-            if not ref:
-                continue
-            sim = _cosine(emb, np.array(ref, dtype=np.float32))
-            if sim > best_sim:
-                best_sim, best_name = sim, n
-        if best_name and best_sim >= VOICE_THRESHOLD:
-            return best_name, best_sim
         return None
 
     # ── Keyword watch-list ──────────────────────────────────────────

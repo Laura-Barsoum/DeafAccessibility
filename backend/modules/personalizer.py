@@ -251,7 +251,8 @@ class Personalizer:
         # for open-set rejection at match time.
         norm_embs = [_l2norm(e) for e in emb_list]
         prototype = _l2norm(np.mean(norm_embs, axis=0))
-        radius = float(np.mean([_sqeuclidean(e, prototype) for e in norm_embs]))
+        dists = [_sqeuclidean(e, prototype) for e in norm_embs]
+        radius = float(np.mean(dists))
 
         sounds = self.profile.setdefault("sounds", {})
         sounds[label] = {
@@ -260,6 +261,7 @@ class Personalizer:
             "embedding": mean_emb.tolist(),         # kept for the cosine method
             "prototype": prototype.tolist(),        # normalised, for prototypical
             "radius": radius,
+            "max_distance": float(np.max(dists)),   # farthest enrolment clip: the lowest the gate may go
             "embedding_dim": int(mean_emb.shape[0]),
             "embedder": "ast" if mean_emb.shape[0] == AST_EMBEDDING_DIM else
                         "yamnet" if mean_emb.shape[0] == 1024 else "fallback",
@@ -465,6 +467,16 @@ class Personalizer:
         s = sounds[label]
         ref = np.array(s["embedding"], dtype=np.float32)
         new_emb = np.array(match["embedding"], dtype=np.float32)
+        # The prototypical gate a sound starts with, and the lowest it may reach:
+        # the distance of its farthest enrolment clip, so rejections can never stop
+        # the sound matching its own recordings. Profiles enrolled before that
+        # distance was stored fall back to the mean distance (radius), and
+        # profiles with neither to the old fixed floor.
+        cal = _calibration(int(s.get("embedding_dim", len(s["embedding"]))))
+        default_gate = max(float(s.get("radius", 0.0)) * cal["radius_k"], cal["gate_floor"])
+        spread = float(s.get("max_distance", s.get("radius", 0.0)))
+        floor = min(default_gate, spread + 1e-6) if spread > 0 else 0.02
+        gate_before = float(s.get("proto_gate", default_gate))
 
         if is_positive:
             # Incremental running mean: new_mean = (n*old + new) / (n+1)
@@ -474,30 +486,29 @@ class Personalizer:
             # Keep the prototypical representation in sync with the new mean.
             s["prototype"] = _l2norm(updated).tolist()
             s["n_examples"] = n + 1
+            # A confirmation undoes one rejection's tightening, up to the default gate.
+            if "proto_gate" in s:
+                s["proto_gate"] = min(default_gate, gate_before / 0.85)
             s["last_positive_ts"] = match["similarity"]
             self._save()
             log.info(
-                "personalizer: + feedback on '%s' (n=%d → %d, sim=%.3f)",
-                label, n, n + 1, match["similarity"],
+                "personalizer: + feedback on '%s' (n=%d → %d, sim=%.3f, gate %.3f)",
+                label, n, n + 1, match["similarity"], s.get("proto_gate", default_gate),
             )
             return {
                 "ok": True, "label": label, "is_positive": True,
                 "n_examples": s["n_examples"],
                 "similarity": match["similarity"],
+                "proto_gate": s.get("proto_gate", default_gate),
             }
         else:
-            # Tighten BOTH matchers. The cosine rule reads `threshold`; the
-            # default prototypical rule reads `proto_gate`. Originally only the
-            # threshold was bumped, so under the prototypical matcher a rejected
-            # alert changed nothing. The gate shrinks by 15% per rejection but
-            # never below a small floor, so a sound cannot become unmatchable.
+            # The default prototypical matcher reads `proto_gate`, which shrinks by
+            # 15% per rejection down to the floor above. `threshold` is read only by
+            # the cosine matcher (ACCESSIBILITY_PERSONALIZER_METHOD=cosine).
             current = float(s.get("threshold", 0.90))
             bumped = min(0.95, current + 0.02)
             s["threshold"] = bumped
-            cal = _calibration(int(s.get("embedding_dim", len(s["embedding"]))))
-            default_gate = max(float(s.get("radius", 0.0)) * cal["radius_k"], cal["gate_floor"])
-            gate_before = float(s.get("proto_gate", default_gate))
-            s["proto_gate"] = max(0.02, gate_before * 0.85)
+            s["proto_gate"] = max(floor, gate_before * 0.85)
             s["last_negative_ts"] = match["similarity"]
             self._save()
             log.info(

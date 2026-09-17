@@ -67,10 +67,10 @@ class NameCallTests(unittest.TestCase):
 
     def test_other_person_mention_is_inform_not_critical(self):
         self.reg.set_self_name("Laura")
-        # Enrol someone by writing directly to the profile (skip face/voice
-        # which need real models).
+        # Enrol someone by writing directly to the profile (skip face
+        # enrolment, which needs a real model).
         self.reg.profile["people"]["Mike"] = {
-            "name": "Mike", "n_face_examples": 0, "n_voice_examples": 0,
+            "name": "Mike", "n_face_examples": 0,
         }
         out = self.reg.detect_name_calls("Mike said hello to me")
         self.assertFalse(out["self_called"])
@@ -81,7 +81,7 @@ class NameCallTests(unittest.TestCase):
         """If both 'Laura' and 'Mike' appear, CRITICAL must fire."""
         self.reg.set_self_name("Laura")
         self.reg.profile["people"]["Mike"] = {
-            "name": "Mike", "n_face_examples": 0, "n_voice_examples": 0,
+            "name": "Mike", "n_face_examples": 0,
         }
         out = self.reg.detect_name_calls("Mike asked Laura a question")
         self.assertTrue(out["self_called"])
@@ -112,16 +112,16 @@ class RegistryPersistenceTests(unittest.TestCase):
 
     def test_reserved_name_rejected(self):
         # Names starting with "_" are reserved for internal keys
-        res = self.reg.enrol("_self", frames_b64=[], audio_clips_bytes=[])
+        res = self.reg.enrol("_self", frames_b64=[])
         self.assertFalse(res["ok"])
 
     def test_empty_name_rejected(self):
-        res = self.reg.enrol("   ", frames_b64=[], audio_clips_bytes=[])
+        res = self.reg.enrol("   ", frames_b64=[])
         self.assertFalse(res["ok"])
 
     def test_no_samples_rejected(self):
         # We deliberately give no usable input → enrolment must fail cleanly
-        res = self.reg.enrol("Bob", frames_b64=[], audio_clips_bytes=[])
+        res = self.reg.enrol("Bob", frames_b64=[])
         self.assertFalse(res["ok"])
         self.assertIn("no usable", res.get("error", ""))
 
