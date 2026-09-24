@@ -1029,22 +1029,39 @@ def _prewarm() -> None:
     try:
         log.info("Prewarming models (first load can take ~20s)...")
         t0 = time.time()
+        # Warm-up input matches a real tick: 2.8 s of audio at 16 kHz and three
+        # frames at the capture size. Half a second of silence loaded the models
+        # but left the first real tick paying for the shapes it actually gets,
+        # and models that return early on silence never ran at all.
+        sr, n = 16000, int(16000 * 2.8)
+        rng = np.random.default_rng(0)
+        envelope = 0.5 + 0.5 * np.sin(2 * np.pi * 3.0 * np.arange(n) / sr)
+        noise = (rng.standard_normal(n) * envelope * 0.05 * 32767).astype(np.int16)
         buf = io.BytesIO()
-        w = wave.open(buf, "wb"); w.setnchannels(1); w.setsampwidth(2); w.setframerate(16000)
-        w.writeframes(np.zeros(8000, dtype=np.int16).tobytes()); w.close()
+        w = wave.open(buf, "wb"); w.setnchannels(1); w.setsampwidth(2); w.setframerate(sr)
+        w.writeframes(noise.tobytes()); w.close()
         audio_b64 = base64.b64encode(buf.getvalue()).decode()
         frames = []
         try:
-            from PIL import Image
-            im = Image.new("RGB", (320, 240), (127, 127, 127))
+            from PIL import Image, ImageDraw
+            # A drawn scene, not noise: the captioner writes a few words about
+            # shapes on a surface, so its decoder warms the way a real frame
+            # uses it. Noise produces a one-word caption and leaves it cold.
+            im = Image.new("RGB", (320, 240), (188, 205, 224))
+            d = ImageDraw.Draw(im)
+            d.rectangle([0, 150, 320, 240], fill=(150, 120, 90))
+            d.rectangle([40, 90, 130, 165], fill=(220, 220, 215), outline=(60, 60, 60), width=2)
+            d.ellipse([170, 100, 240, 170], fill=(200, 70, 60), outline=(40, 40, 40), width=2)
+            d.rectangle([250, 60, 300, 165], fill=(90, 140, 90), outline=(30, 50, 30), width=2)
             fb = io.BytesIO(); im.save(fb, "JPEG")
             frames = [base64.b64encode(fb.getvalue()).decode()] * 3
         except Exception:
             pass
         with app.test_client() as c:
-            c.post("/process", json={"audio_b64": audio_b64,
-                                     "frames_b64": frames, "audio_rms_hint": 0.0})
-        # Don't let the synthetic grey warm-up frame pollute the live scene
+            # Twice: the second pass warms anything the first pass allocated.
+            for _ in range(2):
+                c.post("/process", json={"audio_b64": audio_b64, "frames_b64": frames})
+        # Don't let the synthetic warm-up frame pollute the live scene
         # cache or consume the "run BLIP on tick 1" slot. Clear both the
         # server-side cache AND the SceneDescriber's own internal cache.
         try:

@@ -1498,31 +1498,27 @@ class SignLanguageRecognizer:
             last_label = top
             last_end = start + window_size
 
-        # ── Blend in the TGCN whole-clip prediction ─────────────────────
-        # If the TGCN's word-level guess is BETTER than anything we
-        # found via sliding windows, prepend it as the dominant label.
+        # ── The TGCN leads whenever it fires ────────────────────────────
+        # Its confidence is a softmax probability over the 100 trained signs;
+        # the window voters' is a weighted vote count. Ranking one against the
+        # other compared unlike numbers and left the rules in front, which is
+        # why the cascade scored 21% on the WLASL100 test clips where the
+        # network alone scored 60%. The display threshold was chosen on
+        # validation clips so that at least half of the accepted predictions
+        # are right, while the window voters, covering seven gestures, letters
+        # and about 25 handshapes, score 1% on that vocabulary. Window
+        # detections keep their place behind it. The cost is that a sign
+        # outside the trained vocabulary is now led by the nearest of the 100.
         if tgcn_top:
             tgcn_label, tgcn_conf = tgcn_top
-            existing_labels = {s["label"] for s in sequence}
-            # If sequence is empty or has only weak detections, TGCN wins
-            best_existing = max((s["confidence"] for s in sequence), default=0)
-            if tgcn_conf > best_existing or not sequence:
-                sequence.insert(0, {
-                    "label": tgcn_label,
-                    "confidence": round(tgcn_conf, 3),
-                    "start_frame": 0,
-                    "end_frame": n_total,
-                    "source": "tgcn_wlasl",
-                })
-            elif tgcn_label not in existing_labels:
-                # Append as supplementary high-level interpretation
-                sequence.append({
-                    "label": tgcn_label,
-                    "confidence": round(tgcn_conf * 0.8, 3),
-                    "start_frame": 0,
-                    "end_frame": n_total,
-                    "source": "tgcn_wlasl",
-                })
+            sequence = [s for s in sequence if s["label"] != tgcn_label]
+            sequence.insert(0, {
+                "label": tgcn_label,
+                "confidence": round(tgcn_conf, 3),
+                "start_frame": 0,
+                "end_frame": n_total,
+                "source": "tgcn_wlasl",
+            })
 
         # ── Append spelled words from SpellBuffer ───────────────────────
         for word in spelled_words:

@@ -82,9 +82,10 @@ Results are in `backend/eval_results/` (`fusion_eval.json`,
   through the browser codec, the adopted matcher recalls 0.64 at a 4.9%
   false-alarm rate, so it still misses about one play in three.
 - Sign recognition covers only the 100 WLASL100 signs: 60% top-1 on 100 of the
-  258 official test clips, but 21% through the full cascade, which puts the
-  model's word first only when it beats the hand-shape rules. It was trained
-  and tested on WLASL's signers, not on webcam signing by Deaf users
+  258 official test clips, and 59% through the full cascade once the trained
+  network was allowed to lead, against 21% while the hand-shape rules outranked
+  it. It was trained and tested on WLASL's signers, not on webcam signing by
+  Deaf users
   (`docs/WLASL_EVAL_RESULTS.md`).
 - Language-model latency depends on a hosted provider, which can withdraw
   models, as happened to Llama 3.3 during the project.

@@ -1,9 +1,16 @@
 """[Final report: Section 5.3, Figure 5.3]
 
 Why the first live-caption tick of the latency benchmark took far longer than the
-rest. The benchmark imported the server without its start-up warm-up; the
-application's own warm-up (server._prewarm) sends one tick of silence and grey
-frames, which may leave models that only run on a face, a hand or speech unloaded.
+rest, and what the application's start-up warm-up (server._prewarm) is worth. The
+benchmark imported the server without that warm-up at all.
+
+Run first against a warm-up that sent half a second of silence and grey frames
+(eval_results/first_tick_probe_silence.json): the models were loaded, but the
+first real tick still paid 5.1 s, because AST met a chunk length it had not seen,
+the voice-emotion model returns early on silence and had never run, and the
+captioner had only described a flat grey frame. The warm-up now sends 2.8 s of
+audio and a drawn scene, the same shapes a real tick brings, and this script was
+run again to measure what that is worth.
 
 This script starts the server state as the application does, runs _prewarm, then
 sends five live-caption ticks built exactly as latency_on_recorded_media.py builds

@@ -65,10 +65,11 @@ feedback.
 
 - **Sign recognition covers 100 signs.** A TGCN trained on the application's
   own MediaPipe keypoints from WLASL100 recognises 60% of 100 official test
-  clips first time and 78% within its top five. Through the full sign cascade
-  it leads only 21% of the time, because the cascade puts its word first only
-  when it beats the older hand-shape rules, which often answer "ok" or
-  "hello". It knows only those 100 signs, was trained and tested on
+  clips first time and 78% within its top five. Through the full sign cascade it
+  scored 21% until the cascade was changed to let the trained network lead
+  whenever it fires, which raised the cascade to 59%; the unmeasured cost is
+  that a sign outside those 100 words is now labelled with the nearest of them.
+  It knows only those 100 signs, was trained and tested on
   WLASL's signers, and has not been tested on webcam signing by Deaf users. Two
   silent defects had held sign recognition at 1%: a network no checkpoint
   fitted, and hand landmarks dropped on every frame. See
@@ -189,7 +190,7 @@ cd backend && source venv/bin/activate
 python -m pytest tests/ -q
 ```
 
-174 unit and integration tests. Unit tests cover pure logic (fusion ranking,
+177 unit and integration tests. Unit tests cover pure logic (fusion ranking,
 priority mapping, prototypical matching, the feedback loop, fingerspelling,
 name matching, the language-model fallback chain). Integration tests exercise
 the HTTP layer, including graceful degradation when audio or frames are absent.

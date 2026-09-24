@@ -42,15 +42,22 @@ scored once.
 | Sign cascade without the TGCN tier | 1% | 1% | 1% |
 | Published weights, model alone | 8% | not recorded | 31% |
 | Retrained weights, model alone | 60% (95% Wilson interval 50% to 69%) | 72% | 78% (69% to 85%) |
-| Retrained weights, full sign cascade (as shipped) | 21% (14% to 30%) | 41% | 56% |
+| Retrained weights, full cascade, rules ranked first | 21% (14% to 30%) | 41% | 56% |
+| Retrained weights, full cascade, network leads (as shipped) | 59% (49% to 68%) | 59% | 59% |
 
-The full cascade keeps far fewer correct answers than the model because it
-puts the TGCN's word first only when that word is more confident than the
-curated hand-shape and gesture tiers, which cover everyday signs such as "ok"
-and "hello" that are not among the 100 WLASL signs. In 38 of the 59 test clips
-where the TGCN's answer was right, one of those labels came first. Letting the
-TGCN lead would raise the word-level score but would mislabel signs outside its
-vocabulary; that trade-off has not been measured.
+The cascade used to keep far fewer correct answers than the model because it
+ranked the TGCN's softmax probability against the curated tiers' weighted vote
+counts, two unlike numbers, so the hand-shape and gesture labels such as "ok"
+and "hello" came first. The tier order is now by vocabulary rather than by
+score: the TGCN leads whenever it fires, and the window detections follow it.
+The training script had chosen its display threshold on 163 validation clips as
+the lowest at which at least half of accepted predictions are right, while the
+window voters score 1% on this vocabulary, so leading is the better bet within
+the 100 signs. Outside them it is not: a sign the network was never trained on
+is now labelled with the nearest of the 100, with the rules' answer behind it.
+That cost is still unmeasured, and measuring it needs clips of signs outside
+WLASL100. The cascade scores one clip below the model alone (59 against 60),
+where its own landmark pass produced a different answer from the script's.
 
 The retrained weights and their settings are in
 `backend/data/tgcn/asl100_mediapipe/`, and the tier runs by default when they
