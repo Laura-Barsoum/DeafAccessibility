@@ -891,7 +891,11 @@ function updateLiveUI(data) {
       const pName = (s.priority_name || 'ambient').toLowerCase();
       li.className = pName;
       const dir = s.direction ? ` [${s.direction}]` : '';
-      const conf = s.confidence != null ? ` (${Math.round(s.confidence * 100)}%)` : '';
+      // A personal match's confidence is the softmax over the enrolled sounds,
+      // which is 1 whenever a single sound is enrolled, so it says nothing about
+      // how good the match is and is not shown. The classifier's own confidence is.
+      const conf = (s.confidence != null && !s.extra?.match_id)
+        ? ` (${Math.round(s.confidence * 100)}%)` : '';
 
       // Personal-sound matches carry a match_id in extra — render ✓/✗
       // feedback buttons next to them so the user can confirm or reject.
