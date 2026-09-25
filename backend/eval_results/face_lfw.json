@@ -1,0 +1,1943 @@
+{
+ "method": "[Final report: Section 5.2 people, Table 3.1, Table 5.1]\n\nFace identification through the application's own registry, on Labeled Faces in\nthe Wild (Huang et al., 2007), the standard public benchmark for this task.\n\nThe application enrols a person from camera frames and later names the face it\nsees (people.PeopleRegistry.enrol / identify_face, DeepFace VGG-Face embeddings\ncompared by cosine similarity against a fixed threshold). Nothing here reaches\ninto those internals: identities are enrolled through enrol() from JPEG frames\nand scored through identify_face(), so what is measured is the deployed path.\n\nProtocol. Identities with at least five photographs are split into a development\nhalf and a test half, disjoint by person. In each half, 30 identities are enrolled\nfrom 3 photographs each and probed with 2 held-out photographs; the same number of\nphotographs of people who were never enrolled act as impostors, because a home\nassistant sees strangers far more often than it sees the four people it knows.\nThe acceptance threshold is chosen on the development half alone, as the value\nthat maximises correct decisions there, and the test half is scored once, at both\nthat value and the application's current 0.35.\n\nWrites eval_results/face_lfw.json. The LFW archive is not committed\n(backend/data/lfw, about 173 MB).\n",
+ "dataset": "Labeled Faces in the Wild, funneled-free originals (data/lfw, not committed)",
+ "identities": {
+  "with_enough_photos": 423,
+  "enrolled_per_half": 30,
+  "enrol_photos": 3,
+  "probe_photos": 2,
+  "impostor_identities": 60
+ },
+ "app_threshold": 0.35,
+ "development": {
+  "curve": [
+   {
+    "threshold": 0.2,
+    "genuine": 60,
+    "impostors": 60,
+    "correct": 54,
+    "correct_rate": 0.9,
+    "wrong_name": 6,
+    "wrong_name_rate": 0.1,
+    "no_match": 0,
+    "no_match_rate": 0.0,
+    "false_accept": 51,
+    "false_accept_rate": 0.85,
+    "correct_decisions": 0.525
+   },
+   {
+    "threshold": 0.25,
+    "genuine": 60,
+    "impostors": 60,
+    "correct": 54,
+    "correct_rate": 0.9,
+    "wrong_name": 6,
+    "wrong_name_rate": 0.1,
+    "no_match": 0,
+    "no_match_rate": 0.0,
+    "false_accept": 44,
+    "false_accept_rate": 0.7333333333333333,
+    "correct_decisions": 0.5833333333333334
+   },
+   {
+    "threshold": 0.3,
+    "genuine": 60,
+    "impostors": 60,
+    "correct": 54,
+    "correct_rate": 0.9,
+    "wrong_name": 5,
+    "wrong_name_rate": 0.08333333333333333,
+    "no_match": 1,
+    "no_match_rate": 0.016666666666666666,
+    "false_accept": 30,
+    "false_accept_rate": 0.5,
+    "correct_decisions": 0.7
+   },
+   {
+    "threshold": 0.35,
+    "genuine": 60,
+    "impostors": 60,
+    "correct": 54,
+    "correct_rate": 0.9,
+    "wrong_name": 3,
+    "wrong_name_rate": 0.05,
+    "no_match": 3,
+    "no_match_rate": 0.05,
+    "false_accept": 14,
+    "false_accept_rate": 0.23333333333333334,
+    "correct_decisions": 0.8333333333333334
+   },
+   {
+    "threshold": 0.4,
+    "genuine": 60,
+    "impostors": 60,
+    "correct": 49,
+    "correct_rate": 0.8166666666666667,
+    "wrong_name": 1,
+    "wrong_name_rate": 0.016666666666666666,
+    "no_match": 10,
+    "no_match_rate": 0.16666666666666666,
+    "false_accept": 4,
+    "false_accept_rate": 0.06666666666666667,
+    "correct_decisions": 0.875
+   },
+   {
+    "threshold": 0.45,
+    "genuine": 60,
+    "impostors": 60,
+    "correct": 44,
+    "correct_rate": 0.7333333333333333,
+    "wrong_name": 0,
+    "wrong_name_rate": 0.0,
+    "no_match": 16,
+    "no_match_rate": 0.26666666666666666,
+    "false_accept": 2,
+    "false_accept_rate": 0.03333333333333333,
+    "correct_decisions": 0.85
+   },
+   {
+    "threshold": 0.5,
+    "genuine": 60,
+    "impostors": 60,
+    "correct": 32,
+    "correct_rate": 0.5333333333333333,
+    "wrong_name": 0,
+    "wrong_name_rate": 0.0,
+    "no_match": 28,
+    "no_match_rate": 0.4666666666666667,
+    "false_accept": 2,
+    "false_accept_rate": 0.03333333333333333,
+    "correct_decisions": 0.75
+   },
+   {
+    "threshold": 0.55,
+    "genuine": 60,
+    "impostors": 60,
+    "correct": 23,
+    "correct_rate": 0.38333333333333336,
+    "wrong_name": 0,
+    "wrong_name_rate": 0.0,
+    "no_match": 37,
+    "no_match_rate": 0.6166666666666667,
+    "false_accept": 0,
+    "false_accept_rate": 0.0,
+    "correct_decisions": 0.6916666666666667
+   },
+   {
+    "threshold": 0.6,
+    "genuine": 60,
+    "impostors": 60,
+    "correct": 12,
+    "correct_rate": 0.2,
+    "wrong_name": 0,
+    "wrong_name_rate": 0.0,
+    "no_match": 48,
+    "no_match_rate": 0.8,
+    "false_accept": 0,
+    "false_accept_rate": 0.0,
+    "correct_decisions": 0.6
+   },
+   {
+    "threshold": 0.65,
+    "genuine": 60,
+    "impostors": 60,
+    "correct": 8,
+    "correct_rate": 0.13333333333333333,
+    "wrong_name": 0,
+    "wrong_name_rate": 0.0,
+    "no_match": 52,
+    "no_match_rate": 0.8666666666666667,
+    "false_accept": 0,
+    "false_accept_rate": 0.0,
+    "correct_decisions": 0.5666666666666667
+   },
+   {
+    "threshold": 0.7,
+    "genuine": 60,
+    "impostors": 60,
+    "correct": 2,
+    "correct_rate": 0.03333333333333333,
+    "wrong_name": 0,
+    "wrong_name_rate": 0.0,
+    "no_match": 58,
+    "no_match_rate": 0.9666666666666667,
+    "false_accept": 0,
+    "false_accept_rate": 0.0,
+    "correct_decisions": 0.5166666666666667
+   },
+   {
+    "threshold": 0.75,
+    "genuine": 60,
+    "impostors": 60,
+    "correct": 1,
+    "correct_rate": 0.016666666666666666,
+    "wrong_name": 0,
+    "wrong_name_rate": 0.0,
+    "no_match": 59,
+    "no_match_rate": 0.9833333333333333,
+    "false_accept": 0,
+    "false_accept_rate": 0.0,
+    "correct_decisions": 0.5083333333333333
+   },
+   {
+    "threshold": 0.8,
+    "genuine": 60,
+    "impostors": 60,
+    "correct": 0,
+    "correct_rate": 0.0,
+    "wrong_name": 0,
+    "wrong_name_rate": 0.0,
+    "no_match": 60,
+    "no_match_rate": 1.0,
+    "false_accept": 0,
+    "false_accept_rate": 0.0,
+    "correct_decisions": 0.5
+   },
+   {
+    "threshold": 0.85,
+    "genuine": 60,
+    "impostors": 60,
+    "correct": 0,
+    "correct_rate": 0.0,
+    "wrong_name": 0,
+    "wrong_name_rate": 0.0,
+    "no_match": 60,
+    "no_match_rate": 1.0,
+    "false_accept": 0,
+    "false_accept_rate": 0.0,
+    "correct_decisions": 0.5
+   },
+   {
+    "threshold": 0.9,
+    "genuine": 60,
+    "impostors": 60,
+    "correct": 0,
+    "correct_rate": 0.0,
+    "wrong_name": 0,
+    "wrong_name_rate": 0.0,
+    "no_match": 60,
+    "no_match_rate": 1.0,
+    "false_accept": 0,
+    "false_accept_rate": 0.0,
+    "correct_decisions": 0.5
+   }
+  ],
+  "chosen_threshold": 0.4
+ },
+ "test": {
+  "at_app_threshold": {
+   "threshold": 0.35,
+   "genuine": 60,
+   "impostors": 60,
+   "correct": 49,
+   "correct_rate": 0.8166666666666667,
+   "wrong_name": 4,
+   "wrong_name_rate": 0.06666666666666667,
+   "no_match": 7,
+   "no_match_rate": 0.11666666666666667,
+   "false_accept": 17,
+   "false_accept_rate": 0.2833333333333333,
+   "correct_decisions": 0.7666666666666667
+  },
+  "at_chosen_threshold": {
+   "threshold": 0.4,
+   "genuine": 60,
+   "impostors": 60,
+   "correct": 48,
+   "correct_rate": 0.8,
+   "wrong_name": 0,
+   "wrong_name_rate": 0.0,
+   "no_match": 12,
+   "no_match_rate": 0.2,
+   "false_accept": 7,
+   "false_accept_rate": 0.11666666666666667,
+   "correct_decisions": 0.8416666666666667
+  }
+ },
+ "trials": {
+  "development": [
+   {
+    "kind": "genuine",
+    "truth": "Lance_Armstrong",
+    "best": "Lance_Armstrong",
+    "sim": 0.48916423320770264,
+    "photo": "data/lfw/Lance_Armstrong/Lance_Armstrong_0004.jpg"
+   },
+   {
+    "kind": "genuine",
+    "truth": "Lance_Armstrong",
+    "best": "Lance_Armstrong",
+    "sim": 0.35258230566978455,
+    "photo": "data/lfw/Lance_Armstrong/Lance_Armstrong_0005.jpg"
+   },
+   {
+    "kind": "genuine",
+    "truth": "Walter_Mondale",
+    "best": "Walter_Mondale",
+    "sim": 0.5514979362487793,
+    "photo": "data/lfw/Walter_Mondale/Walter_Mondale_0004.jpg"
+   },
+   {
+    "kind": "genuine",
+    "truth": "Walter_Mondale",
+    "best": "Walter_Mondale",
+    "sim": 0.570972740650177,
+    "photo": "data/lfw/Walter_Mondale/Walter_Mondale_0005.jpg"
+   },
+   {
+    "kind": "genuine",
+    "truth": "Julie_Gerberding",
+    "best": "Julie_Gerberding",
+    "sim": 0.46863242983818054,
+    "photo": "data/lfw/Julie_Gerberding/Julie_Gerberding_0004.jpg"
+   },
+   {
+    "kind": "genuine",
+    "truth": "Julie_Gerberding",
+    "best": "Julie_Gerberding",
+    "sim": 0.551555335521698,
+    "photo": "data/lfw/Julie_Gerberding/Julie_Gerberding_0005.jpg"
+   },
+   {
+    "kind": "genuine",
+    "truth": "John_Ashcroft",
+    "best": "John_Ashcroft",
+    "sim": 0.3934521973133087,
+    "photo": "data/lfw/John_Ashcroft/John_Ashcroft_0004.jpg"
+   },
+   {
+    "kind": "genuine",
+    "truth": "John_Ashcroft",
+    "best": "Valery_Giscard_dEstaing",
+    "sim": 0.4314214885234833,
+    "photo": "data/lfw/John_Ashcroft/John_Ashcroft_0005.jpg"
+   },
+   {
+    "kind": "genuine",
+    "truth": "Ariel_Sharon",
+    "best": "Fernando_Gonzalez",
+    "sim": 0.26083940267562866,
+    "photo": "data/lfw/Ariel_Sharon/Ariel_Sharon_0004.jpg"
+   },
+   {
+    "kind": "genuine",
+    "truth": "Ariel_Sharon",
+    "best": "Ariel_Sharon",
+    "sim": 0.6952492594718933,
+    "photo": "data/lfw/Ariel_Sharon/Ariel_Sharon_0005.jpg"
+   },
+   {
+    "kind": "genuine",
+    "truth": "Michael_Chang",
+    "best": "Michael_Chang",
+    "sim": 0.6640977263450623,
+    "photo": "data/lfw/Michael_Chang/Michael_Chang_0004.jpg"
+   },
+   {
+    "kind": "genuine",
+    "truth": "Michael_Chang",
+    "best": "Michael_Chang",
+    "sim": 0.4063486158847809,
+    "photo": "data/lfw/Michael_Chang/Michael_Chang_0005.jpg"
+   },
+   {
+    "kind": "genuine",
+    "truth": "Arminio_Fraga",
+    "best": "Arminio_Fraga",
+    "sim": 0.6048663258552551,
+    "photo": "data/lfw/Arminio_Fraga/Arminio_Fraga_0004.jpg"
+   },
+   {
+    "kind": "genuine",
+    "truth": "Arminio_Fraga",
+    "best": "Arminio_Fraga",
+    "sim": 0.6266635656356812,
+    "photo": "data/lfw/Arminio_Fraga/Arminio_Fraga_0005.jpg"
+   },
+   {
+    "kind": "genuine",
+    "truth": "Fernando_Gonzalez",
+    "best": "Fernando_Gonzalez",
+    "sim": 0.5599262118339539,
+    "photo": "data/lfw/Fernando_Gonzalez/Fernando_Gonzalez_0004.jpg"
+   },
+   {
+    "kind": "genuine",
+    "truth": "Fernando_Gonzalez",
+    "best": "Fernando_Gonzalez",
+    "sim": 0.4962853789329529,
+    "photo": "data/lfw/Fernando_Gonzalez/Fernando_Gonzalez_0005.jpg"
+   },
+   {
+    "kind": "genuine",
+    "truth": "Choi_Sung-hong",
+    "best": "Choi_Sung-hong",
+    "sim": 0.6219611763954163,
+    "photo": "data/lfw/Choi_Sung-hong/Choi_Sung-hong_0004.jpg"
+   },
+   {
+    "kind": "genuine",
+    "truth": "Choi_Sung-hong",
+    "best": "Choi_Sung-hong",
+    "sim": 0.7560157775878906,
+    "photo": "data/lfw/Choi_Sung-hong/Choi_Sung-hong_0005.jpg"
+   },
+   {
+    "kind": "genuine",
+    "truth": "Tiger_Woods",
+    "best": "Tiger_Woods",
+    "sim": 0.4451887905597687,
+    "photo": "data/lfw/Tiger_Woods/Tiger_Woods_0004.jpg"
+   },
+   {
+    "kind": "genuine",
+    "truth": "Tiger_Woods",
+    "best": "Tiger_Woods",
+    "sim": 0.506675660610199,
+    "photo": "data/lfw/Tiger_Woods/Tiger_Woods_0005.jpg"
+   },
+   {
+    "kind": "genuine",
+    "truth": "Michelle_Yeoh",
+    "best": "Michelle_Yeoh",
+    "sim": 0.6782972812652588,
+    "photo": "data/lfw/Michelle_Yeoh/Michelle_Yeoh_0004.jpg"
+   },
+   {
+    "kind": "genuine",
+    "truth": "Michelle_Yeoh",
+    "best": "Michelle_Yeoh",
+    "sim": 0.5535749793052673,
+    "photo": "data/lfw/Michelle_Yeoh/Michelle_Yeoh_0005.jpg"
+   },
+   {
+    "kind": "genuine",
+    "truth": "Yao_Ming",
+    "best": "George_HW_Bush",
+    "sim": 0.314729243516922,
+    "photo": "data/lfw/Yao_Ming/Yao_Ming_0004.jpg"
+   },
+   {
+    "kind": "genuine",
+    "truth": "Yao_Ming",
+    "best": "Yao_Ming",
+    "sim": 0.4916013181209564,
+    "photo": "data/lfw/Yao_Ming/Yao_Ming_0005.jpg"
+   },
+   {
+    "kind": "genuine",
+    "truth": "Rick_Perry",
+    "best": "Rick_Perry",
+    "sim": 0.5265772342681885,
+    "photo": "data/lfw/Rick_Perry/Rick_Perry_0004.jpg"
+   },
+   {
+    "kind": "genuine",
+    "truth": "Rick_Perry",
+    "best": "Rick_Perry",
+    "sim": 0.546550452709198,
+    "photo": "data/lfw/Rick_Perry/Rick_Perry_0005.jpg"
+   },
+   {
+    "kind": "genuine",
+    "truth": "Kristanna_Loken",
+    "best": "Kristanna_Loken",
+    "sim": 0.46579423546791077,
+    "photo": "data/lfw/Kristanna_Loken/Kristanna_Loken_0004.jpg"
+   },
+   {
+    "kind": "genuine",
+    "truth": "Kristanna_Loken",
+    "best": "Kristanna_Loken",
+    "sim": 0.5189641118049622,
+    "photo": "data/lfw/Kristanna_Loken/Kristanna_Loken_0005.jpg"
+   },
+   {
+    "kind": "genuine",
+    "truth": "Arnold_Schwarzenegger",
+    "best": "Arnold_Schwarzenegger",
+    "sim": 0.5856055021286011,
+    "photo": "data/lfw/Arnold_Schwarzenegger/Arnold_Schwarzenegger_0004.jpg"
+   },
+   {
+    "kind": "genuine",
+    "truth": "Arnold_Schwarzenegger",
+    "best": "Arnold_Schwarzenegger",
+    "sim": 0.5886361598968506,
+    "photo": "data/lfw/Arnold_Schwarzenegger/Arnold_Schwarzenegger_0005.jpg"
+   },
+   {
+    "kind": "genuine",
+    "truth": "Jack_Straw",
+    "best": "Jack_Straw",
+    "sim": 0.38653093576431274,
+    "photo": "data/lfw/Jack_Straw/Jack_Straw_0004.jpg"
+   },
+   {
+    "kind": "genuine",
+    "truth": "Jack_Straw",
+    "best": "Jack_Straw",
+    "sim": 0.531279981136322,
+    "photo": "data/lfw/Jack_Straw/Jack_Straw_0005.jpg"
+   },
+   {
+    "kind": "genuine",
+    "truth": "Celine_Dion",
+    "best": "Celine_Dion",
+    "sim": 0.5272987484931946,
+    "photo": "data/lfw/Celine_Dion/Celine_Dion_0004.jpg"
+   },
+   {
+    "kind": "genuine",
+    "truth": "Celine_Dion",
+    "best": "Celine_Dion",
+    "sim": 0.6789728999137878,
+    "photo": "data/lfw/Celine_Dion/Celine_Dion_0005.jpg"
+   },
+   {
+    "kind": "genuine",
+    "truth": "Thomas_OBrien",
+    "best": "Thomas_OBrien",
+    "sim": 0.5447104573249817,
+    "photo": "data/lfw/Thomas_OBrien/Thomas_OBrien_0004.jpg"
+   },
+   {
+    "kind": "genuine",
+    "truth": "Thomas_OBrien",
+    "best": "Thomas_OBrien",
+    "sim": 0.5670731067657471,
+    "photo": "data/lfw/Thomas_OBrien/Thomas_OBrien_0005.jpg"
+   },
+   {
+    "kind": "genuine",
+    "truth": "George_HW_Bush",
+    "best": "George_HW_Bush",
+    "sim": 0.43414410948753357,
+    "photo": "data/lfw/George_HW_Bush/George_HW_Bush_0004.jpg"
+   },
+   {
+    "kind": "genuine",
+    "truth": "George_HW_Bush",
+    "best": "George_HW_Bush",
+    "sim": 0.4846157729625702,
+    "photo": "data/lfw/George_HW_Bush/George_HW_Bush_0005.jpg"
+   },
+   {
+    "kind": "genuine",
+    "truth": "Calista_Flockhart",
+    "best": "Calista_Flockhart",
+    "sim": 0.5160980820655823,
+    "photo": "data/lfw/Calista_Flockhart/Calista_Flockhart_0004.jpg"
+   },
+   {
+    "kind": "genuine",
+    "truth": "Calista_Flockhart",
+    "best": "Calista_Flockhart",
+    "sim": 0.4743393361568451,
+    "photo": "data/lfw/Calista_Flockhart/Calista_Flockhart_0005.jpg"
+   },
+   {
+    "kind": "genuine",
+    "truth": "Jonathan_Edwards",
+    "best": "Jonathan_Edwards",
+    "sim": 0.6638227701187134,
+    "photo": "data/lfw/Jonathan_Edwards/Jonathan_Edwards_0004.jpg"
+   },
+   {
+    "kind": "genuine",
+    "truth": "Jonathan_Edwards",
+    "best": "Jonathan_Edwards",
+    "sim": 0.5613647103309631,
+    "photo": "data/lfw/Jonathan_Edwards/Jonathan_Edwards_0005.jpg"
+   },
+   {
+    "kind": "genuine",
+    "truth": "Eduardo_Duhalde",
+    "best": "Eduardo_Duhalde",
+    "sim": 0.45171067118644714,
+    "photo": "data/lfw/Eduardo_Duhalde/Eduardo_Duhalde_0004.jpg"
+   },
+   {
+    "kind": "genuine",
+    "truth": "Eduardo_Duhalde",
+    "best": "Eduardo_Duhalde",
+    "sim": 0.45825353264808655,
+    "photo": "data/lfw/Eduardo_Duhalde/Eduardo_Duhalde_0005.jpg"
+   },
+   {
+    "kind": "genuine",
+    "truth": "Justin_Timberlake",
+    "best": "Justin_Timberlake",
+    "sim": 0.5143526196479797,
+    "photo": "data/lfw/Justin_Timberlake/Justin_Timberlake_0004.jpg"
+   },
+   {
+    "kind": "genuine",
+    "truth": "Justin_Timberlake",
+    "best": "Justin_Timberlake",
+    "sim": 0.5643976926803589,
+    "photo": "data/lfw/Justin_Timberlake/Justin_Timberlake_0005.jpg"
+   },
+   {
+    "kind": "genuine",
+    "truth": "Jean_Charest",
+    "best": "Fernando_Gonzalez",
+    "sim": 0.37002986669540405,
+    "photo": "data/lfw/Jean_Charest/Jean_Charest_0004.jpg"
+   },
+   {
+    "kind": "genuine",
+    "truth": "Jean_Charest",
+    "best": "Valery_Giscard_dEstaing",
+    "sim": 0.39843329787254333,
+    "photo": "data/lfw/Jean_Charest/Jean_Charest_0005.jpg"
+   },
+   {
+    "kind": "genuine",
+    "truth": "George_Clooney",
+    "best": "George_Clooney",
+    "sim": 0.44196027517318726,
+    "photo": "data/lfw/George_Clooney/George_Clooney_0004.jpg"
+   },
+   {
+    "kind": "genuine",
+    "truth": "George_Clooney",
+    "best": "George_Clooney",
+    "sim": 0.3801328241825104,
+    "photo": "data/lfw/George_Clooney/George_Clooney_0005.jpg"
+   },
+   {
+    "kind": "genuine",
+    "truth": "John_Abizaid",
+    "best": "John_Abizaid",
+    "sim": 0.4843379557132721,
+    "photo": "data/lfw/John_Abizaid/John_Abizaid_0004.jpg"
+   },
+   {
+    "kind": "genuine",
+    "truth": "John_Abizaid",
+    "best": "John_Abizaid",
+    "sim": 0.6293375492095947,
+    "photo": "data/lfw/John_Abizaid/John_Abizaid_0005.jpg"
+   },
+   {
+    "kind": "genuine",
+    "truth": "Mohamed_ElBaradei",
+    "best": "Mohamed_ElBaradei",
+    "sim": 0.4613192081451416,
+    "photo": "data/lfw/Mohamed_ElBaradei/Mohamed_ElBaradei_0004.jpg"
+   },
+   {
+    "kind": "genuine",
+    "truth": "Mohamed_ElBaradei",
+    "best": "Mohamed_ElBaradei",
+    "sim": 0.36871078610420227,
+    "photo": "data/lfw/Mohamed_ElBaradei/Mohamed_ElBaradei_0005.jpg"
+   },
+   {
+    "kind": "genuine",
+    "truth": "Christine_Baumgartner",
+    "best": "Christine_Baumgartner",
+    "sim": 0.5603628754615784,
+    "photo": "data/lfw/Christine_Baumgartner/Christine_Baumgartner_0004.jpg"
+   },
+   {
+    "kind": "genuine",
+    "truth": "Christine_Baumgartner",
+    "best": "Christine_Baumgartner",
+    "sim": 0.4774579107761383,
+    "photo": "data/lfw/Christine_Baumgartner/Christine_Baumgartner_0005.jpg"
+   },
+   {
+    "kind": "genuine",
+    "truth": "Luis_Horna",
+    "best": "Luis_Horna",
+    "sim": 0.41182541847229004,
+    "photo": "data/lfw/Luis_Horna/Luis_Horna_0004.jpg"
+   },
+   {
+    "kind": "genuine",
+    "truth": "Luis_Horna",
+    "best": "Eduardo_Duhalde",
+    "sim": 0.32918623089790344,
+    "photo": "data/lfw/Luis_Horna/Luis_Horna_0005.jpg"
+   },
+   {
+    "kind": "genuine",
+    "truth": "Valery_Giscard_dEstaing",
+    "best": "Valery_Giscard_dEstaing",
+    "sim": 0.6987385749816895,
+    "photo": "data/lfw/Valery_Giscard_dEstaing/Valery_Giscard_dEstaing_0004.jpg"
+   },
+   {
+    "kind": "genuine",
+    "truth": "Valery_Giscard_dEstaing",
+    "best": "Valery_Giscard_dEstaing",
+    "sim": 0.7176085710525513,
+    "photo": "data/lfw/Valery_Giscard_dEstaing/Valery_Giscard_dEstaing_0005.jpg"
+   },
+   {
+    "kind": "impostor",
+    "truth": null,
+    "best": "Jack_Straw",
+    "sim": 0.25837525725364685,
+    "photo": "data/lfw/Francis_Ricciardone/Francis_Ricciardone_0001.jpg"
+   },
+   {
+    "kind": "impostor",
+    "truth": null,
+    "best": "Lance_Armstrong",
+    "sim": 0.2751811444759369,
+    "photo": "data/lfw/Helio_Castroneves/Helio_Castroneves_0001.jpg"
+   },
+   {
+    "kind": "impostor",
+    "truth": null,
+    "best": "Eduardo_Duhalde",
+    "sim": 0.2938556373119354,
+    "photo": "data/lfw/Albert_Brooks/Albert_Brooks_0001.jpg"
+   },
+   {
+    "kind": "impostor",
+    "truth": null,
+    "best": "Julie_Gerberding",
+    "sim": 0.34087467193603516,
+    "photo": "data/lfw/Melissa_Stark/Melissa_Stark_0001.jpg"
+   },
+   {
+    "kind": "impostor",
+    "truth": null,
+    "best": "Jean_Charest",
+    "sim": 0.3603665232658386,
+    "photo": "data/lfw/Anthony_Pico/Anthony_Pico_0001.jpg"
+   },
+   {
+    "kind": "impostor",
+    "truth": null,
+    "best": "Julie_Gerberding",
+    "sim": 0.25290563702583313,
+    "photo": "data/lfw/Marina_Kuptsova/Marina_Kuptsova_0001.jpg"
+   },
+   {
+    "kind": "impostor",
+    "truth": null,
+    "best": "Michelle_Yeoh",
+    "sim": 0.21569013595581055,
+    "photo": "data/lfw/Eve_Ensler/Eve_Ensler_0001.jpg"
+   },
+   {
+    "kind": "impostor",
+    "truth": null,
+    "best": "Choi_Sung-hong",
+    "sim": 0.258590966463089,
+    "photo": "data/lfw/Eddie_Murray/Eddie_Murray_0001.jpg"
+   },
+   {
+    "kind": "impostor",
+    "truth": null,
+    "best": "Lance_Armstrong",
+    "sim": 0.3547051250934601,
+    "photo": "data/lfw/Claudio_Abbado/Claudio_Abbado_0001.jpg"
+   },
+   {
+    "kind": "impostor",
+    "truth": null,
+    "best": "Justin_Timberlake",
+    "sim": 0.33299127221107483,
+    "photo": "data/lfw/Joshua_Harapko/Joshua_Harapko_0001.jpg"
+   },
+   {
+    "kind": "impostor",
+    "truth": null,
+    "best": "Yao_Ming",
+    "sim": 0.18313229084014893,
+    "photo": "data/lfw/Chris_Terry/Chris_Terry_0001.jpg"
+   },
+   {
+    "kind": "impostor",
+    "truth": null,
+    "best": "Rick_Perry",
+    "sim": 0.25357499718666077,
+    "photo": "data/lfw/Jamir_Miller/Jamir_Miller_0001.jpg"
+   },
+   {
+    "kind": "impostor",
+    "truth": null,
+    "best": "Luis_Horna",
+    "sim": 0.36512067914009094,
+    "photo": "data/lfw/Taylor_Twellman/Taylor_Twellman_0001.jpg"
+   },
+   {
+    "kind": "impostor",
+    "truth": null,
+    "best": "Michelle_Yeoh",
+    "sim": 0.265943706035614,
+    "photo": "data/lfw/Donald_Hays/Donald_Hays_0001.jpg"
+   },
+   {
+    "kind": "impostor",
+    "truth": null,
+    "best": "Calista_Flockhart",
+    "sim": 0.31778329610824585,
+    "photo": "data/lfw/Johnny_Htu/Johnny_Htu_0001.jpg"
+   },
+   {
+    "kind": "impostor",
+    "truth": null,
+    "best": "Jean_Charest",
+    "sim": 0.37157049775123596,
+    "photo": "data/lfw/Chris_Matthews/Chris_Matthews_0001.jpg"
+   },
+   {
+    "kind": "impostor",
+    "truth": null,
+    "best": "Kristanna_Loken",
+    "sim": 0.19874827563762665,
+    "photo": "data/lfw/Estella_Warren/Estella_Warren_0001.jpg"
+   },
+   {
+    "kind": "impostor",
+    "truth": null,
+    "best": "Mohamed_ElBaradei",
+    "sim": 0.1944478303194046,
+    "photo": "data/lfw/Peter_Harvey/Peter_Harvey_0001.jpg"
+   },
+   {
+    "kind": "impostor",
+    "truth": null,
+    "best": "Julie_Gerberding",
+    "sim": 0.3943747282028198,
+    "photo": "data/lfw/Anne_Donovan/Anne_Donovan_0001.jpg"
+   },
+   {
+    "kind": "impostor",
+    "truth": null,
+    "best": "Yao_Ming",
+    "sim": 0.24311769008636475,
+    "photo": "data/lfw/Ray_Young/Ray_Young_0001.jpg"
+   },
+   {
+    "kind": "impostor",
+    "truth": null,
+    "best": "Mohamed_ElBaradei",
+    "sim": 0.1936456263065338,
+    "photo": "data/lfw/Michael_Stark/Michael_Stark_0001.jpg"
+   },
+   {
+    "kind": "impostor",
+    "truth": null,
+    "best": "Fernando_Gonzalez",
+    "sim": 0.3185383379459381,
+    "photo": "data/lfw/Denise_Locke/Denise_Locke_0001.jpg"
+   },
+   {
+    "kind": "impostor",
+    "truth": null,
+    "best": "Julie_Gerberding",
+    "sim": 0.30740904808044434,
+    "photo": "data/lfw/Abdel_Aziz_Al-Hakim/Abdel_Aziz_Al-Hakim_0001.jpg"
+   },
+   {
+    "kind": "impostor",
+    "truth": null,
+    "best": "Justin_Timberlake",
+    "sim": 0.18517936766147614,
+    "photo": "data/lfw/Tristan_Gretzky/Tristan_Gretzky_0001.jpg"
+   },
+   {
+    "kind": "impostor",
+    "truth": null,
+    "best": "Choi_Sung-hong",
+    "sim": 0.32667961716651917,
+    "photo": "data/lfw/Zaini_Abdullah/Zaini_Abdullah_0001.jpg"
+   },
+   {
+    "kind": "impostor",
+    "truth": null,
+    "best": "Jack_Straw",
+    "sim": 0.34471508860588074,
+    "photo": "data/lfw/Randall_Terry/Randall_Terry_0001.jpg"
+   },
+   {
+    "kind": "impostor",
+    "truth": null,
+    "best": "Jean_Charest",
+    "sim": 0.32762372493743896,
+    "photo": "data/lfw/Craig_Morgan/Craig_Morgan_0001.jpg"
+   },
+   {
+    "kind": "impostor",
+    "truth": null,
+    "best": "Julie_Gerberding",
+    "sim": 0.2393571138381958,
+    "photo": "data/lfw/Suzie_McConnell_Serio/Suzie_McConnell_Serio_0001.jpg"
+   },
+   {
+    "kind": "impostor",
+    "truth": null,
+    "best": "George_HW_Bush",
+    "sim": 0.3543747365474701,
+    "photo": "data/lfw/Michael_Rolinee/Michael_Rolinee_0001.jpg"
+   },
+   {
+    "kind": "impostor",
+    "truth": null,
+    "best": "Choi_Sung-hong",
+    "sim": 0.25762903690338135,
+    "photo": "data/lfw/Geraldo_Rivera/Geraldo_Rivera_0001.jpg"
+   },
+   {
+    "kind": "impostor",
+    "truth": null,
+    "best": "Walter_Mondale",
+    "sim": 0.2576451003551483,
+    "photo": "data/lfw/Christy_Ferer/Christy_Ferer_0001.jpg"
+   },
+   {
+    "kind": "impostor",
+    "truth": null,
+    "best": "Calista_Flockhart",
+    "sim": 0.3639254868030548,
+    "photo": "data/lfw/Nicole/Nicole_0001.jpg"
+   },
+   {
+    "kind": "impostor",
+    "truth": null,
+    "best": "Arnold_Schwarzenegger",
+    "sim": 0.31441518664360046,
+    "photo": "data/lfw/Daniel_Chin/Daniel_Chin_0001.jpg"
+   },
+   {
+    "kind": "impostor",
+    "truth": null,
+    "best": "George_Clooney",
+    "sim": 0.18903587758541107,
+    "photo": "data/lfw/Derek_Abney/Derek_Abney_0001.jpg"
+   },
+   {
+    "kind": "impostor",
+    "truth": null,
+    "best": "Arnold_Schwarzenegger",
+    "sim": 0.37149807810783386,
+    "photo": "data/lfw/Tom_Smothers/Tom_Smothers_0001.jpg"
+   },
+   {
+    "kind": "impostor",
+    "truth": null,
+    "best": "Valery_Giscard_dEstaing",
+    "sim": 0.33047398924827576,
+    "photo": "data/lfw/Pringe_Ernst_August/Pringe_Ernst_August_0001.jpg"
+   },
+   {
+    "kind": "impostor",
+    "truth": null,
+    "best": "Kristanna_Loken",
+    "sim": 0.3240456283092499,
+    "photo": "data/lfw/Jodie_Kidd/Jodie_Kidd_0001.jpg"
+   },
+   {
+    "kind": "impostor",
+    "truth": null,
+    "best": "Kristanna_Loken",
+    "sim": 0.25765013694763184,
+    "photo": "data/lfw/Marina_Hands/Marina_Hands_0001.jpg"
+   },
+   {
+    "kind": "impostor",
+    "truth": null,
+    "best": "Choi_Sung-hong",
+    "sim": 0.28724101185798645,
+    "photo": "data/lfw/Leo_Ramirez/Leo_Ramirez_0001.jpg"
+   },
+   {
+    "kind": "impostor",
+    "truth": null,
+    "best": "Justin_Timberlake",
+    "sim": 0.3477219343185425,
+    "photo": "data/lfw/Clint_Lamebear/Clint_Lamebear_0001.jpg"
+   },
+   {
+    "kind": "impostor",
+    "truth": null,
+    "best": "Celine_Dion",
+    "sim": 0.18564535677433014,
+    "photo": "data/lfw/Kathy_Gannon/Kathy_Gannon_0001.jpg"
+   },
+   {
+    "kind": "impostor",
+    "truth": null,
+    "best": "Kristanna_Loken",
+    "sim": 0.19746176898479462,
+    "photo": "data/lfw/Faye_Alibocus/Faye_Alibocus_0001.jpg"
+   },
+   {
+    "kind": "impostor",
+    "truth": null,
+    "best": "Mohamed_ElBaradei",
+    "sim": 0.2571324110031128,
+    "photo": "data/lfw/Gene_Keady/Gene_Keady_0001.jpg"
+   },
+   {
+    "kind": "impostor",
+    "truth": null,
+    "best": "Julie_Gerberding",
+    "sim": 0.501982569694519,
+    "photo": "data/lfw/Ann_Godbehere/Ann_Godbehere_0001.jpg"
+   },
+   {
+    "kind": "impostor",
+    "truth": null,
+    "best": "Eduardo_Duhalde",
+    "sim": 0.43793433904647827,
+    "photo": "data/lfw/Kurt_Thomas/Kurt_Thomas_0001.jpg"
+   },
+   {
+    "kind": "impostor",
+    "truth": null,
+    "best": "Jack_Straw",
+    "sim": 0.3633236587047577,
+    "photo": "data/lfw/Hussam_Mohammed_Amin/Hussam_Mohammed_Amin_0001.jpg"
+   },
+   {
+    "kind": "impostor",
+    "truth": null,
+    "best": "Tiger_Woods",
+    "sim": 0.5001952648162842,
+    "photo": "data/lfw/Marlon_Devonish/Marlon_Devonish_0001.jpg"
+   },
+   {
+    "kind": "impostor",
+    "truth": null,
+    "best": "Walter_Mondale",
+    "sim": 0.3235127925872803,
+    "photo": "data/lfw/Mark_Martin/Mark_Martin_0001.jpg"
+   },
+   {
+    "kind": "impostor",
+    "truth": null,
+    "best": "Eduardo_Duhalde",
+    "sim": 0.289692223072052,
+    "photo": "data/lfw/Narendra_Modi/Narendra_Modi_0001.jpg"
+   },
+   {
+    "kind": "impostor",
+    "truth": null,
+    "best": "Valery_Giscard_dEstaing",
+    "sim": 0.33095023036003113,
+    "photo": "data/lfw/Pio_Laghi/Pio_Laghi_0001.jpg"
+   },
+   {
+    "kind": "impostor",
+    "truth": null,
+    "best": "Julie_Gerberding",
+    "sim": 0.33623605966567993,
+    "photo": "data/lfw/Bettina_Rheims/Bettina_Rheims_0001.jpg"
+   },
+   {
+    "kind": "impostor",
+    "truth": null,
+    "best": "Mohamed_ElBaradei",
+    "sim": 0.2101536989212036,
+    "photo": "data/lfw/Daniel_Pearl/Daniel_Pearl_0001.jpg"
+   },
+   {
+    "kind": "impostor",
+    "truth": null,
+    "best": "Julie_Gerberding",
+    "sim": 0.2257625013589859,
+    "photo": "data/lfw/Einars_Repse/Einars_Repse_0001.jpg"
+   },
+   {
+    "kind": "impostor",
+    "truth": null,
+    "best": "Celine_Dion",
+    "sim": 0.2097780853509903,
+    "photo": "data/lfw/Dorothy_Lamour/Dorothy_Lamour_0001.jpg"
+   },
+   {
+    "kind": "impostor",
+    "truth": null,
+    "best": "Jack_Straw",
+    "sim": 0.25544947385787964,
+    "photo": "data/lfw/Hunter_Kemper/Hunter_Kemper_0001.jpg"
+   },
+   {
+    "kind": "impostor",
+    "truth": null,
+    "best": "Ariel_Sharon",
+    "sim": 0.41371598839759827,
+    "photo": "data/lfw/Vladimir_Meciar/Vladimir_Meciar_0001.jpg"
+   },
+   {
+    "kind": "impostor",
+    "truth": null,
+    "best": "Justin_Timberlake",
+    "sim": 0.19208744168281555,
+    "photo": "data/lfw/Justin_Wilson/Justin_Wilson_0001.jpg"
+   },
+   {
+    "kind": "impostor",
+    "truth": null,
+    "best": "Arminio_Fraga",
+    "sim": 0.23499935865402222,
+    "photo": "data/lfw/Jonathan_Schroeder/Jonathan_Schroeder_0001.jpg"
+   },
+   {
+    "kind": "impostor",
+    "truth": null,
+    "best": "Walter_Mondale",
+    "sim": 0.3379751741886139,
+    "photo": "data/lfw/Alek_Wek/Alek_Wek_0001.jpg"
+   },
+   {
+    "kind": "impostor",
+    "truth": null,
+    "best": "Fernando_Gonzalez",
+    "sim": 0.36145588755607605,
+    "photo": "data/lfw/Chuck_Finley/Chuck_Finley_0001.jpg"
+   }
+  ],
+  "test": [
+   {
+    "kind": "genuine",
+    "truth": "Yoriko_Kawaguchi",
+    "best": "Yoriko_Kawaguchi",
+    "sim": 0.6614982485771179,
+    "photo": "data/lfw/Yoriko_Kawaguchi/Yoriko_Kawaguchi_0004.jpg"
+   },
+   {
+    "kind": "genuine",
+    "truth": "Yoriko_Kawaguchi",
+    "best": "Yoriko_Kawaguchi",
+    "sim": 0.8180378079414368,
+    "photo": "data/lfw/Yoriko_Kawaguchi/Yoriko_Kawaguchi_0005.jpg"
+   },
+   {
+    "kind": "genuine",
+    "truth": "Scott_Peterson",
+    "best": "Scott_Peterson",
+    "sim": 0.6684348583221436,
+    "photo": "data/lfw/Scott_Peterson/Scott_Peterson_0004.jpg"
+   },
+   {
+    "kind": "genuine",
+    "truth": "Scott_Peterson",
+    "best": "Scott_Peterson",
+    "sim": 0.5380046963691711,
+    "photo": "data/lfw/Scott_Peterson/Scott_Peterson_0005.jpg"
+   },
+   {
+    "kind": "genuine",
+    "truth": "Ralf_Schumacher",
+    "best": "Ralf_Schumacher",
+    "sim": 0.4003298878669739,
+    "photo": "data/lfw/Ralf_Schumacher/Ralf_Schumacher_0004.jpg"
+   },
+   {
+    "kind": "genuine",
+    "truth": "Ralf_Schumacher",
+    "best": "Ralf_Schumacher",
+    "sim": 0.3081989288330078,
+    "photo": "data/lfw/Ralf_Schumacher/Ralf_Schumacher_0005.jpg"
+   },
+   {
+    "kind": "genuine",
+    "truth": "Vladimir_Putin",
+    "best": "Vladimir_Putin",
+    "sim": 0.4641518294811249,
+    "photo": "data/lfw/Vladimir_Putin/Vladimir_Putin_0004.jpg"
+   },
+   {
+    "kind": "genuine",
+    "truth": "Vladimir_Putin",
+    "best": "Vladimir_Putin",
+    "sim": 0.733694314956665,
+    "photo": "data/lfw/Vladimir_Putin/Vladimir_Putin_0005.jpg"
+   },
+   {
+    "kind": "genuine",
+    "truth": "Martin_McGuinness",
+    "best": "Martin_McGuinness",
+    "sim": 0.5992198586463928,
+    "photo": "data/lfw/Martin_McGuinness/Martin_McGuinness_0004.jpg"
+   },
+   {
+    "kind": "genuine",
+    "truth": "Martin_McGuinness",
+    "best": "Martin_McGuinness",
+    "sim": 0.5362941026687622,
+    "photo": "data/lfw/Martin_McGuinness/Martin_McGuinness_0005.jpg"
+   },
+   {
+    "kind": "genuine",
+    "truth": "Tommy_Thompson",
+    "best": "Tommy_Thompson",
+    "sim": 0.6582474708557129,
+    "photo": "data/lfw/Tommy_Thompson/Tommy_Thompson_0004.jpg"
+   },
+   {
+    "kind": "genuine",
+    "truth": "Tommy_Thompson",
+    "best": "Tommy_Thompson",
+    "sim": 0.6662222743034363,
+    "photo": "data/lfw/Tommy_Thompson/Tommy_Thompson_0005.jpg"
+   },
+   {
+    "kind": "genuine",
+    "truth": "Muhammad_Ali",
+    "best": "Muhammad_Ali",
+    "sim": 0.5400965809822083,
+    "photo": "data/lfw/Muhammad_Ali/Muhammad_Ali_0004.jpg"
+   },
+   {
+    "kind": "genuine",
+    "truth": "Muhammad_Ali",
+    "best": "Muhammad_Ali",
+    "sim": 0.46682289242744446,
+    "photo": "data/lfw/Muhammad_Ali/Muhammad_Ali_0005.jpg"
+   },
+   {
+    "kind": "genuine",
+    "truth": "Kalpana_Chawla",
+    "best": "Kalpana_Chawla",
+    "sim": 0.6763219237327576,
+    "photo": "data/lfw/Kalpana_Chawla/Kalpana_Chawla_0004.jpg"
+   },
+   {
+    "kind": "genuine",
+    "truth": "Kalpana_Chawla",
+    "best": "Kalpana_Chawla",
+    "sim": 0.5858408212661743,
+    "photo": "data/lfw/Kalpana_Chawla/Kalpana_Chawla_0005.jpg"
+   },
+   {
+    "kind": "genuine",
+    "truth": "Alan_Greenspan",
+    "best": "Alan_Greenspan",
+    "sim": 0.7537285089492798,
+    "photo": "data/lfw/Alan_Greenspan/Alan_Greenspan_0004.jpg"
+   },
+   {
+    "kind": "genuine",
+    "truth": "Alan_Greenspan",
+    "best": "Alan_Greenspan",
+    "sim": 0.7685497999191284,
+    "photo": "data/lfw/Alan_Greenspan/Alan_Greenspan_0005.jpg"
+   },
+   {
+    "kind": "genuine",
+    "truth": "Victoria_Clarke",
+    "best": "Goldie_Hawn",
+    "sim": 0.38603711128234863,
+    "photo": "data/lfw/Victoria_Clarke/Victoria_Clarke_0004.jpg"
+   },
+   {
+    "kind": "genuine",
+    "truth": "Victoria_Clarke",
+    "best": "Victoria_Clarke",
+    "sim": 0.7613838315010071,
+    "photo": "data/lfw/Victoria_Clarke/Victoria_Clarke_0005.jpg"
+   },
+   {
+    "kind": "genuine",
+    "truth": "Charles_Moose",
+    "best": "Charles_Moose",
+    "sim": 0.5963737368583679,
+    "photo": "data/lfw/Charles_Moose/Charles_Moose_0004.jpg"
+   },
+   {
+    "kind": "genuine",
+    "truth": "Charles_Moose",
+    "best": "Charles_Moose",
+    "sim": 0.6369571685791016,
+    "photo": "data/lfw/Charles_Moose/Charles_Moose_0005.jpg"
+   },
+   {
+    "kind": "genuine",
+    "truth": "Hamid_Karzai",
+    "best": "Hamid_Karzai",
+    "sim": 0.644874095916748,
+    "photo": "data/lfw/Hamid_Karzai/Hamid_Karzai_0004.jpg"
+   },
+   {
+    "kind": "genuine",
+    "truth": "Hamid_Karzai",
+    "best": "Hamid_Karzai",
+    "sim": 0.6504214406013489,
+    "photo": "data/lfw/Hamid_Karzai/Hamid_Karzai_0005.jpg"
+   },
+   {
+    "kind": "genuine",
+    "truth": "Carlos_Menem",
+    "best": "Carlos_Menem",
+    "sim": 0.5055880546569824,
+    "photo": "data/lfw/Carlos_Menem/Carlos_Menem_0004.jpg"
+   },
+   {
+    "kind": "genuine",
+    "truth": "Carlos_Menem",
+    "best": "Carlos_Menem",
+    "sim": 0.332838773727417,
+    "photo": "data/lfw/Carlos_Menem/Carlos_Menem_0005.jpg"
+   },
+   {
+    "kind": "genuine",
+    "truth": "Charlton_Heston",
+    "best": "Charlton_Heston",
+    "sim": 0.6346781849861145,
+    "photo": "data/lfw/Charlton_Heston/Charlton_Heston_0004.jpg"
+   },
+   {
+    "kind": "genuine",
+    "truth": "Charlton_Heston",
+    "best": "Charlton_Heston",
+    "sim": 0.5177650451660156,
+    "photo": "data/lfw/Charlton_Heston/Charlton_Heston_0005.jpg"
+   },
+   {
+    "kind": "genuine",
+    "truth": "Jose_Maria_Aznar",
+    "best": "Jose_Maria_Aznar",
+    "sim": 0.4406173825263977,
+    "photo": "data/lfw/Jose_Maria_Aznar/Jose_Maria_Aznar_0004.jpg"
+   },
+   {
+    "kind": "genuine",
+    "truth": "Jose_Maria_Aznar",
+    "best": "Jose_Maria_Aznar",
+    "sim": 0.7025442719459534,
+    "photo": "data/lfw/Jose_Maria_Aznar/Jose_Maria_Aznar_0005.jpg"
+   },
+   {
+    "kind": "genuine",
+    "truth": "Paula_Radcliffe",
+    "best": "Paula_Radcliffe",
+    "sim": 0.40770936012268066,
+    "photo": "data/lfw/Paula_Radcliffe/Paula_Radcliffe_0004.jpg"
+   },
+   {
+    "kind": "genuine",
+    "truth": "Paula_Radcliffe",
+    "best": "Paula_Radcliffe",
+    "sim": 0.28964391350746155,
+    "photo": "data/lfw/Paula_Radcliffe/Paula_Radcliffe_0005.jpg"
+   },
+   {
+    "kind": "genuine",
+    "truth": "Wen_Jiabao",
+    "best": "Wen_Jiabao",
+    "sim": 0.6231909990310669,
+    "photo": "data/lfw/Wen_Jiabao/Wen_Jiabao_0004.jpg"
+   },
+   {
+    "kind": "genuine",
+    "truth": "Wen_Jiabao",
+    "best": "Wen_Jiabao",
+    "sim": 0.7072061896324158,
+    "photo": "data/lfw/Wen_Jiabao/Wen_Jiabao_0005.jpg"
+   },
+   {
+    "kind": "genuine",
+    "truth": "George_Pataki",
+    "best": "George_Pataki",
+    "sim": 0.4285951554775238,
+    "photo": "data/lfw/George_Pataki/George_Pataki_0004.jpg"
+   },
+   {
+    "kind": "genuine",
+    "truth": "George_Pataki",
+    "best": "George_Pataki",
+    "sim": 0.6423136591911316,
+    "photo": "data/lfw/George_Pataki/George_Pataki_0005.jpg"
+   },
+   {
+    "kind": "genuine",
+    "truth": "Gray_Davis",
+    "best": "Gray_Davis",
+    "sim": 0.5654778480529785,
+    "photo": "data/lfw/Gray_Davis/Gray_Davis_0004.jpg"
+   },
+   {
+    "kind": "genuine",
+    "truth": "Gray_Davis",
+    "best": "Gray_Davis",
+    "sim": 0.4478130638599396,
+    "photo": "data/lfw/Gray_Davis/Gray_Davis_0005.jpg"
+   },
+   {
+    "kind": "genuine",
+    "truth": "Goldie_Hawn",
+    "best": "Goldie_Hawn",
+    "sim": 0.3390684425830841,
+    "photo": "data/lfw/Goldie_Hawn/Goldie_Hawn_0004.jpg"
+   },
+   {
+    "kind": "genuine",
+    "truth": "Goldie_Hawn",
+    "best": "Goldie_Hawn",
+    "sim": 0.3150024712085724,
+    "photo": "data/lfw/Goldie_Hawn/Goldie_Hawn_0005.jpg"
+   },
+   {
+    "kind": "genuine",
+    "truth": "David_Nalbandian",
+    "best": "David_Nalbandian",
+    "sim": 0.49286848306655884,
+    "photo": "data/lfw/David_Nalbandian/David_Nalbandian_0004.jpg"
+   },
+   {
+    "kind": "genuine",
+    "truth": "David_Nalbandian",
+    "best": "David_Nalbandian",
+    "sim": 0.5042818784713745,
+    "photo": "data/lfw/David_Nalbandian/David_Nalbandian_0005.jpg"
+   },
+   {
+    "kind": "genuine",
+    "truth": "Nancy_Pelosi",
+    "best": "Nancy_Pelosi",
+    "sim": 0.6178498268127441,
+    "photo": "data/lfw/Nancy_Pelosi/Nancy_Pelosi_0004.jpg"
+   },
+   {
+    "kind": "genuine",
+    "truth": "Nancy_Pelosi",
+    "best": "Alan_Greenspan",
+    "sim": 0.3288062512874603,
+    "photo": "data/lfw/Nancy_Pelosi/Nancy_Pelosi_0005.jpg"
+   },
+   {
+    "kind": "genuine",
+    "truth": "Tang_Jiaxuan",
+    "best": "Tang_Jiaxuan",
+    "sim": 0.8335180282592773,
+    "photo": "data/lfw/Tang_Jiaxuan/Tang_Jiaxuan_0004.jpg"
+   },
+   {
+    "kind": "genuine",
+    "truth": "Tang_Jiaxuan",
+    "best": "Tang_Jiaxuan",
+    "sim": 0.6934924125671387,
+    "photo": "data/lfw/Tang_Jiaxuan/Tang_Jiaxuan_0005.jpg"
+   },
+   {
+    "kind": "genuine",
+    "truth": "Costas_Simitis",
+    "best": "Costas_Simitis",
+    "sim": 0.38895276188850403,
+    "photo": "data/lfw/Costas_Simitis/Costas_Simitis_0004.jpg"
+   },
+   {
+    "kind": "genuine",
+    "truth": "Costas_Simitis",
+    "best": "Costas_Simitis",
+    "sim": 0.49160635471343994,
+    "photo": "data/lfw/Costas_Simitis/Costas_Simitis_0005.jpg"
+   },
+   {
+    "kind": "genuine",
+    "truth": "James_Wolfensohn",
+    "best": "James_Wolfensohn",
+    "sim": 0.7311422228813171,
+    "photo": "data/lfw/James_Wolfensohn/James_Wolfensohn_0004.jpg"
+   },
+   {
+    "kind": "genuine",
+    "truth": "James_Wolfensohn",
+    "best": "James_Wolfensohn",
+    "sim": 0.605631947517395,
+    "photo": "data/lfw/James_Wolfensohn/James_Wolfensohn_0005.jpg"
+   },
+   {
+    "kind": "genuine",
+    "truth": "Richard_Armitage",
+    "best": "Richard_Armitage",
+    "sim": 0.30410122871398926,
+    "photo": "data/lfw/Richard_Armitage/Richard_Armitage_0004.jpg"
+   },
+   {
+    "kind": "genuine",
+    "truth": "Richard_Armitage",
+    "best": "Richard_Armitage",
+    "sim": 0.585167646408081,
+    "photo": "data/lfw/Richard_Armitage/Richard_Armitage_0005.jpg"
+   },
+   {
+    "kind": "genuine",
+    "truth": "Sergei_Ivanov",
+    "best": "Sergei_Ivanov",
+    "sim": 0.5152432322502136,
+    "photo": "data/lfw/Sergei_Ivanov/Sergei_Ivanov_0004.jpg"
+   },
+   {
+    "kind": "genuine",
+    "truth": "Sergei_Ivanov",
+    "best": "Sergei_Ivanov",
+    "sim": 0.4338105618953705,
+    "photo": "data/lfw/Sergei_Ivanov/Sergei_Ivanov_0005.jpg"
+   },
+   {
+    "kind": "genuine",
+    "truth": "Robert_Blake",
+    "best": "Robert_Blake",
+    "sim": 0.7772486209869385,
+    "photo": "data/lfw/Robert_Blake/Robert_Blake_0004.jpg"
+   },
+   {
+    "kind": "genuine",
+    "truth": "Robert_Blake",
+    "best": "Robert_Blake",
+    "sim": 0.6243022084236145,
+    "photo": "data/lfw/Robert_Blake/Robert_Blake_0005.jpg"
+   },
+   {
+    "kind": "genuine",
+    "truth": "Michelle_Kwan",
+    "best": "Paula_Radcliffe",
+    "sim": 0.37662339210510254,
+    "photo": "data/lfw/Michelle_Kwan/Michelle_Kwan_0004.jpg"
+   },
+   {
+    "kind": "genuine",
+    "truth": "Michelle_Kwan",
+    "best": "Paula_Radcliffe",
+    "sim": 0.38025593757629395,
+    "photo": "data/lfw/Michelle_Kwan/Michelle_Kwan_0005.jpg"
+   },
+   {
+    "kind": "genuine",
+    "truth": "Rubens_Barrichello",
+    "best": "Rubens_Barrichello",
+    "sim": 0.5589151382446289,
+    "photo": "data/lfw/Rubens_Barrichello/Rubens_Barrichello_0004.jpg"
+   },
+   {
+    "kind": "genuine",
+    "truth": "Rubens_Barrichello",
+    "best": "Muhammad_Ali",
+    "sim": 0.39746448397636414,
+    "photo": "data/lfw/Rubens_Barrichello/Rubens_Barrichello_0005.jpg"
+   },
+   {
+    "kind": "impostor",
+    "truth": null,
+    "best": "Martin_McGuinness",
+    "sim": 0.2952331602573395,
+    "photo": "data/lfw/Rocco_Buttiglione/Rocco_Buttiglione_0001.jpg"
+   },
+   {
+    "kind": "impostor",
+    "truth": null,
+    "best": "Rubens_Barrichello",
+    "sim": 0.2879122495651245,
+    "photo": "data/lfw/Pierre_Gagnon/Pierre_Gagnon_0001.jpg"
+   },
+   {
+    "kind": "impostor",
+    "truth": null,
+    "best": "Kalpana_Chawla",
+    "sim": 0.3465380370616913,
+    "photo": "data/lfw/Katie_Holmes/Katie_Holmes_0001.jpg"
+   },
+   {
+    "kind": "impostor",
+    "truth": null,
+    "best": "Sergei_Ivanov",
+    "sim": 0.3448996841907501,
+    "photo": "data/lfw/Michael_Dell/Michael_Dell_0001.jpg"
+   },
+   {
+    "kind": "impostor",
+    "truth": null,
+    "best": "Muhammad_Ali",
+    "sim": 0.25131163001060486,
+    "photo": "data/lfw/Laurent_Woulzy/Laurent_Woulzy_0001.jpg"
+   },
+   {
+    "kind": "impostor",
+    "truth": null,
+    "best": "Yoriko_Kawaguchi",
+    "sim": 0.3522968888282776,
+    "photo": "data/lfw/Keizo_Yamada/Keizo_Yamada_0001.jpg"
+   },
+   {
+    "kind": "impostor",
+    "truth": null,
+    "best": "Goldie_Hawn",
+    "sim": 0.4014342725276947,
+    "photo": "data/lfw/Roberto_Cercelletta/Roberto_Cercelletta_0001.jpg"
+   },
+   {
+    "kind": "impostor",
+    "truth": null,
+    "best": "Richard_Armitage",
+    "sim": 0.25672706961631775,
+    "photo": "data/lfw/Enos_Slaughter/Enos_Slaughter_0001.jpg"
+   },
+   {
+    "kind": "impostor",
+    "truth": null,
+    "best": "Carlos_Menem",
+    "sim": 0.35139915347099304,
+    "photo": "data/lfw/James_Brown/James_Brown_0001.jpg"
+   },
+   {
+    "kind": "impostor",
+    "truth": null,
+    "best": "George_Pataki",
+    "sim": 0.329491525888443,
+    "photo": "data/lfw/Katalin_Kollat/Katalin_Kollat_0001.jpg"
+   },
+   {
+    "kind": "impostor",
+    "truth": null,
+    "best": "Michelle_Kwan",
+    "sim": 0.27059268951416016,
+    "photo": "data/lfw/Kimora_Lee/Kimora_Lee_0001.jpg"
+   },
+   {
+    "kind": "impostor",
+    "truth": null,
+    "best": "Richard_Armitage",
+    "sim": 0.2299412190914154,
+    "photo": "data/lfw/Janusz_Kaminski/Janusz_Kaminski_0001.jpg"
+   },
+   {
+    "kind": "impostor",
+    "truth": null,
+    "best": "Robert_Blake",
+    "sim": 0.2660476565361023,
+    "photo": "data/lfw/Wayne_Newton/Wayne_Newton_0001.jpg"
+   },
+   {
+    "kind": "impostor",
+    "truth": null,
+    "best": "Richard_Armitage",
+    "sim": 0.21893376111984253,
+    "photo": "data/lfw/Carol_Niedermayer/Carol_Niedermayer_0001.jpg"
+   },
+   {
+    "kind": "impostor",
+    "truth": null,
+    "best": "Goldie_Hawn",
+    "sim": 0.3297232687473297,
+    "photo": "data/lfw/Elaine_Chao/Elaine_Chao_0001.jpg"
+   },
+   {
+    "kind": "impostor",
+    "truth": null,
+    "best": "Robert_Blake",
+    "sim": 0.33794572949409485,
+    "photo": "data/lfw/Severino_Antinori/Severino_Antinori_0001.jpg"
+   },
+   {
+    "kind": "impostor",
+    "truth": null,
+    "best": "Richard_Armitage",
+    "sim": 0.2647722363471985,
+    "photo": "data/lfw/Melinda_Czink/Melinda_Czink_0001.jpg"
+   },
+   {
+    "kind": "impostor",
+    "truth": null,
+    "best": "Scott_Peterson",
+    "sim": 0.3209878206253052,
+    "photo": "data/lfw/Graciano_Rocchigiani/Graciano_Rocchigiani_0001.jpg"
+   },
+   {
+    "kind": "impostor",
+    "truth": null,
+    "best": "George_Pataki",
+    "sim": 0.3694731891155243,
+    "photo": "data/lfw/Mark_Salter/Mark_Salter_0001.jpg"
+   },
+   {
+    "kind": "impostor",
+    "truth": null,
+    "best": "Ralf_Schumacher",
+    "sim": 0.3110060393810272,
+    "photo": "data/lfw/Sivan_Klein/Sivan_Klein_0001.jpg"
+   },
+   {
+    "kind": "impostor",
+    "truth": null,
+    "best": "Alan_Greenspan",
+    "sim": 0.3447425365447998,
+    "photo": "data/lfw/Norman_Mailer/Norman_Mailer_0001.jpg"
+   },
+   {
+    "kind": "impostor",
+    "truth": null,
+    "best": "James_Wolfensohn",
+    "sim": 0.3066970705986023,
+    "photo": "data/lfw/Elizabeth_Pena/Elizabeth_Pena_0001.jpg"
+   },
+   {
+    "kind": "impostor",
+    "truth": null,
+    "best": "Paula_Radcliffe",
+    "sim": 0.2866021394729614,
+    "photo": "data/lfw/Peri_Gilpin/Peri_Gilpin_0001.jpg"
+   },
+   {
+    "kind": "impostor",
+    "truth": null,
+    "best": "Martin_McGuinness",
+    "sim": 0.5207892656326294,
+    "photo": "data/lfw/Jose_Lopez_Beltran/Jose_Lopez_Beltran_0001.jpg"
+   },
+   {
+    "kind": "impostor",
+    "truth": null,
+    "best": "Martin_McGuinness",
+    "sim": 0.5594801306724548,
+    "photo": "data/lfw/Herb_Brooks/Herb_Brooks_0001.jpg"
+   },
+   {
+    "kind": "impostor",
+    "truth": null,
+    "best": "Hamid_Karzai",
+    "sim": 0.36734527349472046,
+    "photo": "data/lfw/David_Alpay/David_Alpay_0001.jpg"
+   },
+   {
+    "kind": "impostor",
+    "truth": null,
+    "best": "Paula_Radcliffe",
+    "sim": 0.2466619461774826,
+    "photo": "data/lfw/Yekaterina_Guseva/Yekaterina_Guseva_0001.jpg"
+   },
+   {
+    "kind": "impostor",
+    "truth": null,
+    "best": "Carlos_Menem",
+    "sim": 0.3646843433380127,
+    "photo": "data/lfw/Stephen_Cooper/Stephen_Cooper_0001.jpg"
+   },
+   {
+    "kind": "impostor",
+    "truth": null,
+    "best": "Sergei_Ivanov",
+    "sim": 0.3168652057647705,
+    "photo": "data/lfw/Stephen_Glassroth/Stephen_Glassroth_0001.jpg"
+   },
+   {
+    "kind": "impostor",
+    "truth": null,
+    "best": "Carlos_Menem",
+    "sim": 0.30397260189056396,
+    "photo": "data/lfw/Martha_Smith/Martha_Smith_0001.jpg"
+   },
+   {
+    "kind": "impostor",
+    "truth": null,
+    "best": "Michelle_Kwan",
+    "sim": 0.22853635251522064,
+    "photo": "data/lfw/Michael_Michele/Michael_Michele_0001.jpg"
+   },
+   {
+    "kind": "impostor",
+    "truth": null,
+    "best": "Nancy_Pelosi",
+    "sim": 0.14421358704566956,
+    "photo": "data/lfw/Ratna_Sari_Dewi_Sukarno/Ratna_Sari_Dewi_Sukarno_0001.jpg"
+   },
+   {
+    "kind": "impostor",
+    "truth": null,
+    "best": "George_Pataki",
+    "sim": 0.25303277373313904,
+    "photo": "data/lfw/Trevor_Watson/Trevor_Watson_0001.jpg"
+   },
+   {
+    "kind": "impostor",
+    "truth": null,
+    "best": "Charlton_Heston",
+    "sim": 0.3369506299495697,
+    "photo": "data/lfw/Helio_Rubens_Garcia/Helio_Rubens_Garcia_0001.jpg"
+   },
+   {
+    "kind": "impostor",
+    "truth": null,
+    "best": "Tommy_Thompson",
+    "sim": 0.24848021566867828,
+    "photo": "data/lfw/Billy_Beane/Billy_Beane_0001.jpg"
+   },
+   {
+    "kind": "impostor",
+    "truth": null,
+    "best": "George_Pataki",
+    "sim": 0.23357772827148438,
+    "photo": "data/lfw/George_Murphy/George_Murphy_0001.jpg"
+   },
+   {
+    "kind": "impostor",
+    "truth": null,
+    "best": "Carlos_Menem",
+    "sim": 0.3308101296424866,
+    "photo": "data/lfw/Emmanuel_Milingo/Emmanuel_Milingo_0001.jpg"
+   },
+   {
+    "kind": "impostor",
+    "truth": null,
+    "best": "David_Nalbandian",
+    "sim": 0.4063650071620941,
+    "photo": "data/lfw/Larry_Beinfest/Larry_Beinfest_0001.jpg"
+   },
+   {
+    "kind": "impostor",
+    "truth": null,
+    "best": "Scott_Peterson",
+    "sim": 0.1348033845424652,
+    "photo": "data/lfw/Billy_Edelin/Billy_Edelin_0001.jpg"
+   },
+   {
+    "kind": "impostor",
+    "truth": null,
+    "best": "Goldie_Hawn",
+    "sim": 0.34346067905426025,
+    "photo": "data/lfw/Ahmet_Demir/Ahmet_Demir_0001.jpg"
+   },
+   {
+    "kind": "impostor",
+    "truth": null,
+    "best": "Goldie_Hawn",
+    "sim": 0.379185289144516,
+    "photo": "data/lfw/Raja_Ibrahim/Raja_Ibrahim_0001.jpg"
+   },
+   {
+    "kind": "impostor",
+    "truth": null,
+    "best": "Michelle_Kwan",
+    "sim": 0.37468335032463074,
+    "photo": "data/lfw/Amanda_Marsh/Amanda_Marsh_0001.jpg"
+   },
+   {
+    "kind": "impostor",
+    "truth": null,
+    "best": "Martin_McGuinness",
+    "sim": 0.23387198150157928,
+    "photo": "data/lfw/Betty_Garrison/Betty_Garrison_0001.jpg"
+   },
+   {
+    "kind": "impostor",
+    "truth": null,
+    "best": "Muhammad_Ali",
+    "sim": 0.3406735360622406,
+    "photo": "data/lfw/William_Hyde/William_Hyde_0001.jpg"
+   },
+   {
+    "kind": "impostor",
+    "truth": null,
+    "best": "Martin_McGuinness",
+    "sim": 0.4109906852245331,
+    "photo": "data/lfw/Roberto_Tovar/Roberto_Tovar_0001.jpg"
+   },
+   {
+    "kind": "impostor",
+    "truth": null,
+    "best": "Ralf_Schumacher",
+    "sim": 0.21928535401821136,
+    "photo": "data/lfw/Linda_Mason/Linda_Mason_0001.jpg"
+   },
+   {
+    "kind": "impostor",
+    "truth": null,
+    "best": "Muhammad_Ali",
+    "sim": 0.19885770976543427,
+    "photo": "data/lfw/Matt_Siebrandt/Matt_Siebrandt_0001.jpg"
+   },
+   {
+    "kind": "impostor",
+    "truth": null,
+    "best": "Martin_McGuinness",
+    "sim": 0.37137138843536377,
+    "photo": "data/lfw/Bob_Menendez/Bob_Menendez_0001.jpg"
+   },
+   {
+    "kind": "impostor",
+    "truth": null,
+    "best": "Tommy_Thompson",
+    "sim": 0.3479688763618469,
+    "photo": "data/lfw/Mark_Polansky/Mark_Polansky_0001.jpg"
+   },
+   {
+    "kind": "impostor",
+    "truth": null,
+    "best": "James_Wolfensohn",
+    "sim": 0.24375559389591217,
+    "photo": "data/lfw/Stan_Kasten/Stan_Kasten_0001.jpg"
+   },
+   {
+    "kind": "impostor",
+    "truth": null,
+    "best": "Michelle_Kwan",
+    "sim": 0.44391176104545593,
+    "photo": "data/lfw/Alberta_Lee/Alberta_Lee_0001.jpg"
+   },
+   {
+    "kind": "impostor",
+    "truth": null,
+    "best": "Nancy_Pelosi",
+    "sim": 0.30657368898391724,
+    "photo": "data/lfw/Kim_Weeks/Kim_Weeks_0001.jpg"
+   },
+   {
+    "kind": "impostor",
+    "truth": null,
+    "best": "Martin_McGuinness",
+    "sim": 0.36829355359077454,
+    "photo": "data/lfw/William_Perry/William_Perry_0001.jpg"
+   },
+   {
+    "kind": "impostor",
+    "truth": null,
+    "best": "Goldie_Hawn",
+    "sim": 0.19595785439014435,
+    "photo": "data/lfw/Raul_Castaneda/Raul_Castaneda_0001.jpg"
+   },
+   {
+    "kind": "impostor",
+    "truth": null,
+    "best": "Gray_Davis",
+    "sim": 0.42504969239234924,
+    "photo": "data/lfw/Robert_Wagner/Robert_Wagner_0001.jpg"
+   },
+   {
+    "kind": "impostor",
+    "truth": null,
+    "best": "Carlos_Menem",
+    "sim": 0.38055840134620667,
+    "photo": "data/lfw/Jane_Walker_Wood/Jane_Walker_Wood_0001.jpg"
+   },
+   {
+    "kind": "impostor",
+    "truth": null,
+    "best": "James_Wolfensohn",
+    "sim": 0.3106039762496948,
+    "photo": "data/lfw/Pete_Beaudrault/Pete_Beaudrault_0001.jpg"
+   },
+   {
+    "kind": "impostor",
+    "truth": null,
+    "best": "Martin_McGuinness",
+    "sim": 0.3059625029563904,
+    "photo": "data/lfw/Ken_Wharfe/Ken_Wharfe_0001.jpg"
+   },
+   {
+    "kind": "impostor",
+    "truth": null,
+    "best": "Michelle_Kwan",
+    "sim": 0.33292219042778015,
+    "photo": "data/lfw/Bryan_Thomas/Bryan_Thomas_0001.jpg"
+   },
+   {
+    "kind": "impostor",
+    "truth": null,
+    "best": "Sergei_Ivanov",
+    "sim": 0.3017222583293915,
+    "photo": "data/lfw/Peter_Mackay/Peter_Mackay_0001.jpg"
+   }
+  ]
+ }
+}

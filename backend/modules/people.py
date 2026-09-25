@@ -46,10 +46,13 @@ PROFILE_PATH = os.path.join(PROFILE_DIR, "profile.json")
 
 # Cosine-similarity threshold for a face match. DeepFace's documented default
 # for VGG-Face is a cosine DISTANCE of 0.68, i.e. a similarity of about 0.32.
-# We sit slightly stricter than that to limit false identifications, but not so
-# strict that a genuine match under different lighting is rejected. The actual
-# similarity is logged on every attempt so this can be tuned against real data.
-FACE_THRESHOLD = 0.35
+# 0.40 was chosen on a development half of Labeled Faces in the Wild and scored
+# once on a disjoint test half (scripts/report_experiments/face_identification_lfw.py):
+# against the 0.35 shipped before, it names the right person about as often
+# (80% against 82% of 60 probes), never names the wrong enrolled person (0
+# against 7%), and accepts a stranger as someone enrolled far less often (12%
+# against 28% of 60 impostor probes). The similarity is logged on every attempt.
+FACE_THRESHOLD = 0.40
 FACE_THRESHOLD_ENV = "ACCESSIBILITY_FACE_THRESHOLD"
 
 # Default safety keywords that trigger a CRITICAL alert when spoken aloud.

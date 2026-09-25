@@ -87,6 +87,13 @@ Results are in `backend/eval_results/` (`fusion_eval.json`,
   it. It was trained and tested on WLASL's signers, not on webcam signing by
   Deaf users
   (`docs/WLASL_EVAL_RESULTS.md`).
+- Face identification was measured on Labeled Faces in the Wild, not on webcam
+  frames at home, and with 30 people enrolled rather than the handful a home
+  would hold. With 3 photographs each it names the right person in 80% of 60
+  probes and accepts a stranger as someone enrolled in 12% of 60 impostor
+  probes, at the 0.40 threshold chosen on a disjoint development half. The 0.35
+  shipped before scored 82% but accepted 28% of strangers and misnamed 7% of
+  genuine probes (`backend/scripts/report_experiments/face_identification_lfw.py`).
 - Language-model latency depends on a hosted provider, which can withdraw
   models, as happened to Llama 3.3 during the project.
 - Five Deaf and hard-of-hearing people gave informal feedback on successive

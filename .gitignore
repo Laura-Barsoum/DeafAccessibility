@@ -62,3 +62,8 @@ backend/data/WLASL-master/videos_test100/
 backend/data/WLASL-master/videos_trainval100/
 backend/data/tgcn/*
 !backend/data/tgcn/asl100_mediapipe/
+
+# Labeled Faces in the Wild, downloaded for the face-identification measurement
+backend/data/lfw/
+backend/data/lfw.tgz
+backend/data/eval_people/

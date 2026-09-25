@@ -177,7 +177,9 @@ classifying sounds.
    below the distance of the farthest enrolment clip.
 3. **People tab.** Set your own name so the system flashes when it is spoken.
    Optionally enrol a person's face; when recognised, the Live view
-   shows them and captions are attributed to them.
+   shows them and captions are attributed to them. On Labeled Faces in the Wild
+   with 30 people enrolled, it names the right person in 80% of probes and
+   accepts a stranger as someone enrolled in 12% (`docs/MODEL_EVALUATION.md`).
 4. **Sign panel.** Click *Start signing*, sign a short phrase, then stop. The
    glosses are polished into a sentence and spoken aloud.
 5. **Diary and Summary tabs.** Review a longitudinal log filtered by time and
