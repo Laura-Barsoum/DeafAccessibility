@@ -30,6 +30,7 @@ import logging
 import os
 import re
 import tempfile
+import time
 from typing import Any, Dict, List, Optional, Tuple
 
 import numpy as np
@@ -127,14 +128,22 @@ class PeopleRegistry:
             return None
 
     # ── Enrolment ───────────────────────────────────────────────────
-    def enrol(self, name: str, frames_b64: Optional[List[str]] = None) -> Dict[str, Any]:
+    def enrol(self, name: str, frames_b64: Optional[List[str]] = None,
+              consent: bool = False) -> Dict[str, Any]:
         """Enrol or update a person from face frames. Voice is not recorded,
-        because nothing matched voice embeddings. Returns a result dict."""
+        because nothing matched voice embeddings.
+
+        The face belongs to someone who is not at the keyboard, so enrolment
+        stores nothing until the user confirms that person agreed, and the
+        confirmation is kept with the profile. Returns a result dict.
+        """
         name = _normalize(name)
         if not name:
             return {"ok": False, "error": "name required"}
         if name.startswith("_"):
             return {"ok": False, "error": "reserved name"}
+        if not consent:
+            return {"ok": False, "error": "consent not confirmed"}
 
         face_embs: List[np.ndarray] = []
         for f in (frames_b64 or []):
@@ -150,6 +159,7 @@ class PeopleRegistry:
         existing["face_embedding"] = mean_face.tolist()
         existing["n_face_examples"] = existing.get("n_face_examples", 0) + len(face_embs)
         existing["name"] = name
+        existing["consent_confirmed_at"] = time.time()
         self.profile["people"][name] = existing
         self._save()
         return {"ok": True, "name": name, "n_face": len(face_embs),

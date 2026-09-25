@@ -1475,11 +1475,12 @@ function refreshPeopleSubmitState() {
   const submit = document.getElementById('people-enrol-submit');
   const name = (document.getElementById('people-enrol-name').value || '').trim();
   const hasSample = _peopleEnrolFaceFrames.length > 0;
-  submit.disabled = !(name && hasSample);
+  const consent = document.getElementById('people-enrol-consent').checked;
+  submit.disabled = !(name && hasSample && consent);
 }
 
 document.addEventListener('input', e => {
-  if (e.target && e.target.id === 'people-enrol-name') refreshPeopleSubmitState();
+  if (e.target && ['people-enrol-name', 'people-enrol-consent'].includes(e.target.id)) refreshPeopleSubmitState();
 });
 
 async function submitPersonEnrolment() {
@@ -1491,6 +1492,7 @@ async function submitPersonEnrolment() {
       body: JSON.stringify({
         name,
         frames_b64: _peopleEnrolFaceFrames,
+        consent: document.getElementById('people-enrol-consent').checked,
       })
     });
     const data = await r.json();
@@ -1507,6 +1509,7 @@ function clearPersonEnrolment() {
   _peopleEnrolFaceFrames = [];
   document.getElementById('people-enrol-name').value = '';
   document.getElementById('people-face-count').textContent = '0 face frames';
+  document.getElementById('people-enrol-consent').checked = false;
   refreshPeopleSubmitState();
 }
 

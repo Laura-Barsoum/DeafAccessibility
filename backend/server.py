@@ -951,13 +951,14 @@ def people_list():
 
 @app.route("/people/enrol", methods=["POST"])
 def people_enrol():
-    """Body: {"name": "Sarah", "frames_b64": [<jpeg-b64>, ...]}. Face frames
-    only: voice is not recorded, since nothing matched voice embeddings."""
+    """Body: {"name": "Sarah", "frames_b64": [...], "consent": true}. Face frames
+    only: voice is not recorded, since nothing matched voice embeddings. The
+    enrolled person is not at the keyboard, so their agreement is confirmed here."""
     from modules.people import get_people
     data = request.get_json(force=True) or {}
     name = (data.get("name") or "").strip()
     frames = data.get("frames_b64") or []
-    res = get_people().enrol(name, frames)
+    res = get_people().enrol(name, frames, consent=bool(data.get("consent")))
     return jsonify(res), (200 if res.get("ok") else 400)
 
 

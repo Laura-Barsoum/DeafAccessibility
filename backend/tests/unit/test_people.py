@@ -119,9 +119,16 @@ class RegistryPersistenceTests(unittest.TestCase):
         res = self.reg.enrol("   ", frames_b64=[])
         self.assertFalse(res["ok"])
 
+    def test_enrolment_without_consent_is_refused(self):
+        """A face belongs to someone who is not at the keyboard."""
+        res = self.reg.enrol("Bob", frames_b64=["not-a-frame"])
+        self.assertFalse(res["ok"])
+        self.assertIn("consent", res.get("error", ""))
+        self.assertNotIn("Bob", self.reg.profile["people"])
+
     def test_no_samples_rejected(self):
         # We deliberately give no usable input → enrolment must fail cleanly
-        res = self.reg.enrol("Bob", frames_b64=[])
+        res = self.reg.enrol("Bob", frames_b64=[], consent=True)
         self.assertFalse(res["ok"])
         self.assertIn("no usable", res.get("error", ""))
 
