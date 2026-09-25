@@ -1,4 +1,4 @@
-"""[Final report: Figures 4.3 to 4.5]
+"""[Final report: Figures 4.3 to 4.6]
 
 Capture genuine screenshots of the running application.
 
@@ -133,12 +133,15 @@ try:
         page.click("#stop-btn")
         page.wait_for_timeout(3000)
         for tab, fname in (("#tab-personal", "tab_personal.png"), ("#tab-people", "tab_people.png"),
-                           ("#tab-diary", "tab_diary.png")):
+                           ("#tab-diary", "tab_diary.png"), ("#tab-summary", "tab_summary.png")):
             page.click(tab)
             page.wait_for_timeout(2500)
             if tab == "#tab-diary":
                 page.click("#diary-refresh")
                 page.wait_for_timeout(3000)
+            if tab == "#tab-summary":
+                page.click("#generate-summary")       # one language-model call on the session's events
+                page.wait_for_timeout(12000)
             page.screenshot(path=os.path.join(OUT, fname), full_page=True)
         json.dump(logs, open(os.path.join(OUT, "console.json"), "w"), indent=1)
         browser.close()
